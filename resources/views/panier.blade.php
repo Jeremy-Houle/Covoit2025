@@ -95,6 +95,6 @@
     </div>
     
     @endif
-    <button class="btn btn-success btn-home" onclick="location.href='{{ route('Acceuil') }}'">Retourner à l'accueil</button>
+    <button class="btn btn-success btn-home" onclick="location.href='/'">Retourner à l'accueil</button>
 </body>
 </html>
