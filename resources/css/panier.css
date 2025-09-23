@@ -1,0 +1,147 @@
+body {
+    background-color: #1A202C;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* padding: 20px; */
+}
+
+h1, h2 , h3 {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.list-group {
+    max-width: 700px;
+    background-color: #333333;
+    margin: 0 0 20px 30px; 
+    border-radius: 10px;
+    overflow: hidden ;
+    text-align: left;
+    
+}
+.fleche-image{
+    width: 300px;
+    height: 50px;
+    vertical-align: middle; 
+    margin: 0 5px;
+    filter: invert(100%);
+
+}
+.fleche-Tiny{
+    width: 100px;
+    height: 20px;
+    vertical-align: middle; 
+    margin: 0 5px;
+    filter: invert(100%);
+
+}
+.list-group-item {
+    
+    border: none;
+    background-color: #333333;
+    padding: 15px 20px;
+    font-size: 16px;
+    color: white;
+    display: flex;
+    text-align: center;
+}
+li#trajet-recap {
+    display: flex;
+    flex-direction: column;
+    background-color: #333333;
+    color: white;
+}
+
+#trajet-item {
+    display: flex;
+    align-items: center; 
+  
+}
+
+#trajet-recap {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+  
+}
+ 
+#trajets-reserves {
+    width: 70%;
+}
+
+.paiement {
+    border-radius: 10px;
+    display: inline-block;
+    background-color: #333333;
+    width: 40%;
+    padding: 20px;
+    align-self: flex-start;
+    margin-top: 65px;
+}
+
+button.btn-warning {
+    display: block;
+    margin: 20px auto;
+    padding: 12px 25px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+button.btn-warning:hover {
+    background-color: #ffc107cc;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-home {
+    margin-left: 145px;
+    margin-top: 50px;
+}
+
+/* Modal personnalisé */
+.modal-content {
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-title {
+    font-weight: 700;
+    color: #343a40;
+}
+
+.modal-body {
+    padding-top: 0;
+}
+
+.modal-body .form-control {
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.modal-body button.btn-success {
+    width: 100%;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.modal-body button.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
