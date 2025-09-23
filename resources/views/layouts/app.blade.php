@@ -2,8 +2,11 @@
 <html>
 <head>
     <title>@yield('title', 'Mon site')</title>
+    <link rel="stylesheet" href="{{ asset(path: 'css\site.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
-        body { margin:0; font-family: Arial, sans-serif; }
+        body { margin:0; font-family: Arial, sans-serif; background-color: rgb(202, 253, 251);}
         header {
             background: #1e3c72; /* bleu foncé */
             color: white;
