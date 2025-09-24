@@ -12,9 +12,7 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return view('about');
 });
-Route::get('/test', function () {
-    return view('test');
-});
+
 
 Route::get('/Panier', function () {
     $paiements = DB::table('Paiements as p')
