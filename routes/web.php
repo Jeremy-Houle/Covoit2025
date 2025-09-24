@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\cartController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PanierController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,3 +28,6 @@ Route::get('/Panier', function () {
     return view('panier', ['paiements' => $paiements]);
 })->name('Panier');
 
+
+Route::post('/payer/{conducteurId}/{utilisateurId}', [CartController::class, 'payerPanier'])
+    ->name('payer.panier');

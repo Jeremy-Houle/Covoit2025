@@ -1,4 +1,4 @@
-
+document.addEventListener('DOMContentLoaded', () => {
 const input = document.getElementById('dateExp');
 
 input.addEventListener('input', function(e) {
@@ -26,4 +26,29 @@ const inputCVV = document.getElementById('cvv');
 
 inputCVV.addEventListener('input', function() {
     this.value = this.value.replace(/\D/g, '');
+});
+
+ const priceElement = document.getElementById('price');
+    const paiements = JSON.parse(priceElement.dataset.paiements);
+
+    let total = 0;
+    paiements.forEach(paiement => {
+        total += paiement.Prix * paiement.NombrePlaces;
+    });
+
+    priceElement.innerText = 'Total : ' + total + ' $';
+
+
+    // const validationPriceElement = document.getElementById('ValidationPrice');
+    // const Validationpaiements = JSON.parse(validationPriceElement.dataset.paiements);
+
+    // let Validationtotal = 0;
+    // paiements.forEach(paiement => {
+    //     total += paiement.Prix * paiement.NombrePlaces;
+    // });
+
+    // validationPriceElement.innerText = 'confirmer le paiement de ' + Validationtotal + ' $';
+    
+
+    
 });

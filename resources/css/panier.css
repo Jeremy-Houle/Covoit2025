@@ -10,6 +10,10 @@ h1, h2 , h3 {
     margin-bottom: 30px;
     font-weight: 700;
 }
+hr{
+    color: white;
+    height: auto;
+}
 
 .container {
     display: flex;
@@ -76,6 +80,12 @@ li#trajet-recap {
     width: 70%;
 }
 
+#price {
+    text-align: center;
+    color: blue;
+    font-weight: bold;
+    font-size: 20px;
+}
 .paiement {
     border-radius: 10px;
     display: inline-block;
@@ -87,6 +97,7 @@ li#trajet-recap {
 }
 
 button.btn-warning {
+   background-color: #22c55e;
     display: block;
     margin: 20px auto;
     padding: 12px 25px;
