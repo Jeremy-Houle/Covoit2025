@@ -41,17 +41,17 @@
         <div class="small-card">
             <i class="fa-solid fa-magnifying-glass"></i>
             <h3 style="font-size: 30px;">1. Recherchez</h3>
-            <span>Parmis nos nombreux trajets</span>
+            <p>Parmis nos nombreux trajets</p>
         </div>
         <div class="small-card">
             <i class="fa-solid fa-money-check"></i>            
             <h3 style="font-size: 30px;">2. Réservez</h3>
-            <span>Facilement en ligne</span>
+            <p>Facilement en ligne</p>
         </div>
         <div class="small-card">
             <i class="fa-solid fa-suitcase-rolling"></i>
             <h3 style="font-size: 30px;">3. Voyagez</h3>
-            <span>Et le tour est joué!</span>
+            <p>Et le tour est joué!</p>
         </div>
     </div>
     
