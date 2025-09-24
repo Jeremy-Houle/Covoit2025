@@ -71,7 +71,6 @@
                 <div class="navbar">
                     <div class="navbar-center">
                         <a href="/">Accueil</a>
-                        <a href="/test">Test</a>
                         <a href="/cart">Panier</a>
                         <a href="/about">À propos</a>
                     </div>
