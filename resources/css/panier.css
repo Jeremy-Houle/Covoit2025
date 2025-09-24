@@ -81,8 +81,17 @@ li#trajet-recap {
 }
 
 #price {
+    display: block;
     text-align: center;
     color: blue;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+#ValidationPrice {
+    display: block;
+    text-align: center;
+    color: red;
     font-weight: bold;
     font-size: 20px;
 }

@@ -8,8 +8,13 @@ use Illuminate\Http\Request;
 class CartController extends Controller
 {
     public function payerPanier($p_conducteurId, $p_idUtilisateur)
-{
-    DB::statement("CALL PayerPanier(?, ?)", [$p_conducteurId, $p_idUtilisateur]);
-    return redirect()->route('Panier')->with('success', 'Paiement effectué!');
-}
+    {
+        DB::statement("CALL PayerPanier(?, ?)", [$p_conducteurId, $p_idUtilisateur]);
+        return redirect()->route('cart')->with('success', 'Paiement effectué!');
+    }
+
+    public function getidConducteur($p_Idpaiement)
+    {
+        return DB::select("CALL GetConducteurByPaiement(?)", [$p_Idpaiement]);
+    }
 }
