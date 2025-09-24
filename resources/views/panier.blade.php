@@ -60,8 +60,17 @@
           <span></span>
           <span id="price" data-paiements='@json($paiements)'>Total :</span>
 
-          <button type="submit" class="btn btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#paiementModal">
-            Payer le panier
+          <button type="button" class="btn btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#paiementModal">Voir le récapitulatif</button>
+
+          <h3 class="mt-3">Payer par conducteur</h3>
+          @foreach($paiements->groupBy('IdConducteur') as $conducteurId => $trajetsConducteur)
+            <form action="{{ route('payer.panier', [$conducteurId, session('utilisateur_id', 1)]) }}" method="POST" class="mb-2">
+              @csrf
+              <button type="submit" class="btn btn-success">
+                Payer les trajets de {{ $trajetsConducteur->first()->ConducteurPrenom ?? '' }} {{ $trajetsConducteur->first()->ConducteurNom ?? '' }}
+              </button>
+            </form>
+          @endforeach
       </div>
     </div>
 
@@ -71,7 +80,7 @@
     <!-- Modal paiement -->
     <div class="modal fade" id="paiementModal" tabindex="-1" aria-labelledby="paiementModalLabel" aria-hidden="true"
       data-bs-backdrop="static">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             
@@ -82,12 +91,11 @@
               <span id="ValidationPrice" data-paiements='@json($paiements)'>Total : </span>
             </div>
 
-            <form action="{{ route('payer.panier', [1, 2]) }}" method="POST">
-              @csrf
-              <button type="submit" class="btn btn-warning mb-3">
-                Valider le paiement
+            <div class="text-center">
+              <button type="button" class="btn btn-secondary mb-3" data-bs-dismiss="modal">
+                Fermer
               </button>
-            </form>
+            </div>
 
           </div>
         </div>

@@ -36,7 +36,7 @@ Route::get('/cart', function () {
         ->where('p.IdUtilisateur', session('utilisateur_id', 1))
         ->get();
     return view('panier', ['paiements' => $paiements]);
-});
+})->name('cart');
 
 Route::get('/connexion', [AuthController::class, 'afficherConnexion']);
 Route::post('/connexion', [AuthController::class, 'traiterConnexion']);
