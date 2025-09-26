@@ -1,167 +1,650 @@
+/* Variables CSS */
+:root {
+    --primary-color: #22c55e;
+    --secondary-color: #1A202C;
+    --card-bg: #2D3748;
+    --text-primary: #FFFFFF;
+    --text-secondary: #A0AEC0;
+    --border-color: #4A5568;
+    --success-color: #48BB78;
+    --warning-color: #ED8936;
+    --danger-color: #F56565;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Base styles */
 body {
-    background-color: #1A202C;
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #2D3748 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* padding: 20px; */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    color: var(--text-primary);
 }
 
-h1, h2 , h3 {
-    text-align: center;
-    color: white;
-    margin-bottom: 30px;
-    font-weight: 700;
-}
-hr{
-    color: white;
-    height: auto;
-}
-
-.container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.list-group {
-    max-width: 700px;
-    background-color: #333333;
-    margin: 0 0 20px 30px; 
-    border-radius: 10px;
-    overflow: hidden ;
-    text-align: left;
-    
-}
-.fleche-image{
-    width: 300px;
-    height: 50px;
-    vertical-align: middle; 
-    margin: 0 5px;
-    filter: invert(100%);
-
-}
-.fleche-Tiny{
-    width: 100px;
-    height: 20px;
-    vertical-align: middle; 
-    margin: 0 5px;
-    filter: invert(100%);
-
-}
-.list-group-item {
-    
-    border: none;
-    background-color: #333333;
-    padding: 15px 20px;
-    font-size: 16px;
-    color: white;
-    display: flex;
-    text-align: center;
-}
-li#trajet-recap {
-    display: flex;
-    flex-direction: column;
-    background-color: #333333;
-    color: white;
-}
-
-#trajet-item {
-    display: flex;
-    align-items: center; 
-  
-}
-
-#trajet-recap {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-  
-}
- 
-#trajets-reserves {
-    width: 70%;
-}
-
-#price {
-    display: block;
-    text-align: center;
-    color: blue;
-    font-weight: bold;
-    font-size: 20px;
-}
-
-#ValidationPrice {
-    display: block;
-    text-align: center;
-    color: red;
-    font-weight: bold;
-    font-size: 20px;
-}
-.paiement {
-    border-radius: 10px;
-    display: inline-block;
-    background-color: #333333;
-    width: 40%;
+.panier-container {
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
-    align-self: flex-start;
-    margin-top: 65px;
 }
 
-button.btn-warning {
-   background-color: #22c55e;
-    display: block;
-    margin: 20px auto;
-    padding: 12px 25px;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 50px;
+/* Header */
+.panier-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 0;
+}
+
+.panier-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.panier-header h1 i {
+    color: var(--primary-color);
+    margin-right: 15px;
+}
+
+.panier-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Empty cart */
+.empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--card-bg);
+    border-radius: 15px;
+    box-shadow: var(--shadow-lg);
+}
+
+.empty-cart-icon {
+    font-size: 4rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.empty-cart h3 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+
+.empty-cart p {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+/* Main content layout */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Trajets section */
+.trajets-section h2 {
+    color: var(--text-primary);
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+}
+
+.trajets-section h2 i {
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+/* Trajet card */
+.trajet-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
 }
 
-button.btn-warning:hover {
-    background-color: #ffc107cc;
+.trajet-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-lg);
 }
 
-.btn-home {
-    margin-left: 145px;
-    margin-top: 50px;
+.trajet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* Modal personnalisé */
-.modal-content {
+.conducteur-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.conducteur-info i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.conducteur-nom {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.trajet-status .badge {
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-waiting {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+/* Route display */
+.trajet-route {
+    margin-bottom: 20px;
+}
+
+.route-points {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.depart, .destination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.depart-icon {
+    color: var(--success-color);
+    font-size: 1.2rem;
+}
+
+.destination-icon {
+    color: var(--danger-color);
+    font-size: 1.2rem;
+}
+
+.point-label {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.route-arrow {
+    flex-shrink: 0;
+}
+
+.fleche-image {
+    width: 200px;
+    height: 40px;
+    filter: invert(100%);
+    opacity: 0.8;
+}
+
+/* Trajet details */
+.trajet-details {
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+
+.detail-item i {
+    color: var(--primary-color);
+    width: 16px;
+}
+
+/* Pricing */
+.trajet-pricing {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.price-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-item.total {
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding-top: 10px;
+    border-top: 1px solid rgba(34, 197, 94, 0.3);
+    margin-top: 5px;
+}
+
+.price-value {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Actions */
+.trajet-actions {
+    text-align: center;
+}
+
+.btn-pay {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #16a34a 100%);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.btn-pay:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #16a34a 0%, var(--primary-color) 100%);
+}
+
+.btn-pay i {
+    margin-right: 8px;
+}
+
+/* Summary section */
+.summary-section {
+    position: sticky;
+    top: 20px;
+}
+
+.summary-card {
+    background: var(--card-bg);
     border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    padding: 25px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
 }
 
-.modal-header {
+.summary-card h3 {
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.summary-card h3 i {
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+.summary-items {
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.summary-item:last-child {
     border-bottom: none;
 }
 
-.modal-title {
+.summary-route {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.route-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.fleche-Tiny {
+    width: 60px;
+    height: 12px;
+    filter: invert(100%);
+    opacity: 0.7;
+}
+
+.summary-price {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.summary-divider {
+    border-color: var(--border-color);
+    margin: 20px 0;
+}
+
+.total-section {
+    background: rgba(34, 197, 94, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.total-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-label {
     font-weight: 700;
-    color: #343a40;
+    font-size: 1.1rem;
+}
+
+.total-amount {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.summary-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(66, 153, 225, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(66, 153, 225, 0.2);
+}
+
+.summary-info p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.summary-info i {
+    color: #4299E1;
+    margin-right: 8px;
+}
+
+/* Messages d'alerte */
+.alert {
+    border-radius: 10px;
+    border: none;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(72, 187, 120, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+    border-left: 4px solid var(--success-color);
+    color: var(--success-color);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(245, 101, 101, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
+    border-left: 4px solid var(--danger-color);
+    color: var(--danger-color);
+}
+
+.alert i {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.alert .btn-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.alert .btn-close:hover {
+    opacity: 1;
+}
+
+/* Navigation footer */
+.navigation-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-home {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-home:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.btn-home i {
+    margin-right: 8px;
+}
+
+/* Modal styles */
+.modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.modal-title i {
+    color: var(--primary-color);
+    margin-right: 10px;
 }
 
 .modal-body {
-    padding-top: 0;
+    padding: 30px;
 }
 
-.modal-body .form-control {
-    border-radius: 8px;
-    padding: 10px;
+/* Contenu de confirmation de paiement */
+.payment-confirmation-content {
+    text-align: center;
 }
 
-.modal-body button.btn-success {
-    width: 100%;
-    font-size: 18px;
+.payment-confirmation-content .confirmation-icon {
+    font-size: 3rem;
+    color: var(--warning-color);
+    margin-bottom: 20px;
+}
+
+.payment-confirmation-content h4 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.payment-confirmation-content p {
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+}
+
+/* Montant total dans le modal */
+.montant-total {
+    background: rgba(34, 197, 94, 0.1);
+    border: 2px solid var(--primary-color);
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 25px;
+    text-align: center;
+}
+
+.montant-total .total-label {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.montant-total .total-amount {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Modal de succès */
+.payment-confirmation {
+    text-align: center;
+}
+
+.payment-confirmation .confirmation-icon.success {
+    font-size: 4rem;
+    color: var(--success-color);
+    margin-bottom: 20px;
+}
+
+.payment-confirmation h4 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.payment-confirmation p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 20px 30px;
+}
+
+.modal-footer .btn {
+    padding: 10px 25px;
     font-weight: 600;
-    padding: 12px;
-    border-radius: 50px;
+    border-radius: 25px;
     transition: all 0.3s ease;
 }
 
-.modal-body button.btn-success:hover {
+.modal-footer .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow);
+}
+
+/* Animation d'entrée du modal */
+.modal.fade .modal-dialog {
+    transform: translate(0, -50px);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: translate(0, 0);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .panier-header h1 {
+        font-size: 2rem;
+    }
+    
+    .trajet-card {
+        padding: 20px;
+    }
+    
+    .route-points {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .fleche-image {
+        width: 150px;
+        height: 30px;
+        transform: rotate(90deg);
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .summary-card {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .panier-container {
+        padding: 15px;
+    }
+    
+    .trajet-card {
+        padding: 15px;
+    }
+    
+    .panier-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .btn-pay {
+        width: 100%;
+        padding: 15px;
+    }
 }
