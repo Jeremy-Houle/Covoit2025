@@ -37,5 +37,7 @@ Route::get('/deconnexion', [AuthController::class, 'deconnexion']);
 
 Route::post('/payer-panier/{conducteurId}/{idUtilisateur}', [CartController::class, 'payerPanier'])->name('payer.panier');
 Route::get('/profil', [ProfilController::class, 'index']);
+Route::get('/edit-profil', [ProfilController::class, 'edit'])->name('profil.edit');
+Route::post('/edit-profil', [ProfilController::class, 'update'])->name('profil.update');
 
 

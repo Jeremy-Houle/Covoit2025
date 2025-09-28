@@ -57,6 +57,9 @@ body {
   height: 40px;
   border-radius: 50%;
   border: 2px solid #0c7d9a;
+  border: 1.5px solid  #40e0d0;
+  cursor: pointer;
+  
 }
 .quick-actions {
   margin-bottom: 32px;

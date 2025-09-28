@@ -5,9 +5,53 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 class ProfilController extends Controller
 {
+     // Afficher le formulaire d'édition
+    public function edit()
+    {
+        $userId = session('utilisateur_id');
+        if (!$userId) {
+            return redirect('/connexion');
+        }
+
+        $user = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+
+        return view('edit-profil', compact('user'));
+    }
+
+    // Mettre à jour les informations utilisateur
+public function update(Request $request)
+{
+    $userId = session('utilisateur_id');
+    if (!$userId) {
+        return redirect('/connexion');
+    }
+
+    $request->validate([
+        'Prenom' => 'required|string|max:50',
+        'Nom' => 'required|string|max:50',
+        'Courriel' => 'required|email|unique:Utilisateurs,Courriel,' . $userId . ',IdUtilisateur',
+        'MotDePasse' => 'nullable|min:6|confirmed',
+    ]);
+
+    $data = [
+        'Prenom' => $request->Prenom,
+        'Nom' => $request->Nom,
+        'Courriel' => $request->Courriel,
+    ];
+
+    if ($request->MotDePasse) {
+        $data['MotDePasse'] = Hash::make($request->MotDePasse);
+    }
+
+    DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->update($data);
+
+    // Redirige vers la page profil après sauvegarde
+    return redirect('/profil')->with('success', 'Profil mis à jour avec succès.');
+}
     public function index()
     {
         $userId = session('utilisateur_id');
