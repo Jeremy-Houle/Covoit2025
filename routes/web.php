@@ -15,24 +15,14 @@ Route::get('/about', function () {
 });
 
 
-Route::get('/Panier', function () {
-    $paiements = DB::table('Paiements as p')
-        ->join('Trajets as t', 'p.IdTrajet', '=', 't.IdTrajet')
-        ->leftJoin('Vehicules as v', 't.IdConducteur', '=', 'v.IdConducteur')
-        ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
-        ->select('p.*', 't.*', 'v.*', 'u.Nom as ConducteurNom', 'u.Prenom as ConducteurPrenom')
-        ->where('p.IdUtilisateur', 1)
-        ->get();
-    return view('panier', ['paiements' => $paiements]);
-})->name('Panier');
 
 Route::get('/cart', function () {
     $paiements = DB::table('Paiements as p')
         ->join('Trajets as t', 'p.IdTrajet', '=', 't.IdTrajet')
-        ->leftJoin('Vehicules as v', 't.IdConducteur', '=', 'v.IdConducteur')
         ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
-        ->select('p.*', 't.*', 'v.*', 'u.Nom as ConducteurNom', 'u.Prenom as ConducteurPrenom')
+        ->select('p.*', 't.*', 'u.Nom as ConducteurNom', 'u.Prenom as ConducteurPrenom')
         ->where('p.IdUtilisateur', session('utilisateur_id', 1))
+        ->distinct()
         ->get();
     return view('panier', ['paiements' => $paiements]);
 })->name('cart');
