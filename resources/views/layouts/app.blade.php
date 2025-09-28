@@ -73,6 +73,8 @@
                         <a href="/">Accueil</a>
                         <a href="/cart">Panier</a>
                         <a href="/about">À propos</a>
+                        <a href="/profil">Profil</a>
+
                     </div>
                 </div>
                 <div class="navbar-right">

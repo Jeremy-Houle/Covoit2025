@@ -4,6 +4,7 @@ use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfilController;
 
 Route::get('/', function () {
     return view('front-page');
@@ -45,4 +46,6 @@ Route::post('/inscription', [AuthController::class, 'traiterInscription']);
 Route::get('/deconnexion', [AuthController::class, 'deconnexion']);
 
 Route::post('/payer-panier/{conducteurId}/{idUtilisateur}', [CartController::class, 'payerPanier'])->name('payer.panier');
+Route::get('/profil', [ProfilController::class, 'index']);
+
 
