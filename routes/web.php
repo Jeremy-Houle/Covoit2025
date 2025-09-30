@@ -14,6 +14,10 @@ Route::get('/about', function () {
     return view('about');
 });
 
+Route::get('/about', function () {
+    return view('about');
+});
+
 
 
 Route::get('/cart', function () {
@@ -34,6 +38,7 @@ Route::get('/inscription', [AuthController::class, 'afficherInscription']);
 Route::post('/inscription', [AuthController::class, 'traiterInscription']);
 
 Route::get('/deconnexion', [AuthController::class, 'deconnexion']);
+
 
 Route::post('/payer-panier/{conducteurId}/{idUtilisateur}', [CartController::class, 'payerPanier'])->name('payer.panier');
 Route::get('/profil', [ProfilController::class, 'index']);
