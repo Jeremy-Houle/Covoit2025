@@ -3,7 +3,7 @@
 @section('title', 'Acceuil')
 
 @section('content')
-<div class="centered-div-acceuil div-top-section-acceuil acceuil-background-img" style="color: white">
+<div class="centered-div-acceuil div-top-section-acceuil acceuil-background-img" style="color: white;">
     <h1>Voyagez ensemble aujourd'hui, <br> économisez ensemble toujours</h1>
     <p>Découvrez comment nos utilisateurs fidèle voyagent avec CoRide</p>
     <div style="display: flex; text-align: center;">
@@ -76,7 +76,7 @@
     <h1>Prêt à vous lancer?</h1>
     <p style="font-size: 20px;">Simple comme bonjour! Gratuit. Facile. Avantageux.</p>
 
-        <form action="POST">
+        <form action="/inscription">
             <input type="submit" value="Créer un compte gratuitement" class="button">
         </form>
     

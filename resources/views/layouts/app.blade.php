@@ -9,7 +9,7 @@
     <style>
         * { box-sizing: border-box; }
         html { overflow-x: hidden; width: 100%; height: 100%; }
-        body { margin:0; padding: 0; font-family: Arial, sans-serif; background: linear-gradient(135deg, #87CEEB, #B0E0E6); overflow-x: hidden; width: 100%; max-width: 100vw;}
+        body { margin:0; padding: 0; font-family: Arial, sans-serif; background: linear-gradient(135deg, #87CEEB, white /* ancienne couleur etait #B0E0E6 si vous voulez la remettre*/); overflow-x: hidden; width: 100%; max-width: 100vw;}
         header {
             background: #1e3c72; /* bleu foncé */
             color: white;
