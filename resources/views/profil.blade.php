@@ -1,32 +1,28 @@
-<!DOCTYPE html>
-<html lang="fr">
+@extends('layouts.app')
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profil {{ $user->Prenom }} {{ $user->Nom }}</title>
+@section('title', 'Profil ' . $user->Prenom . ' ' . $user->Nom)
+
+@push('styles')
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  @vite(['resources/css/app.css', 'resources/css/profil.css', 'resources/js/app.js'])
-</head>
+  @vite(['resources/css/profil.css'])
+@endpush
 
-<body>
+@section('content')
+<div class="profil-page">
+  <div class="profil-title-section">
+    <h1>Bonjour {{ $user->Prenom }} {{ $user->Nom }} !</h1>
+    <p>Voici un aperçu de votre activité d'aujourd'hui</p>
+    <div class="profil-actions">
+      <a href="/edit-profil" class="btn-edit-profil">
+        <i class="fas fa-edit"></i> Modifier mon profil
+      </a>
+    </div>
+  </div>
+  
   <div class="dashboard">
-    <header class="header">
-      <div class="header-left">
-        <h1>Bonjour {{ $user->Prenom }} {{ $user->Nom }} !</h1>
-        <p>Voici un aperçu de votre activité d'aujourd'hui</p>
-      </div>
-      <div class="header-right" onclick="window.location.href='/edit-profil'">
-        <div class="profile-avatar">
-          <img src="https://dummyimage.com/40x40/cffafe/000000&text={{ Str::upper(substr($user->Nom, 0, 2)) }}">
-
-        </div>
-      </div>
-    </header>
 
     <main class="main-content">
-      <!-- Actions rapides -->
       <section class="quick-actions">
         <h2>Actions rapides</h2>
         <div class="actions-grid">
@@ -92,9 +88,7 @@
       </section>
 
       <div class="content-grid">
-        <!-- Colonne gauche -->
         <div class="left-column">
-          <!-- Statistiques -->
           <section class="stats-section">
             <h2>Vos statistiques</h2>
             <div class="stats-grid">
@@ -111,7 +105,6 @@
             </div>
           </section>
 
-          <!-- Activité récente -->
           <section class="activity-section">
             <div class="section-header">
               <h2>Activité récente</h2>
@@ -132,9 +125,7 @@
           </section>
         </div>
 
-        <!-- Colonne droite -->
         <div class="right-column">
-          <!-- Prochaines réservations -->
           <section class="bookings-section">
             <h2>Prochaines réservations</h2>
             @forelse($prochainesReservations as $resa)
@@ -159,7 +150,6 @@
             @endforelse
           </section>
 
-          <!-- Messages récents -->
           <section class="messages-section">
             <div class="section-header">
               <h2>Messages récents</h2>
@@ -184,6 +174,5 @@
       </div>
     </main>
   </div>
-</body>
-
-</html>
+</div>
+@endsection

@@ -7,6 +7,7 @@
 @endpush
 
 @section('content')
+<div class="auth-page connexion-page">
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
@@ -66,5 +67,6 @@
             <p><a href="#" class="forgot-password">Mot de passe oublié ?</a></p>
         </div>
     </div>
+</div>
 </div>
 @endsection

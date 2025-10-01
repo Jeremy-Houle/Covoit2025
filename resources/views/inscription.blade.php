@@ -7,6 +7,7 @@
 @endpush
 
 @section('content')
+<div class="auth-page inscription-page">
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
@@ -76,5 +77,6 @@
             <p class="terms">En vous inscrivant, vous acceptez nos <a href="#">conditions d'utilisation</a></p>
         </div>
     </div>
+</div>
 </div>
 @endsection

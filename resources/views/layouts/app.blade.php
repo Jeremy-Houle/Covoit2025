@@ -13,85 +13,126 @@
         header {
             background: #1e3c72;
             color: white;
-            padding: 15px 0;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-            border-radius: 0 0 12px 12px;
-            position: fixed;   /* <-- Changer sticky à fixed */
+            padding: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: fixed;
             top: 0;
-            width: 100%;       /* <-- Ajoute cette ligne */
+            width: 100%;
             z-index: 100;
-            height: 70px;
+            height: 60px;
         }
             .navbar {
                 display: flex;
-                align-items: center;        /* centre verticalement tous les enfants */
+                align-items: center;        
                 justify-content: space-between;
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 20px;
+                max-width: 100%;
+                margin: 0;
+                padding: 0 15px;
                 position: relative;
-                height: 100%;
+                height: 60px;
+                width: 100%;
             }
             .navbar-logo {
                 display: flex;
-                align-items: center;        /* centre verticalement le contenu du logo */
-                justify-content: center;    /* centre horizontalement */
-                font-size: 1.3em;
+                align-items: center;        
+                justify-content: flex-start;
+                font-size: 1.2em;
                 font-weight: bold;
                 color: #ffd700;
-                flex: 1;
-                height: 100%;               /* occupe toute la hauteur du header */
+                flex-shrink: 0;          
+                height: 60px;              
+                margin-left: 0;
+                padding-left: 0;
             }
             .navbar-logo i {
                 margin-right: 8px;
             }
             .navbar-center {
                 display: flex;
-                gap: 40px;
+                gap: 12px;
                 align-items: center;
-                justify-content: center; /* <-- Ajouté pour centrer horizontalement */
-                flex: 1;                 /* <-- Ajouté pour occuper l'espace disponible */
-                height: 100%;
-                position: static; /* modifié */
-                transform: none;  /* modifié */
+                justify-content: center; 
+                flex: 1;                 
+                height: 60px;
+                position: static;
+                transform: none;
+                flex-wrap: nowrap;       
+                overflow: hidden;      
             }
             .navbar-right {
                 display: flex;
-                gap: 20px;
+                gap: 15px;
                 align-items: center;
-                position: static; /* modifié */
-                transform: none;  /* modifié */
-                margin-left: auto; /* Ajouté */
+                position: static;
+                transform: none;
+                flex-shrink: 0;    
+                height: 60px;
                 z-index: 11;
+                margin-right: 0;
+                padding-right: 0;
             }
         .navbar a, .navbar-right a {
             color: white;
             text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1em;
+            font-weight: 600;
+            font-size: 0.85em;
             transition: color 0.2s, border-bottom 0.2s;
             border-bottom: 2px solid transparent;
             white-space: nowrap;
+            padding: 2px 4px;
+            display: flex;
+            align-items: center;
+            height: 100%;
         }
-        .navbar a:hover, .navbar-right a:hover {
+        
+        .navbar-right a:not(.btn-logout) {
+            height: 100%;
+        }
+        .navbar a:hover, .navbar-right a:not(.btn-logout):hover {
             color: #ffd700;
             border-bottom: 2px solid #ffd700;
         }
         .navbar-right span {
             color: #ffd700;
-            font-weight: bold;
-            font-size: 1.1em;
+            font-weight: 600;
+            font-size: 0.85em;
             white-space: nowrap;
+            padding: 2px 4px;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .btn-logout {
+            background: #dc3545 !important;
+            color: white !important;
+            padding: 3px 6px !important;
+            border-radius: 4px !important;
+            text-decoration: none !important;
+            font-size: 0.7em !important;
+            font-weight: 500 !important;
+            border-bottom: none !important;
+            transition: background-color 0.2s ease !important;
+            height: auto !important;
+            display: inline-block !important;
+            line-height: 1.2 !important;
+            vertical-align: middle !important;
+        }
+        
+        .btn-logout:hover {
+            background: #c82333 !important;
+            color: white !important;
+            border-bottom: none !important;
         }
 
         @media (max-width: 768px) {
             header {
-                height: auto;
+                min-height: auto;
                 padding: 10px 0;
             }
             .navbar {
                 flex-direction: column;
-                align-items: center; /* <-- Change ici pour centrer tous les éléments */
+                align-items: center; 
                 padding: 0 10px;
                 height: auto;
             }
@@ -100,7 +141,7 @@
                 margin-bottom: 10px;
                 justify-content: center;
                 width: 100%;
-                text-align: center;   /* <-- Ajoute ceci pour centrer le texte/logo */
+                text-align: center;   
             }
             .navbar-center,
             .navbar-right {
@@ -117,9 +158,8 @@
             }
             .navbar.open .navbar-center,
             .navbar.open .navbar-right {
-                max-height: 500px;
+                max-height: 800px;
                 opacity: 1;
-                /* SUPPRIME animation: slideDown ... */
             }
             @keyframes slideDown {
                 from { opacity: 0; transform: translateY(-20px);}
@@ -148,7 +188,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
-                align-items: center;   /* <-- Centré au lieu de droite */
+                align-items: center;  
                 width: 100%;
                 margin: 0;
                 animation: slideDown 1.3s;
@@ -167,17 +207,23 @@
                     </button>
                     <div class="navbar-center">
                         <a href="/">Accueil</a>
-                        <a href="/cart">Panier</a>
+                        <a href="/rechercher">Rechercher</a>
+                        <a href="/publier">Publier</a>
+                        <a href="/mes-reservations">Mes Réservations</a>
+                        <a href="/tarifs">Tarifs</a>
                         <a href="/about">À propos</a>
-                        <a href="/profil">Profil</a>
+                        <a href="/faq">FAQ</a>
+                        <a href="/contact">Contact</a>
+                        <a href="/cart">Panier</a>
                     </div>
                     <div class="navbar-right">
                         @if(session('utilisateur_id'))
                             <span>
                                 Bonjour {{ session('utilisateur_prenom') }} 
-                                <small style="font-size: 0.9em; opacity: 0.8;">({{ session('utilisateur_role') }})</small>
+                                <small style="font-size: 0.8em; opacity: 0.8;">({{ session('utilisateur_role') }})</small>
                             </span>
-                            <a href="/deconnexion" style="background: #dc3545; padding: 8px 15px; border-radius: 5px; text-decoration: none;">Déconnexion</a>
+                            <a href="/profil">Mon Profil</a>
+                            <a href="/deconnexion" class="btn-logout">Déconnexion</a>
                         @else
                             <a href="/connexion">Connexion</a>
                             <a href="/inscription">Inscription</a>
@@ -185,11 +231,12 @@
                     </div>
                 </div>
             </header>
-    <main style="margin-top: 90px;">  <!-- Ajoute une marge pour ne pas cacher le contenu sous le header -->
+    <main style="margin-top: 0; padding-top: 0;">  
         @yield('content')
     </main>
+    
+    @include('layouts.footer')
     <script>
-        // Affiche le bouton hamburger sur mobile
         function handleNavbarToggleDisplay() {
             const toggle = document.getElementById('navbarToggle');
             if (window.innerWidth <= 768) {
@@ -202,7 +249,6 @@
         window.addEventListener('resize', handleNavbarToggleDisplay);
         window.addEventListener('DOMContentLoaded', handleNavbarToggleDisplay);
 
-        // Ouvre/ferme le menu
         document.addEventListener('DOMContentLoaded', function() {
             const navbar = document.querySelector('.navbar');
             const toggle = document.getElementById('navbarToggle');

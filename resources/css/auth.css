@@ -2,16 +2,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: calc(100vh - 60px); 
     background: linear-gradient(135deg, #87CEEB, #B0E0E6);
-    padding: 5px;
-    overflow: hidden;
-    width: 100vw;
+    padding: 40px 5px 0 5px; 
+    width: 100%;
     box-sizing: border-box;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
+    margin: 0; 
 }
 
 .auth-card {
@@ -22,12 +18,9 @@
     width: 100%;
     max-width: 380px;
     text-align: center;
-    max-height: calc(100vh - 120px);
-    overflow: hidden;
     box-sizing: border-box;
     position: relative;
     z-index: 1;
-    margin-top: 80px;
 }
 
 .auth-header h1 {
@@ -272,13 +265,32 @@
     border: 1px solid #f5c6cb;
 }
 
-/* Force l'absence de scroll sur les pages d'authentification */
+.auth-page {
+    min-height: 100vh;
+    padding-top: 60px; 
+    padding-bottom: 0; 
+    width: 100%;
+    margin-bottom: 0; 
+}
+
 body {
-    overflow: hidden !important;
     background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 html {
-    overflow: hidden !important;
     background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.auth-page + .site-footer,
+.auth-page ~ .site-footer {
+    margin-top: 0 !important;
+}
+
+body:has(.auth-page) main {
+    margin: 0 !important;
+    padding: 0 !important;
 }

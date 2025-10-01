@@ -1,12 +1,57 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Modifier mon profil</title>
+@extends('layouts.app')
+
+@section('title', 'Modifier mon profil')
+
+@push('styles')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="p-5">
+    <style>
+        .edit-profil-page {
+            background: #ffffff;
+            min-height: 100vh; 
+            margin: 0;
+            padding: 0;
+            padding-top: 60px;
+            padding-bottom: 0; 
+            width: 100%;
+        }
+        
+        .edit-profil-title-section {
+            text-align: center;
+            padding: 30px 20px;
+            margin: 0;
+            width: 100%;
+            background: #ffffff;
+        }
+        
+        .edit-profil-title-section h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: black;
+            margin-bottom: 4px;
+            display: block;
+        }
+        
+        .edit-profil-title-section p {
+            color: #686868;
+            font-size: 14px;
+            margin: 0;
+            margin-bottom: 20px;
+        }
+        
+        .edit-profil-title-section i {
+            color: #0c7d9a;
+            margin-right: 10px;
+        }
+    </style>
+@endpush
+
+@section('content')
+<div class="edit-profil-page">
+    <div class="edit-profil-title-section">
+        <h1><i class="fas fa-user-edit"></i> Modifier mon profil</h1>
+        <p>Mettez à jour vos informations personnelles</p>
+    </div>
 
     <div class="container mt-5">
         <h2>Modifier mon profil</h2>
@@ -51,6 +96,5 @@
             <a href="/profil" class="btn btn-secondary">Annuler</a>
         </form>
     </div>
-
-</body>
-</html>
+</div>
+@endsection

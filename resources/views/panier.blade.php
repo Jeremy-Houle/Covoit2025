@@ -1,22 +1,21 @@
-<!DOCTYPE html>
-<html lang="fr">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Panier - Covoit</title>
+@section('title', 'Mon Panier - Covoit')
+
+@push('styles')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/css/panier.css', 'resources/js/app.js', 'resources/js/panier.js'])
-</head>
+    @vite(['resources/css/panier.css', 'resources/js/panier.js'])
+@endpush
 
-<body>
+@section('content')
+<div class="panier-page">
+    <div class="panier-title-section">
+        <h1><i class="fas fa-shopping-cart"></i> Mon Panier</h1>
+        <p class="panier-subtitle">Gérez vos réservations de covoiturage</p>
+    </div>
+    
     <div class="panier-container">
-        <header class="panier-header">
-            <h1><i class="fas fa-shopping-cart"></i> Mon Panier</h1>
-            <p class="panier-subtitle">Gérez vos réservations de covoiturage</p>
-        </header>
 
         @if($paiements->isEmpty())
             <div class="empty-cart">
@@ -30,7 +29,6 @@
                 </a>
             </div>
         @else
-            <!-- Messages de feedback -->
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fas fa-check-circle"></i>
@@ -175,7 +173,6 @@
         </div>
     </div>
 
-    <!-- Modal de confirmation de paiement -->
     <div class="modal fade" id="paymentConfirmationModal" tabindex="-1" aria-labelledby="paymentConfirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -214,7 +211,6 @@
         </div>
     </div>
 
-    <!-- Modal de succès de paiement -->
     <div class="modal fade" id="paymentSuccessModal" tabindex="-1" aria-labelledby="paymentSuccessModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -241,6 +237,5 @@
             </div>
         </div>
     </div>
-</body>
-
-</html>
+</div>
+@endsection

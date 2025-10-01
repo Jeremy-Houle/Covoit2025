@@ -1,5 +1,4 @@
-/* Variables CSS */
-:root {
+.panier-page {
     --primary-color: #22c55e;
     --secondary-color: #1A202C;
     --card-bg: #2D3748;
@@ -13,48 +12,163 @@
     --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
-/* Base styles */
-body {
+body > header {
+    background: #1e3c72 !important;
+    color: white !important;
+    padding: 0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    position: fixed !important;
+    top: 0 !important;
+    width: 100% !important;
+    z-index: 100 !important;
+    height: 60px !important;
+}
+
+body > header * {
+    font-family: Arial, sans-serif !important;
+    color: white !important;
+}
+
+body > header .navbar-logo,
+body > header .navbar-logo *,
+body > header .navbar-right span,
+body > header .navbar-right span * {
+    color: #ffd700 !important; 
+}
+
+body > header i,
+body > header .fa,
+body > header .fas,
+body > header .far,
+body > header .fab {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
+}
+
+body > header .navbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 15px !important;
+    position: relative !important;
+    height: 60px !important;
+    width: 100% !important;
+}
+
+body > header .navbar-logo,
+body > header .navbar-center,
+body > header .navbar-right {
+    display: flex !important;
+    align-items: center !important;
+    height: 60px !important;
+}
+
+body > header .navbar-logo,
+body > header .navbar-logo * {
+    color: #ffd700 !important; 
+    font-weight: bold !important;
+}
+
+body > header .navbar-right span,
+body > header .navbar-right span * {
+    color: #ffd700 !important; 
+}
+
+body > header .navbar-logo i {
+    color: #ffd700 !important; 
+}
+
+body > header .navbar-center {
+    gap: 12px !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    overflow: hidden !important;
+}
+
+body > header .navbar-right {
+    gap: 15px !important;
+    flex-shrink: 0 !important;
+}
+
+body > header .navbar a {
+    color: white !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    font-size: 0.85em !important;
+    padding: 2px 4px !important;
+    white-space: nowrap !important;
+}
+
+.panier-page {
     background: linear-gradient(135deg, var(--secondary-color) 0%, #2D3748 100%);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh; 
     margin: 0;
     padding: 0;
-    min-height: 100vh;
+    padding-top: 60px; 
+    padding-bottom: 0; 
+    width: 100%;
+}
+
+.panier-page *:not(header):not(header *):not(i):not(.fa):not(.fas):not(.far):not(.fab) {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-primary);
+}
+
+.panier-page i,
+.panier-page .fa,
+.panier-page .fas,
+.panier-page .far,
+.panier-page .fab {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
 }
 
 .panier-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 20px; 
 }
 
-/* Header */
-.panier-header {
+.panier-title-section {
     text-align: center;
-    margin-bottom: 40px;
-    padding: 30px 0;
+    padding: 30px 20px;
+    margin: 0;
+    width: 100%;
 }
 
-.panier-header h1 {
-    font-size: 2.5rem;
+.panier-title-section h1 {
+    font-size: 2rem;
     font-weight: 700;
     margin-bottom: 10px;
     color: var(--text-primary);
+    display: block;
 }
 
-.panier-header h1 i {
+.panier-title-section h1 i {
     color: var(--primary-color);
     margin-right: 15px;
 }
 
 .panier-subtitle {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--text-secondary);
     margin: 0;
+    opacity: 0.9;
+    display: block; 
 }
 
-/* Empty cart */
 .empty-cart {
     text-align: center;
     padding: 60px 20px;
@@ -79,7 +193,6 @@ body {
     margin-bottom: 30px;
 }
 
-/* Main content layout */
 .main-content {
     display: grid;
     grid-template-columns: 1fr 350px;
@@ -87,7 +200,6 @@ body {
     align-items: start;
 }
 
-/* Trajets section */
 .trajets-section h2 {
     color: var(--text-primary);
     margin-bottom: 25px;
@@ -99,7 +211,6 @@ body {
     margin-right: 10px;
 }
 
-/* Trajet card */
 .trajet-card {
     background: var(--card-bg);
     border-radius: 15px;
@@ -152,7 +263,6 @@ body {
     color: white;
 }
 
-/* Route display */
 .trajet-route {
     margin-bottom: 20px;
 }
@@ -220,7 +330,6 @@ body {
     width: 16px;
 }
 
-/* Pricing */
 .trajet-pricing {
     margin-bottom: 20px;
     padding: 15px;
@@ -254,7 +363,6 @@ body {
     font-weight: 600;
 }
 
-/* Actions */
 .trajet-actions {
     text-align: center;
 }
@@ -281,7 +389,6 @@ body {
     margin-right: 8px;
 }
 
-/* Summary section */
 .summary-section {
     position: sticky;
     top: 20px;
@@ -394,7 +501,6 @@ body {
     margin-right: 8px;
 }
 
-/* Messages d'alerte */
 .alert {
     border-radius: 10px;
     border: none;
@@ -439,7 +545,6 @@ body {
     opacity: 1;
 }
 
-/* Navigation footer */
 .navigation-footer {
     text-align: center;
     margin-top: 40px;
@@ -471,7 +576,6 @@ body {
     margin-right: 8px;
 }
 
-/* Modal styles */
 .modal-content {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -497,7 +601,6 @@ body {
     padding: 30px;
 }
 
-/* Contenu de confirmation de paiement */
 .payment-confirmation-content {
     text-align: center;
 }
@@ -520,7 +623,6 @@ body {
     font-size: 1.1rem;
 }
 
-/* Montant total dans le modal */
 .montant-total {
     background: rgba(34, 197, 94, 0.1);
     border: 2px solid var(--primary-color);
@@ -544,7 +646,6 @@ body {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Modal de succès */
 .payment-confirmation {
     text-align: center;
 }
@@ -584,7 +685,6 @@ body {
     box-shadow: var(--shadow);
 }
 
-/* Animation d'entrée du modal */
 .modal.fade .modal-dialog {
     transform: translate(0, -50px);
     transition: transform 0.3s ease-out;
@@ -594,7 +694,6 @@ body {
     transform: translate(0, 0);
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
     .main-content {
         grid-template-columns: 1fr;
