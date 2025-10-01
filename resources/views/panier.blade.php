@@ -3,7 +3,11 @@
 @section('title', 'Mon Panier - Covoit2025')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/panier.css') }}?v={{ time() }}">
+@vite(['resources/css/panier.css'])
+@endpush
+
+@push('scripts')
+@vite(['resources/js/panier.js'])
 @endpush
 
 @section('content')
@@ -33,6 +37,13 @@
                 <div class="alert alert-success">
                     <i class="fas fa-check-circle"></i>
                     {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('payment_success'))
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('payment_success') }}
                 </div>
             @endif
 
@@ -95,7 +106,8 @@
                                 <div class="price-breakdown">
                                     <div class="price-item">
                                         <span>Prix par personne :</span>
-                                        <span class="price-value">{{ $paiement->Prix }} $</span>
+                                        <span class="price-value">{{ $paiement->NombrePlaces > 0 ? number_format($paiement->Montant / $paiement->NombrePlaces, 2) : '0.00' }} $</span>
+                                        <!-- Debug: Montant={{ $paiement->Montant }}, Places={{ $paiement->NombrePlaces }}, Calcul={{ $paiement->Montant / $paiement->NombrePlaces }} -->
                                     </div>
                                     <div class="price-item">
                                         <span>Nombre de places :</span>
@@ -154,7 +166,7 @@
                         <div class="total-section">
                             <div class="total-item">
                                 <span class="total-label">Total général :</span>
-                                <span class="total-amount">25,50 $</span>
+                                <span class="total-amount" data-paiements="{{ $paiements->pluck('Montant')->toJson() }}">Calcul en cours...</span>
                             </div>
                         </div>
 
@@ -166,4 +178,56 @@
 
     </div>
 </div>
+
+<!-- Modal de confirmation de paiement -->
+<div class="modal fade" id="paymentConfirmationModal" tabindex="-1" aria-labelledby="paymentConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentConfirmationModalLabel">
+                    <i class="fas fa-credit-card"></i> Confirmation de paiement
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="payment-summary">
+                    <h6><i class="fas fa-route"></i> Détails du trajet</h6>
+                    <div class="trajet-details-modal">
+                        <p><strong>Conducteur :</strong> <span id="modalConducteur"></span></p>
+                        <p><strong>Trajet :</strong> <span id="modalDepart"></span> → <span id="modalDestination"></span></p>
+                        <p><strong>Date :</strong> <span id="modalDate"></span> à <span id="modalHeure"></span></p>
+                        <p><strong>Places :</strong> <span id="modalPlaces"></span></p>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="payment-amount">
+                        <h6><i class="fas fa-dollar-sign"></i> Montant à payer</h6>
+                        <div class="amount-display">
+                            <span id="modalMontant" class="amount-value"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-warning">
+                        
+                           
+                       
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+                <form id="confirmPaymentForm" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-credit-card"></i> Confirmer le paiement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection

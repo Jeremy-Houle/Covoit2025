@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Fonction pour calculer le total des paiements
-    function calculateTotal(paiements) {
+    function calculateTotal(montants) {
         let total = 0;
-        paiements.forEach(paiement => {
-            total += Number(paiement.Montant) || 0;
+        montants.forEach(montant => {
+            total += Number(montant) || 0;
         });
         return total;
     }
@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Calculer et afficher le total général
     const totalElement = document.querySelector('.total-amount');
+    console.log('DEBUG - Élément trouvé:', totalElement);
+    console.log('DEBUG - Dataset:', totalElement?.dataset);
+    console.log('DEBUG - data-paiements:', totalElement?.dataset?.paiements);
+    
     if (totalElement && totalElement.dataset && totalElement.dataset.paiements) {
         try {
             const paiements = JSON.parse(totalElement.dataset.paiements);
@@ -27,6 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Erreur lors du calcul du total:', e);
             totalElement.textContent = 'Erreur de calcul';
         }
+    } else if (totalElement) {
+        // Si pas de données, afficher 0
+        totalElement.textContent = formatPrice(0);
+        console.log('Aucune donnée de paiement trouvée, total affiché: 0');
     }
 
     // Calculer et afficher le montant dans le modal de paiement
@@ -138,13 +146,48 @@ document.addEventListener('DOMContentLoaded', () => {
             const utilisateurId = this.dataset.utilisateurId;
             const paiementId = this.dataset.paiementId;
             const montant = this.dataset.montant;
+            const conducteurNom = this.dataset.conducteurNom;
+            const depart = this.dataset.depart;
+            const destination = this.dataset.destination;
+            const date = this.dataset.date;
+            const heure = this.dataset.heure;
+            const places = this.dataset.places;
             
-            // Afficher le montant dans le modal
+            // Remplir le modal avec les données
+            document.getElementById('modalConducteur').textContent = conducteurNom;
+            document.getElementById('modalDepart').textContent = depart;
+            document.getElementById('modalDestination').textContent = destination;
+            document.getElementById('modalDate').textContent = date;
+            document.getElementById('modalHeure').textContent = heure;
+            document.getElementById('modalPlaces').textContent = places;
             document.getElementById('modalMontant').textContent = `${montant} $`;
             
             // Configurer l'action du formulaire de confirmation
             const confirmForm = document.getElementById('confirmPaymentForm');
             confirmForm.action = `/payer-panier/${conducteurId}/${utilisateurId}/${paiementId}`;
+            
+            // Vérifier que le modal existe et l'ouvrir
+            const modal = document.getElementById('paymentConfirmationModal');
+            const warningElement = document.getElementById('paymentWarning');
+            
+            // Afficher l'avertissement seulement si le montant est > 0
+            if (parseFloat(montant) > 0) {
+                warningElement.style.display = 'block';
+            } else {
+                warningElement.style.display = 'none';
+            }
+            
+            if (modal) {
+                const bootstrapModal = new bootstrap.Modal(modal, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                bootstrapModal.show();
+            } else {
+                console.error('Modal non trouvé');
+            }
+            
         });
     });
 
@@ -165,12 +208,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (paymentConfirmationModal) {
         // Événement quand le modal est complètement fermé
         paymentConfirmationModal.addEventListener('hidden.bs.modal', function() {
+            // Nettoyer le backdrop s'il reste
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            
+            // Réinitialiser le body
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
             // Réinitialiser tous les boutons de paiement
             const allPaymentButtons = document.querySelectorAll('.btn-pay');
             allPaymentButtons.forEach(button => {
                 button.innerHTML = '<i class="fas fa-credit-card"></i> Payer ce trajet';
                 button.disabled = false;
             });
+            
+            // Cacher l'avertissement
+            const warningElement = document.getElementById('paymentWarning');
+            if (warningElement) {
+                warningElement.style.display = 'none';
+            }
         });
 
         // Événement quand le modal commence à se fermer
