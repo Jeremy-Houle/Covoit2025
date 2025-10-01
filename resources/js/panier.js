@@ -136,17 +136,41 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             
           
+            // Récupérer les données du trajet
             const conducteurId = this.dataset.conducteurId;
             const utilisateurId = this.dataset.utilisateurId;
             const paiementId = this.dataset.paiementId;
             const montant = this.dataset.montant;
+            const conducteurNom = this.dataset.conducteurNom;
+            const depart = this.dataset.depart;
+            const destination = this.dataset.destination;
+            const date = this.dataset.date;
+            const heure = this.dataset.heure;
+            const places = this.dataset.places;
             
-           
+            // Remplir le modal avec les données
+            document.getElementById('modalConducteur').textContent = conducteurNom;
+            document.getElementById('modalDepart').textContent = depart;
+            document.getElementById('modalDestination').textContent = destination;
+            document.getElementById('modalDate').textContent = date;
+            document.getElementById('modalHeure').textContent = heure;
+            document.getElementById('modalPlaces').textContent = places;
             document.getElementById('modalMontant').textContent = `${montant} $`;
             
-           
+            // Configurer l'action du formulaire de confirmation
             const confirmForm = document.getElementById('confirmPaymentForm');
             confirmForm.action = `/payer-panier/${conducteurId}/${utilisateurId}/${paiementId}`;
+            
+            // Ouvrir le modal
+            const modal = document.getElementById('paymentConfirmationModal');
+            if (modal) {
+                const bootstrapModal = new bootstrap.Modal(modal, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                bootstrapModal.show();
+            }
         });
     });
 
@@ -167,7 +191,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (paymentConfirmationModal) {
        
         paymentConfirmationModal.addEventListener('hidden.bs.modal', function() {
+            // Nettoyer le backdrop s'il reste
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
             
+            // Réinitialiser le body
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            // Réinitialiser tous les boutons de paiement
             const allPaymentButtons = document.querySelectorAll('.btn-pay');
             allPaymentButtons.forEach(button => {
                 button.innerHTML = '<i class="fas fa-credit-card"></i> Payer ce trajet';
@@ -228,6 +261,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 5000);
     });
+
+    // Fonction globale pour nettoyer les backdrops
+    window.cleanupModalBackdrops = function() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    };
+
+    // Nettoyer automatiquement les backdrops toutes les 2 secondes (sécurité)
+    setInterval(() => {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        if (backdrops.length > 0 && !document.querySelector('.modal.show')) {
+            window.cleanupModalBackdrops();
+        }
+    }, 2000);
 
     console.log('Panier initialisé avec succès !');
 });

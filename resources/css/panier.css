@@ -584,6 +584,20 @@ body:not(.modal-open) {
     overflow: auto !important;
 }
 
+/* Forcer le nettoyage des backdrops orphelins */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+
+.modal-backdrop.fade {
+    opacity: 0.5;
+}
+
+/* S'assurer qu'aucun backdrop ne reste */
+body:not(.modal-open) .modal-backdrop {
+    display: none !important;
+}
+
 @media (max-width: 480px) {
     .panier-container {
         padding: var(--spacing-lg) var(--spacing-sm);
