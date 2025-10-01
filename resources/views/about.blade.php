@@ -84,17 +84,6 @@
     </div>
 </section>
 
-<section class="about-contact">
-    <div class="container">
-        <div class="contact-content">
-            <h2>Contactez-nous</h2>
-            <p>Pour toute question ou suggestion, notre équipe est là pour vous aider.</p>
-            <a href="/contact" class="btn btn-primary">
-                <i class="fas fa-envelope"></i> Nous contacter
-            </a>
-        </div>
-    </div>
-</section>
 
 @push('styles')
 <style>
@@ -259,54 +248,6 @@
     font-weight: 500;
 }
 
-.about-contact {
-    padding: var(--spacing-3xl) 0;
-    background: var(--light-blue);
-    text-align: center;
-}
-
-.contact-content h2 {
-    font-size: var(--font-size-3xl);
-    font-weight: 700;
-    color: var(--primary-blue);
-    margin-bottom: var(--spacing-lg);
-}
-
-.contact-content p {
-    color: var(--gray-600);
-    font-size: var(--font-size-lg);
-    margin-bottom: var(--spacing-2xl);
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-lg) var(--spacing-2xl);
-    border-radius: var(--border-radius-full);
-    font-weight: 600;
-    text-decoration: none;
-    transition: var(--transition-normal);
-    border: none;
-    cursor: pointer;
-    font-size: var(--font-size-base);
-}
-
-.btn-primary {
-    background: var(--gradient-primary);
-    color: var(--white);
-    box-shadow: var(--shadow-blue);
-}
-
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-xl);
-    color: var(--white);
-    text-decoration: none;
-}
 
 @media (max-width: 1024px) {
     .mission-content {
