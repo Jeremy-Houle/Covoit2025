@@ -107,7 +107,6 @@
                                     <div class="price-item">
                                         <span>Prix par personne :</span>
                                         <span class="price-value">{{ $paiement->NombrePlaces > 0 ? number_format($paiement->Montant / $paiement->NombrePlaces, 2) : '0.00' }} $</span>
-                                        <!-- Debug: Montant={{ $paiement->Montant }}, Places={{ $paiement->NombrePlaces }}, Calcul={{ $paiement->Montant / $paiement->NombrePlaces }} -->
                                     </div>
                                     <div class="price-item">
                                         <span>Nombre de places :</span>
@@ -179,7 +178,7 @@
     </div>
 </div>
 
-<!-- Modal de confirmation de paiement -->
+
 <div class="modal fade" id="paymentConfirmationModal" tabindex="-1" aria-labelledby="paymentConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
