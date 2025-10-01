@@ -1,18 +1,18 @@
 :root {
-  --primary-blue: #2563eb;       
+  --primary-blue: #2563eb;        
   --primary-blue-dark: #1d4ed8;   
-  --primary-blue-light: #3b82f6;  
-  --primary-blue-lighter: #60a5fa; 
+  --primary-blue-light: #3b82f6; 
+  --primary-blue-lighter: #60a5fa;
   
   --secondary-blue: #1e40af;     
-  --accent-blue: #0ea5e9;        
-  --light-blue: #dbeafe;         
-  --blue-gray: #64748b;           
+  --accent-blue: #0ea5e9;         
+  --light-blue: #dbeafe;          
+  --blue-gray: #64748b;         
   
-  --success-green: #10b981;       
+  --success-green: #10b981;      
   --warning-orange: #f59e0b;      
-  --error-red: #ef4444;           
-  --info-blue: #06b6d4;           
+  --error-red: #ef4444;          
+  --info-blue: #06b6d4;          
   
   --white: #ffffff;
   --gray-50: #f8fafc;
@@ -428,6 +428,7 @@ header {
 .grid-4 {
   grid-template-columns: repeat(4, 1fr);
 }
+
 
 @media (max-width: 1024px) {
   .container {

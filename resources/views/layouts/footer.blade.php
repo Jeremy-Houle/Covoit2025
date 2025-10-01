@@ -1,5 +1,5 @@
 <footer class="site-footer">
-    <div class="footer-container">
+    <div class="container">
         <div class="footer-main">
             <div class="footer-brand">
                 <div class="footer-logo">
@@ -56,31 +56,22 @@
             </div>
         </div>
 
-        <div class="footer-divider"></div>
-
         <div class="footer-bottom">
             <p>&copy; {{ date('Y') }} Covoit2025. Tous droits réservés.</p>
-            <p class="footer-tagline">Développé par Jad,Francis,Jeremy,Omeed et Abdel</p>
+            <p class="footer-tagline">Développé par Jad, Francis, Jeremy, Omeed et Abdel</p>
         </div>
     </div>
 </footer>
 
 <style>
+
 .site-footer {
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    color: #ffffff;
-    margin-top: 60px;
+    background: var(--gradient-hero);
+    color: var(--white);
+    margin-top: 0;
     position: relative;
     overflow: hidden;
 }
-
-        body:has(.panier-page) .site-footer,
-        body:has(.profil-page) .site-footer,
-        body:has(.edit-profil-page) .site-footer,
-        body:has(.auth-page) .site-footer,
-        body:has(.about-page) .site-footer {
-            margin-top: 0;
-        }
 
 .site-footer::before {
     content: '';
@@ -89,80 +80,76 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700);
-}
-
-.footer-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px 20px;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
 }
 
 .footer-main {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1.5fr;
-    gap: 40px;
-    margin-bottom: 30px;
+    gap: var(--spacing-2xl);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-2xl) 0;
 }
 
 .footer-brand {
-    max-width: 300px;
+    max-width: 350px;
 }
 
 .footer-logo {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #ffd700;
-    margin-bottom: 15px;
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: var(--spacing-lg);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--spacing-sm);
 }
 
 .footer-logo i {
-    font-size: 1.2em;
+    font-size: var(--font-size-xl);
 }
 
 .footer-description {
-    color: #b8d4f0;
+    color: rgba(255, 255, 255, 0.8);
     line-height: 1.6;
-    margin-bottom: 20px;
-    font-size: 0.95em;
+    margin-bottom: var(--spacing-xl);
+    font-size: var(--font-size-sm);
 }
 
 .footer-social {
     display: flex;
-    gap: 12px;
+    gap: var(--spacing-md);
 }
 
 .social-link {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 215, 0, 0.1);
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    border-radius: 50%;
-    color: #ffd700;
+    width: 44px;
+    height: 44px;
+    background: rgba(251, 191, 36, 0.1);
+    border: 2px solid rgba(251, 191, 36, 0.3);
+    border-radius: var(--border-radius-full);
+    color: #fbbf24;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: var(--transition-normal);
+    font-size: var(--font-size-lg);
 }
 
 .social-link:hover {
-    background: #ffd700;
-    color: #1e3c72;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+    background: #fbbf24;
+    color: var(--primary-blue-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
 }
 
 .footer-nav h4,
 .footer-info h4,
 .footer-contact h4 {
-    color: #ffd700;
-    font-size: 1.1em;
+    color: #fbbf24;
+    font-size: var(--font-size-lg);
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-bottom: var(--spacing-lg);
     position: relative;
 }
 
@@ -171,11 +158,12 @@
 .footer-contact h4::after {
     content: '';
     position: absolute;
-    bottom: -5px;
+    bottom: -8px;
     left: 0;
-    width: 30px;
-    height: 2px;
-    background: #ffd700;
+    width: 40px;
+    height: 3px;
+    background: #fbbf24;
+    border-radius: var(--border-radius-full);
 }
 
 .footer-nav ul,
@@ -187,66 +175,72 @@
 
 .footer-nav li,
 .footer-info li {
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-sm);
 }
 
 .footer-nav a,
 .footer-info a {
-    color: #b8d4f0;
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
-    font-size: 0.9em;
-    transition: color 0.3s ease;
+    font-size: var(--font-size-sm);
+    transition: var(--transition-normal);
     display: flex;
     align-items: center;
+    padding: var(--spacing-xs) 0;
 }
 
 .footer-nav a:hover,
 .footer-info a:hover {
-    color: #ffd700;
-    padding-left: 5px;
+    color: #fbbf24;
+    transform: translateX(5px);
 }
 
 .contact-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    color: #b8d4f0;
-    font-size: 0.9em;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: var(--font-size-sm);
 }
 
 .contact-item i {
-    color: #ffd700;
-    width: 16px;
+    color: #fbbf24;
+    width: 20px;
     text-align: center;
+    font-size: var(--font-size-base);
 }
 
-.footer-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
-    margin: 20px 0;
-}
 
 .footer-bottom {
     text-align: center;
-    padding-top: 20px;
+    padding: var(--spacing-lg) 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-bottom p {
-    margin: 5px 0;
-    color: #b8d4f0;
-    font-size: 0.9em;
+    margin: var(--spacing-xs) 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: var(--font-size-sm);
 }
 
 .footer-tagline {
-    color: #ffd700;
+    color: #fbbf24;
     font-style: italic;
+    font-weight: 500;
+}
+
+@media (max-width: 1024px) {
+    .footer-main {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-2xl);
+    }
 }
 
 @media (max-width: 768px) {
     .footer-main {
         grid-template-columns: 1fr;
-        gap: 30px;
+        gap: var(--spacing-2xl);
         text-align: center;
     }
     
@@ -254,23 +248,29 @@
         max-width: none;
     }
     
-    .footer-container {
-        padding: 30px 15px 15px;
-    }
-    
     .footer-nav a:hover,
     .footer-info a:hover {
-        padding-left: 0;
+        transform: none;
+    }
+    
+    .footer-social {
+        justify-content: center;
     }
 }
 
 @media (max-width: 480px) {
     .footer-main {
-        gap: 25px;
+        gap: var(--spacing-xl);
     }
     
     .footer-social {
-        justify-content: center;
+        gap: var(--spacing-sm);
+    }
+    
+    .social-link {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-base);
     }
 }
 </style>

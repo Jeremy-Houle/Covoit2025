@@ -14,11 +14,30 @@ Route::get('/about', function () {
     return view('about');
 });
 
-Route::get('/about', function () {
-    return view('about');
+// Routes pour les pages manquantes
+Route::get('/rechercher', function () {
+    return view('rechercher');
 });
 
+Route::get('/publier', function () {
+    return view('publier');
+});
 
+Route::get('/mes-reservations', function () {
+    return view('mes-reservations');
+});
+
+Route::get('/tarifs', function () {
+    return view('tarifs');
+});
+
+Route::get('/faq', function () {
+    return view('faq');
+});
+
+Route::get('/contact', function () {
+    return view('contact');
+});
 
 Route::get('/cart', function () {
     $paiements = DB::table('Paiements as p')
