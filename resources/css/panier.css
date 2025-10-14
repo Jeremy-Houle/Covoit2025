@@ -461,7 +461,7 @@
     }
 }
 
-/* Styles pour le modal de paiement */
+
 .modal-content {
     border-radius: var(--border-radius-xl);
     border: none;
@@ -566,7 +566,7 @@
     box-shadow: var(--shadow);
 }
 
-/* Correction pour le backdrop Bootstrap */
+
 .modal-backdrop {
     z-index: 1040;
 }
@@ -575,7 +575,7 @@
     z-index: 1050;
 }
 
-/* S'assurer que le body revient à la normale après fermeture du modal */
+
 body.modal-open {
     overflow: hidden;
 }
@@ -584,7 +584,7 @@ body:not(.modal-open) {
     overflow: auto !important;
 }
 
-/* Forcer le nettoyage des backdrops orphelins */
+
 .modal-backdrop {
     z-index: 1040 !important;
 }
@@ -593,7 +593,7 @@ body:not(.modal-open) {
     opacity: 0.5;
 }
 
-/* S'assurer qu'aucun backdrop ne reste */
+
 body:not(.modal-open) .modal-backdrop {
     display: none !important;
 }
@@ -623,5 +623,103 @@ body:not(.modal-open) .modal-backdrop {
     .modal-footer .btn {
         width: 100%;
         margin-bottom: var(--spacing-sm);
+    }
+}
+
+
+.places-control {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xs);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s ease;
+}
+
+.places-control:hover {
+    border-color: var(--primary-blue);
+}
+
+.btn-places {
+    background: var(--primary-blue);
+    border: none;
+    color: var(--white);
+    width: 28px;
+    height: 28px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+}
+
+.btn-places:hover:not(:disabled) {
+    background: #1e40af;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+}
+
+.btn-places:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.btn-places:disabled {
+    background: var(--gray-300);
+    color: var(--gray-500);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-places i {
+    font-size: 10px;
+}
+
+.places-count {
+    min-width: 35px;
+    text-align: center;
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    color: var(--primary-blue);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: rgba(37, 99, 235, 0.08);
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+}
+
+
+@media (max-width: 768px) {
+    .btn-places {
+        width: 32px;
+        height: 32px;
+        font-size: var(--font-size-sm);
+    }
+    
+    .places-count {
+        min-width: 40px;
+        font-size: var(--font-size-lg);
+        padding: var(--spacing-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    .places-control {
+        justify-content: center;
+    }
+    
+    .btn-places {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .places-count {
+        min-width: 45px;
+        font-size: var(--font-size-xl);
+        padding: var(--spacing-sm) var(--spacing-md);
     }
 }

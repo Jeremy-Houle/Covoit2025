@@ -74,4 +74,52 @@ class CartController extends Controller
             return [];
         }
     }
+
+    public function updatePlaces(Request $request)
+    {
+        try {
+            $paiementId = $request->input('paiement_id');
+            $newPlaces = $request->input('places');
+            $userId = session('utilisateur_id', 1);
+
+            // Valider les données
+            if (!$paiementId || !$newPlaces || $newPlaces < 1) {
+                return response()->json(['success' => false, 'message' => 'Données invalides']);
+            }
+
+            // Vérifier que le paiement appartient à l'utilisateur
+            $paiement = DB::table('Paiements')
+                ->where('IdPaiement', $paiementId)
+                ->where('IdUtilisateur', $userId)
+                ->first();
+
+            if (!$paiement) {
+                return response()->json(['success' => false, 'message' => 'Paiement introuvable']);
+            }
+
+            // Appeler la procédure stockée
+            DB::statement("CALL ModifierNombrePlaces(?, ?)", [$paiementId, $newPlaces]);
+
+            // Récupérer les données mises à jour
+            $updatedPaiement = DB::table('Paiements')
+                ->where('IdPaiement', $paiementId)
+                ->first();
+
+            return response()->json([
+                'success' => true,
+                'places' => (int)$updatedPaiement->NombrePlaces,
+                'new_amount' => (float)$updatedPaiement->Montant,
+                'price_per_place' => (float)($updatedPaiement->Montant / $updatedPaiement->NombrePlaces)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la mise à jour des places', [
+                'paiement_id' => $request->input('paiement_id'),
+                'places' => $request->input('places'),
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json(['success' => false, 'message' => 'Erreur lors de la mise à jour']);
+        }
+    }
 }
