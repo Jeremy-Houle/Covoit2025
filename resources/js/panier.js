@@ -279,5 +279,122 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 2000);
 
-    console.log('Panier initialisé avec succès !');
+    // Gestion des boutons de modification des places
+    function initPlacesControls() {
+        const minusButtons = document.querySelectorAll('.btn-places-minus');
+        const plusButtons = document.querySelectorAll('.btn-places-plus');
+
+        minusButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const paiementId = this.dataset.paiementId;
+                const placesCountElement = document.querySelector(`.places-count[data-paiement-id="${paiementId}"]`);
+                const currentPlaces = parseInt(placesCountElement.textContent);
+                
+                if (currentPlaces > 1) {
+                    updatePlaces(paiementId, currentPlaces - 1);
+                }
+            });
+        });
+
+        plusButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const paiementId = this.dataset.paiementId;
+                const placesCountElement = document.querySelector(`.places-count[data-paiement-id="${paiementId}"]`);
+                const currentPlaces = parseInt(placesCountElement.textContent);
+                
+                updatePlaces(paiementId, currentPlaces + 1);
+            });
+        });
+    }
+
+    function updatePlaces(paiementId, newPlaces) {
+        const placesCountElement = document.querySelector(`.places-count[data-paiement-id="${paiementId}"]`);
+        const originalText = placesCountElement.textContent;
+        placesCountElement.textContent = '...';
+
+        const minusButton = document.querySelector(`.btn-places-minus[data-paiement-id="${paiementId}"]`);
+        const plusButton = document.querySelector(`.btn-places-plus[data-paiement-id="${paiementId}"]`);
+        minusButton.disabled = true;
+        plusButton.disabled = true;
+
+        fetch('/update-places', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': window.csrfToken
+            },
+            body: new URLSearchParams({
+                paiement_id: paiementId,
+                places: newPlaces,
+                _token: window.csrfToken
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                placesCountElement.textContent = data.places;
+                
+                const trajetCard = placesCountElement.closest('.trajet-card');
+                const pricePerPersonElement = trajetCard.querySelector('.price-breakdown .price-item:first-child .price-value');
+                if (pricePerPersonElement) {
+                    pricePerPersonElement.textContent = `${parseFloat(data.price_per_place).toFixed(2)} $`;
+                }
+                
+                const totalElement = trajetCard.querySelector('.price-breakdown .price-item.total .price-value');
+                if (totalElement) {
+                    totalElement.textContent = `${parseFloat(data.new_amount).toFixed(2)} $`;
+                }
+
+                const payButton = trajetCard.querySelector('.btn-pay');
+                if (payButton) {
+                    payButton.dataset.places = data.places;
+                    payButton.dataset.montant = data.new_amount;
+                }
+
+                // Mettre à jour le total général
+                updateGeneralTotal();
+                updateButtonsState(paiementId, data.places);
+            } else {
+                placesCountElement.textContent = originalText;
+                alert(data.message || 'Erreur lors de la mise à jour');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            placesCountElement.textContent = originalText;
+            alert('Erreur lors de la mise à jour des places');
+        })
+        .finally(() => {
+            minusButton.disabled = false;
+            plusButton.disabled = false;
+        });
+    }
+
+    function updateButtonsState(paiementId, currentPlaces) {
+        const minusButton = document.querySelector(`.btn-places-minus[data-paiement-id="${paiementId}"]`);
+        minusButton.disabled = currentPlaces <= 1;
+    }
+
+    function updateGeneralTotal() {
+        const totalElement = document.querySelector('.total-amount');
+        if (totalElement) {
+            // Calculer le total en additionnant tous les montants des trajets
+            const trajetCards = document.querySelectorAll('.trajet-card');
+            let total = 0;
+            
+            trajetCards.forEach(card => {
+                const totalElement = card.querySelector('.price-breakdown .price-item.total .price-value');
+                if (totalElement) {
+                    const amount = parseFloat(totalElement.textContent.replace(/[^0-9.-]/g, '')) || 0;
+                    total += amount;
+                }
+            });
+            
+            totalElement.textContent = formatPrice(total);
+        }
+    }
+
+    // Initialiser les contrôles de places
+    initPlacesControls();
+
 });

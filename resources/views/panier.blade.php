@@ -8,6 +8,9 @@
 
 @push('scripts')
 @vite(['resources/js/panier.js'])
+<script>
+    window.csrfToken = '{{ csrf_token() }}';
+</script>
 @endpush
 
 @section('content')
@@ -110,7 +113,18 @@
                                     </div>
                                     <div class="price-item">
                                         <span>Nombre de places :</span>
-                                        <span class="price-value">{{ $paiement->NombrePlaces }}</span>
+                                        <div class="places-control">
+                                            <button type="button" class="btn-places btn-places-minus" 
+                                                    data-paiement-id="{{ $paiement->IdPaiement }}"
+                                                    {{ $paiement->NombrePlaces <= 1 ? 'disabled' : '' }}>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <span class="places-count" data-paiement-id="{{ $paiement->IdPaiement }}">{{ $paiement->NombrePlaces }}</span>
+                                            <button type="button" class="btn-places btn-places-plus" 
+                                                    data-paiement-id="{{ $paiement->IdPaiement }}">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="price-item total">
                                         <span>Total :</span>
