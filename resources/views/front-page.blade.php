@@ -6,7 +6,6 @@
 <style>
 
 .hero-section {
-    background: var(--gradient-hero);
     color: var(--white);
     padding: calc(70px + var(--spacing-3xl)) 0 var(--spacing-3xl);
     text-align: center;
@@ -17,6 +16,16 @@
     align-items: center;
 }
 
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
 .hero-section::before {
     content: '';
     position: absolute;
@@ -24,13 +33,13 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-    opacity: 0.3;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
 }
 
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--spacing-lg);
@@ -349,6 +358,10 @@
 
 @section('content')
 <section class="hero-section">
+    <video class="hero-video" autoplay muted loop playsinline>
+        <source src="{{ asset('Video/ride_share.mp4') }}" type="video/mp4">
+        Votre navigateur ne supporte pas les vidéos HTML5.
+    </video>
     <div class="hero-content">
         <h1 class="hero-title">Voyagez ensemble aujourd'hui,<br>économisez ensemble toujours</h1>
         <p class="hero-subtitle">Découvrez comment nos utilisateurs fidèles voyagent avec Covoit2025</p>
