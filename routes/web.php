@@ -67,3 +67,4 @@ Route::get('/edit-profil', [ProfilController::class, 'edit'])->name('profil.edit
 Route::post('/edit-profil', [ProfilController::class, 'update'])->name('profil.update');
 
 Route::get('/trajets/search', [TrajetController::class, 'search']);
+Route::post('/reservations', [TrajetController::class, 'reserve'])->name('reservations.store');
