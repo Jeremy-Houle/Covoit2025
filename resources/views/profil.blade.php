@@ -145,7 +145,7 @@
                     <img src="https://ui-avatars.com/api/?name={{ $p->Prenom }}+{{ $p->Nom }}&background=2563eb&color=fff&size=28" alt="{{ $p->Prenom }}" />
                   @endforeach
                 </div>
-                <span class="guest-count">{{ $resa->PlacesReservees ?? 0 }}/{{ $resa->PlacesDisponibles ?? 4 }} places</span>
+                <span class="guest-count">{{ $resa->PlacesDisponibles ?? 4}} places libre</span>
               </div>
               <span class="booking-price">{{ $resa->Prix ?? '0' }} $</span>
             </div>
