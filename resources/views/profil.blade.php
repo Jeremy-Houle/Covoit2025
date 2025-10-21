@@ -132,7 +132,11 @@
 
       <aside class="sidebar">
         <section class="bookings-section">
+          @if($user->Role === 'Conducteur')
+          <h2>Trajets assignés</h2>
+          @else
           <h2>Prochaines réservations</h2>
+          @endif
           @forelse($prochainesReservations as $resa)
             <div class="booking-item">
               <div class="booking-info">
