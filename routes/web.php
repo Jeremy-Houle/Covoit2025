@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\TrajetController;
+
 
 Route::get('/', function () {
     return view('front-page');
@@ -14,14 +16,14 @@ Route::get('/about', function () {
     return view('about');
 });
 
-// Routes pour les pages manquantes
-Route::get('/rechercher', function () {
-    return view('rechercher');
-});
+// // Routes pour les pages manquantes
+// Route::get('/rechercher', function () {
+//     return view('rechercher');
+// });
 
-Route::get('/publier', function () {
-    return view('publier');
-});
+// Route::get('/publier', function () {
+//     return view('publier');
+// });
 
 Route::get('/mes-reservations', function () {
     return view('mes-reservations');
@@ -64,5 +66,10 @@ Route::post('/update-places', [CartController::class, 'updatePlaces'])->name('up
 Route::get('/profil', [ProfilController::class, 'index']);
 Route::get('/edit-profil', [ProfilController::class, 'edit'])->name('profil.edit');
 Route::post('/edit-profil', [ProfilController::class, 'update'])->name('profil.update');
+
+Route::get('/publier', [TrajetController::class, 'create'])->name('trajets.create');
+Route::post('/publier', [TrajetController::class, 'store'])->name('trajets.store');
+Route::get('/rechercher', [TrajetController::class, 'index'])->name('trajets.index');
+
 
 
