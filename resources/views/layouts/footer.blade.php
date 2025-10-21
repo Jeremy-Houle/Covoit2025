@@ -61,8 +61,10 @@
             <p class="footer-tagline">Développé par Jad, Francis, Jeremy, Omeed et Abdel</p>
         </div>
     </div>
-    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA15cEUHuUk0chFVlLu9MtJ06aEYwoVqzc&callback=initMap&libraries=places">
-    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA15cEUHuUk0chFVlLu9MtJ06aEYwoVqzc&callback=initMap&libraries=places">
+        </script>
+
 </footer>
 
 <style>
