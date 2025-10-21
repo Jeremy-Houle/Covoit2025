@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\TrajetController;
+use App\Http\Controllers\ReservationController;
 
 
 Route::get('/', function () {
@@ -21,6 +22,9 @@ Route::get('/about', function () {
 //     return view('rechercher');
 // });
 
+Route::get('/publier', function () {
+    return view('publier');
+});
 // Route::get('/publier', function () {
 //     return view('publier');
 // });
@@ -72,4 +76,15 @@ Route::post('/publier', [TrajetController::class, 'store'])->name('trajets.store
 Route::get('/rechercher', [TrajetController::class, 'index'])->name('trajets.index');
 
 
+Route::get('/trajets/search', [TrajetController::class, 'search']);
+Route::get('/mes-reservations', [ReservationController::class, 'index'])->name('mes-reservations.index');
+Route::put('/mes-reservations/{id}/update', [ReservationController::class, 'update'])->name('mes-reservations.update');
+Route::delete('/mes-reservations/{id}', [ReservationController::class, 'destroy'])->name('mes-reservations.destroy');
 
+Route::get('/trajets/{id}/availability', function($id) {
+    $trajet = DB::table('Trajets')->where('IdTrajet', $id)->select('PlacesDisponibles')->first();
+    if (!$trajet) {
+        return response()->json(['error' => 'Trajet introuvable'], 404);
+    }
+    return response()->json(['places_disponibles' => (int)$trajet->PlacesDisponibles]);
+});

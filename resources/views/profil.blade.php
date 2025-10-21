@@ -132,7 +132,11 @@
 
       <aside class="sidebar">
         <section class="bookings-section">
+          @if($user->Role === 'Conducteur')
+          <h2>Trajets assignés</h2>
+          @else
           <h2>Prochaines réservations</h2>
+          @endif
           @forelse($prochainesReservations as $resa)
             <div class="booking-item">
               <div class="booking-info">
@@ -145,7 +149,7 @@
                     <img src="https://ui-avatars.com/api/?name={{ $p->Prenom }}+{{ $p->Nom }}&background=2563eb&color=fff&size=28" alt="{{ $p->Prenom }}" />
                   @endforeach
                 </div>
-                <span class="guest-count">{{ $resa->PlacesReservees ?? 0 }}/{{ $resa->PlacesDisponibles ?? 4 }} places</span>
+                <span class="guest-count">{{ $resa->PlacesDisponibles ?? 4}} places libre</span>
               </div>
               <span class="booking-price">{{ $resa->Prix ?? '0' }} $</span>
             </div>
