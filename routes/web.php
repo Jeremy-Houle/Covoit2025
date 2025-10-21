@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\TrajetController;
 
 Route::get('/', function () {
     return view('front-page');
@@ -65,4 +66,4 @@ Route::get('/profil', [ProfilController::class, 'index']);
 Route::get('/edit-profil', [ProfilController::class, 'edit'])->name('profil.edit');
 Route::post('/edit-profil', [ProfilController::class, 'update'])->name('profil.update');
 
-
+Route::get('/trajets/search', [TrajetController::class, 'search']);
