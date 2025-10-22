@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\TrajetController;
+use App\Http\Controllers\ReservationController;
+
 
 Route::get('/', function () {
     return view('front-page');
@@ -14,14 +17,17 @@ Route::get('/about', function () {
     return view('about');
 });
 
-// Routes pour les pages manquantes
-Route::get('/rechercher', function () {
-    return view('rechercher');
-});
+// // Routes pour les pages manquantes
+// Route::get('/rechercher', function () {
+//     return view('rechercher');
+// });
 
 Route::get('/publier', function () {
     return view('publier');
 });
+// Route::get('/publier', function () {
+//     return view('publier');
+// });
 
 Route::get('/mes-reservations', function () {
     return view('mes-reservations');
@@ -65,4 +71,22 @@ Route::get('/profil', [ProfilController::class, 'index']);
 Route::get('/edit-profil', [ProfilController::class, 'edit'])->name('profil.edit');
 Route::post('/edit-profil', [ProfilController::class, 'update'])->name('profil.update');
 
+Route::get('/trajets/search', [TrajetController::class, 'search']);
+Route::post('/reservations', [TrajetController::class, 'reserve'])->name('reservations.store');
+Route::get('/publier', [TrajetController::class, 'create'])->name('trajets.create');
+Route::post('/publier', [TrajetController::class, 'store'])->name('trajets.store');
+Route::get('/rechercher', [TrajetController::class, 'index'])->name('trajets.index');
 
+
+Route::get('/trajets/search', [TrajetController::class, 'search']);
+Route::get('/mes-reservations', [ReservationController::class, 'index'])->name('mes-reservations.index');
+Route::put('/mes-reservations/{id}/update', [ReservationController::class, 'update'])->name('mes-reservations.update');
+Route::delete('/mes-reservations/{id}', [ReservationController::class, 'destroy'])->name('mes-reservations.destroy');
+
+Route::get('/trajets/{id}/availability', function($id) {
+    $trajet = DB::table('Trajets')->where('IdTrajet', $id)->select('PlacesDisponibles')->first();
+    if (!$trajet) {
+        return response()->json(['error' => 'Trajet introuvable'], 404);
+    }
+    return response()->json(['places_disponibles' => (int)$trajet->PlacesDisponibles]);
+});

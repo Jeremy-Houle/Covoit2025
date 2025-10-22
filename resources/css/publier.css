@@ -21,9 +21,6 @@
 }
 .scroll-view {
   width: 500px;
-  height: 200px;
-  overflow-y: scroll;
-  overflow-x: hidden;
   padding: 10px;
   border: 2px solid var(--gray-200);
   border-radius: 15px;

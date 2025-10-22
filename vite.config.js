@@ -10,7 +10,8 @@ export default defineConfig({
                 'resources/css/panier.css',
                 'resources/css/profil.css',
                 'resources/js/app.js',
-                'resources/js/panier.js'
+                'resources/js/panier.js',
+                'resources/css/publier.css'
             ],
             refresh: true,
         }),
