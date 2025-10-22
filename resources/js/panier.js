@@ -157,9 +157,11 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('modalPlaces').textContent = places;
             document.getElementById('modalMontant').textContent = `${montant} $`;
             
-            // Configurer l'action du formulaire de confirmation
+            // Configurer l'action du formulaire de confirmation (si il existe)
             const confirmForm = document.getElementById('confirmPaymentForm');
-            confirmForm.action = `/payer-panier/${conducteurId}/${utilisateurId}/${paiementId}`;
+            if (confirmForm) {
+                confirmForm.action = `/payer-panier/${conducteurId}/${utilisateurId}/${paiementId}`;
+            }
             
             // Ouvrir le modal
             const modal = document.getElementById('paymentConfirmationModal');
@@ -170,6 +172,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     focus: true
                 });
                 bootstrapModal.show();
+                
+                // Corriger l'attribut aria-hidden après l'ouverture
+                setTimeout(() => {
+                    modal.setAttribute('aria-hidden', 'false');
+                }, 100);
             }
         });
     });
@@ -191,6 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (paymentConfirmationModal) {
        
         paymentConfirmationModal.addEventListener('hidden.bs.modal', function() {
+            // Corriger l'attribut aria-hidden
+            this.setAttribute('aria-hidden', 'true');
+            
             // Nettoyer le backdrop s'il reste
             const backdrops = document.querySelectorAll('.modal-backdrop');
             backdrops.forEach(backdrop => backdrop.remove());

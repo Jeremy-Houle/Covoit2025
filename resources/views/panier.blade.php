@@ -2,6 +2,10 @@
 
 @section('title', 'Mon Panier - Covoit2025')
 
+@push('head')
+<meta http-equiv="Permissions-Policy" content="unload=*">
+@endpush
+
 @push('styles')
 @vite(['resources/css/panier.css'])
 @endpush
@@ -12,7 +16,7 @@
     window.csrfToken = '{{ csrf_token() }}';
 </script>
 @endpush
-
+<script src="https://www.paypal.com/sdk/js?client-id=AWQqeyvmMlkT1LYUxQ-WRRLHao1rtwanQXVP9LTSYtoyCmJ1JKcKimTRLI5oVZ3kEBbRXQ2n0JqSXt9v&currency=CAD&enable-funding=paypal&disable-funding=card,credit&components=buttons"></script>
 @section('content')
 <div class="panier-page">
     <div class="panier-container">
@@ -232,15 +236,156 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Annuler
                 </button>
-                <form id="confirmPaymentForm" method="POST" style="display: inline;">
-                    @csrf
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-credit-card"></i> Confirmer le paiement
-                    </button>
-                </form>
+                <div id="modal-paypal-button-container"></div>
             </div>
         </div>
     </div>
 </div>
 
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables pour stocker les données du trajet sélectionné
+    let currentPaymentData = {};
+    
+    // Gestion des boutons "Payer ce trajet"
+    const payButtons = document.querySelectorAll('.btn-pay');
+    payButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Récupérer les données du trajet
+            currentPaymentData = {
+                conducteurId: this.dataset.conducteurId,
+                utilisateurId: this.dataset.utilisateurId,
+                paiementId: this.dataset.paiementId,
+                montant: this.dataset.montant,
+                conducteurNom: this.dataset.conducteurNom,
+                depart: this.dataset.depart,
+                destination: this.dataset.destination,
+                date: this.dataset.date,
+                heure: this.dataset.heure,
+                places: this.dataset.places
+            };
+            
+            // Remplir le modal avec les données
+            document.getElementById('modalConducteur').textContent = currentPaymentData.conducteurNom;
+            document.getElementById('modalDepart').textContent = currentPaymentData.depart;
+            document.getElementById('modalDestination').textContent = currentPaymentData.destination;
+            document.getElementById('modalDate').textContent = currentPaymentData.date;
+            document.getElementById('modalHeure').textContent = currentPaymentData.heure;
+            document.getElementById('modalPlaces').textContent = currentPaymentData.places;
+            document.getElementById('modalMontant').textContent = `${currentPaymentData.montant} $`;
+            
+          
+            createPayPalButton();
+            
+         
+            const modal = document.getElementById('paymentConfirmationModal');
+            if (modal) {
+                const bootstrapModal = new bootstrap.Modal(modal, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                bootstrapModal.show();
+            }
+        });
+    });
+    
+    function createPayPalButton() {
+       
+        const container = document.getElementById('modal-paypal-button-container');
+        container.innerHTML = '';
+        
+        // Vérifier que PayPal SDK est chargé
+        if (typeof paypal === 'undefined') {
+            console.error('PayPal SDK non chargé');
+            container.innerHTML = '<div class="alert alert-warning">Erreur de chargement PayPal</div>';
+            return;
+        }
+        
+       
+        paypal.Buttons({
+            fundingSource: paypal.FUNDING.PAYPAL,
+            disableFunding: ['card', 'credit'],
+            
+            style: {
+                layout: 'vertical',
+                color: 'gold',
+                shape: 'rect',
+                label: 'paypal',
+                height: 45
+            },
+            
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: { 
+                            value: currentPaymentData.montant,
+                            currency_code: 'CAD'
+                        }
+                    }]
+                });
+            },
+            
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    console.log('Paiement PayPal approuvé:', details);
+                    
+                  
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('paymentConfirmationModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
+                    // Créer un formulaire pour soumettre le paiement
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/payer-panier/${currentPaymentData.conducteurId}/${currentPaymentData.utilisateurId}/${currentPaymentData.paiementId}`;
+                    form.style.display = 'none';
+                    
+                    // Ajouter le token CSRF
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = window.csrfToken;
+                    form.appendChild(csrfInput);
+                    
+                    // Ajouter les données PayPal
+                    const paypalOrderInput = document.createElement('input');
+                    paypalOrderInput.type = 'hidden';
+                    paypalOrderInput.name = 'paypal_order_id';
+                    paypalOrderInput.value = details.id;
+                    form.appendChild(paypalOrderInput);
+                    
+                    const paypalStatusInput = document.createElement('input');
+                    paypalStatusInput.type = 'hidden';
+                    paypalStatusInput.name = 'paypal_status';
+                    paypalStatusInput.value = details.status;
+                    form.appendChild(paypalStatusInput);
+                    
+                    const amountInput = document.createElement('input');
+                    amountInput.type = 'hidden';
+                    amountInput.name = 'amount';
+                    amountInput.value = currentPaymentData.montant;
+                    form.appendChild(amountInput);
+                    
+                    // Ajouter le formulaire au DOM et le soumettre
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            },
+            
+            onError: function(err) {
+                console.error('Erreur PayPal:', err);
+                alert('Erreur PayPal: ' + err.message);
+            }
+        }).render('#modal-paypal-button-container').catch(function(err) {
+            console.error('Erreur lors du rendu du bouton PayPal:', err);
+            container.innerHTML = '<div class="alert alert-danger">Erreur de chargement du bouton PayPal</div>';
+        });
+    }
+});
+</script>
