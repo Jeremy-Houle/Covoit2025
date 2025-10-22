@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InfoCompteModifieMail;
 
 class ProfilController extends Controller
 {
-     // Afficher le formulaire d'édition
     public function edit()
     {
         $userId = session('utilisateur_id');
@@ -22,7 +23,6 @@ class ProfilController extends Controller
         return view('edit-profil', compact('user'));
     }
 
-    // Mettre à jour les informations utilisateur
 public function update(Request $request)
 {
     $userId = session('utilisateur_id');
@@ -37,19 +37,48 @@ public function update(Request $request)
         'MotDePasse' => 'nullable|min:6|confirmed',
     ]);
 
+    $oldUser = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+    
     $data = [
         'Prenom' => $request->Prenom,
         'Nom' => $request->Nom,
         'Courriel' => $request->Courriel,
     ];
 
+    $changedFields = [];
+    if ($oldUser->Prenom !== $request->Prenom) {
+        $changedFields['Prénom'] = $request->Prenom;
+    }
+    if ($oldUser->Nom !== $request->Nom) {
+        $changedFields['Nom'] = $request->Nom;
+    }
+    if ($oldUser->Courriel !== $request->Courriel) {
+        $changedFields['Courriel'] = $request->Courriel;
+    }
+
     if ($request->MotDePasse) {
         $data['MotDePasse'] = Hash::make($request->MotDePasse);
+        $changedFields['Mot de passe'] = '••••••••';
     }
 
     DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->update($data);
 
-    // Redirige vers la page profil après sauvegarde
+    if (!empty($changedFields)) {
+        $updatedUser = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        
+        try {
+            $emailTo = isset($changedFields['Courriel']) ? $oldUser->Courriel : $updatedUser->Courriel;
+            
+            Mail::to($emailTo)->send(new InfoCompteModifieMail($updatedUser, $changedFields));
+            
+            if (isset($changedFields['Courriel'])) {
+                Mail::to($updatedUser->Courriel)->send(new InfoCompteModifieMail($updatedUser, $changedFields));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de l\'envoi de l\'email de modification: ' . $e->getMessage());
+        }
+    }
+
     return redirect('/profil')->with('success', 'Profil mis à jour avec succès.');
 }
     public function index()
@@ -59,16 +88,13 @@ public function update(Request $request)
             return redirect('/connexion');
         }
 
-        // Infos utilisateur
         $user = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
 
-        // Moyenne des notes si conducteur
         $moyenneNote = DB::table('Evaluation as e')
             ->join('Trajets as t', 'e.IdTrajet', '=', 't.IdTrajet')
             ->where('t.IdConducteur', $userId)
             ->avg('e.Note') ?? 0;
 
-        // Prochaines réservations
         if ($user->Role === 'Passager') {
             $prochainesReservations = DB::table('Reservations as r')
                 ->join('Trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
@@ -86,7 +112,7 @@ public function update(Request $request)
                     $resa->passagers = $passagers;
                     return $resa;
                 });
-        } else { // Conducteur
+        } else { 
             $prochainesReservations = DB::table('Trajets as t')
                 ->where('t.IdConducteur', $userId)
                 ->where('t.DateTrajet', '>=', Carbon::today())
@@ -102,7 +128,6 @@ public function update(Request $request)
                     $trajet->PlacesReservees = $reservations->sum('PlacesReservees');
                     $trajet->passagers = $reservations;
 
-                    // Récupérer les commentaires pour ce trajet
                     $trajet->commentaires = DB::table('Commentaires')
                         ->where('IdTrajet', $trajet->IdTrajet)
                         ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
@@ -113,7 +138,6 @@ public function update(Request $request)
                 });
         }
 
-        // Messages récents
         $messagesRecents = DB::table('LesMessages as m')
             ->join('Utilisateurs as u', 'm.IdExpediteur', '=', 'u.IdUtilisateur')
             ->where('m.IdDestinataire', $userId)
@@ -122,10 +146,8 @@ public function update(Request $request)
             ->select('m.*', 'u.Prenom', 'u.Nom')
             ->get();
 
-        // Activités (paiements + activités propres)
         $activites = [];
 
-        // Paiements
         $paiements = DB::table('Paiements')
             ->where('IdUtilisateur', $userId)
             ->orderBy('DateCreation', 'desc')
@@ -140,7 +162,6 @@ public function update(Request $request)
             ];
         }
 
-        // Activités réelles liées à l'utilisateur
         $userActivites = DB::table('Activites')
             ->where('IdUtilisateur', $userId)
             ->orderBy('DateActivite', 'desc')
@@ -155,7 +176,6 @@ public function update(Request $request)
             ];
         }
 
-        // Note moyenne si conducteur
         if ($moyenneNote > 0) {
             $activites[] = [
                 'couleur' => 'orange',

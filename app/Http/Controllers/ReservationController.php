@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Mail\TrajetConfirmeMail;
+use App\Mail\ReservationAnnuleeParPassagerMail;
 
 class ReservationController extends Controller
 {
@@ -52,17 +56,16 @@ class ReservationController extends Controller
     public function index()
 {
     $utilisateurId = session('utilisateur_id');
-    $role = session('utilisateur_role'); // 'conducteur' ou 'passager'
+    $role = session('utilisateur_role'); 
 
     if (!$utilisateurId) {
         return redirect('/connexion')->with('error', 'Veuillez vous connecter pour voir vos réservations.');
     }
 
     if ($role === 'Conducteur') {
-        // 🚗 Si l'utilisateur est conducteur : voir les réservations reçues sur SES trajets
         $reservations = DB::table('Reservations as r')
             ->join('Trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
-            ->join('Utilisateurs as u', 'r.IdPassager', '=', 'u.IdUtilisateur') // le passager
+            ->join('Utilisateurs as u', 'r.IdPassager', '=', 'u.IdUtilisateur')
             ->select(
                 'r.IdReservation',
                 'r.PlacesReservees',
@@ -78,7 +81,6 @@ class ReservationController extends Controller
             ->where('t.IdConducteur', $utilisateurId)
             ->get();
     } else {
-        // 🧳 Si c’est un passager : voir SES propres réservations
         $reservations = DB::table('Reservations as r')
             ->join('Trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
             ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
@@ -101,25 +103,6 @@ class ReservationController extends Controller
     return view('mes-reservations', compact('reservations'));
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //  Modifier une réservation (nombre de places)
 public function update(Request $request, $id)
 {
     $userId = session('utilisateur_id');
@@ -129,13 +112,11 @@ public function update(Request $request, $id)
         'PlacesReservees' => 'required|integer|min:1'
     ]);
 
-    // Récupérer la réservation existante
     $reservation = DB::table('Reservations')->where('IdReservation', $id)->first();
     if (!$reservation || $reservation->IdPassager != $userId) {
         return redirect('/mes-reservations')->with('error', 'Réservation introuvable.');
     }
 
-    // Récupérer le trajet lié
     $trajet = DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)->first();
     if (!$trajet) {
         return redirect('/mes-reservations')->with('error', 'Trajet introuvable.');
@@ -145,31 +126,39 @@ public function update(Request $request, $id)
     $newPlaces = $request->PlacesReservees;
     $diff = $newPlaces - $oldPlaces;
 
-    // Vérifie qu'on ne dépasse pas les places disponibles
     if ($diff > $trajet->PlacesDisponibles) {
         return redirect('/mes-reservations')->with('error', 'Pas assez de places disponibles.');
     }
 
-    // Met à jour la réservation
     DB::table('Reservations')->where('IdReservation', $id)->update([
         'PlacesReservees' => $newPlaces
     ]);
 
-    // Ajuste les places disponibles du trajet
     if ($diff > 0) {
-        // L'utilisateur ajoute des places → on en enlève du trajet
         DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)
             ->decrement('PlacesDisponibles', $diff);
     } elseif ($diff < 0) {
-        // L'utilisateur réduit ses places → on en remet dans le trajet
         DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)
             ->increment('PlacesDisponibles', abs($diff));
+    }
+
+    try {
+        $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        $trajetInfo = DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)->first();
+        $updatedReservation = DB::table('Reservations')->where('IdReservation', $id)->first();
+        
+        if ($passager && $trajetInfo && $updatedReservation) {
+            Mail::to($passager->Courriel)->send(
+                new TrajetConfirmeMail($trajetInfo, $passager, $updatedReservation, 'modified')
+            );
+        }
+    } catch (\Exception $e) {
+        Log::error('Erreur lors de l\'envoi de l\'email de modification: ' . $e->getMessage());
     }
 
     return redirect('/mes-reservations')->with('success', 'Réservation mise à jour.');
 }
 
-    // Annuler une réservation
     public function destroy($id)
     {
         $userId = session('utilisateur_id');
@@ -180,17 +169,27 @@ public function update(Request $request, $id)
             return redirect('/mes-reservations')->with('error', 'Réservation introuvable.');
         }
 
-        // Réaugmenter les places du trajet
+        $trajet = DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)->first();
+        $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+
         DB::table('Trajets')
             ->where('IdTrajet', $reservation->IdTrajet)
             ->increment('PlacesDisponibles', $reservation->PlacesReservees);
 
-        // Mettre à jour le paiement
         DB::table('Paiements')
             ->where('IdTrajet', $reservation->IdTrajet)
             ->where('IdUtilisateur', $userId)
             ->update(['Statut' => 'Annulé']);
 
+        try {
+            if ($passager && $trajet) {
+                Mail::to($passager->Courriel)->send(
+                    new ReservationAnnuleeParPassagerMail($trajet, $passager, $reservation)
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'envoi de l\'email d\'annulation: ' . $e->getMessage());
+        }
         
         DB::table('Reservations')->where('IdReservation', $id)->delete();
 
