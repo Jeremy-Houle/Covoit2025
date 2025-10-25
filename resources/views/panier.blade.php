@@ -7,11 +7,11 @@
 @endpush
 
 @push('styles')
-@vite(['resources/css/panier.css'])
+<link rel="stylesheet" href="{{ asset('css/panier.css') }}?v={{ time() }}">
 @endpush
 
 @push('scripts')
-@vite(['resources/js/panier.js'])
+<script src="{{ asset('js/panier.js') }}?v={{ time() }}"></script>
 <script>
     window.csrfToken = '{{ csrf_token() }}';
 </script>

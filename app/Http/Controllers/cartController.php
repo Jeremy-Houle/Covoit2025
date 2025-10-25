@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ConfirmationPaiementMail;
 
 class CartController extends Controller
 {
@@ -89,6 +91,14 @@ class CartController extends Controller
             'montant' => $montantAttendu,
             'payment_type' => $paymentType
         ]);
+
+        try {
+            Mail::to($utilisateur->Courriel)->send(
+                new ConfirmationPaiementMail($paiement, $trajet, $utilisateur)
+            );
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'envoi de l\'email de confirmation: ' . $e->getMessage());
+        }
         
         $message = $paymentType === 'paypal' 
             ? "Paiement PayPal de " . number_format($montantAttendu, 2) . "$ effectué avec succès !"

@@ -1,10 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Connexion - Covoit2025')
+@section('title', 'Nouveau mot de passe - Covoit2025')
 
 @push('styles')
 <style>
-
 .auth-page {
     min-height: 100vh;
     background: var(--gradient-hero);
@@ -102,129 +101,80 @@
 .form-input:focus {
     outline: none;
     border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.form-input::placeholder {
-    color: var(--gray-400);
+.form-input:disabled {
+    background-color: var(--gray-100);
+    cursor: not-allowed;
 }
 
-.checkbox-group {
+.alert {
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-md);
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
-    margin-bottom: var(--spacing-md);
-}
-
-.checkbox-group input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--primary-blue);
-}
-
-.checkbox-label {
-    color: var(--gray-600);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
     font-weight: 500;
-    cursor: pointer;
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.password-requirements {
+    background-color: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--gray-700);
+}
+
+.password-requirements ul {
+    margin-left: var(--spacing-md);
+    margin-top: var(--spacing-xs);
+}
+
+.password-requirements li {
+    margin-bottom: var(--spacing-xs);
 }
 
 .auth-button {
     width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
     background: var(--gradient-primary);
     color: var(--white);
-    padding: var(--spacing-sm);
     border: none;
     border-radius: var(--border-radius-lg);
     font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition-normal);
-    box-shadow: var(--shadow-blue);
-    margin-bottom: var(--spacing-md);
-}
-
-.auth-button:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
-}
-
-.divider {
-    text-align: center;
-    margin: var(--spacing-md) 0;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.divider::before {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--gray-200);
-    margin-right: var(--spacing-sm);
-}
-
-.divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--gray-200);
-    margin-left: var(--spacing-sm);
-}
-
-.divider span {
-    color: var(--gray-500);
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.social-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-}
-
-.social-button {
-    width: 100%;
-    padding: var(--spacing-sm);
-    border: 2px solid var(--gray-200);
-    border-radius: var(--border-radius-lg);
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition-normal);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--spacing-xs);
-    background: var(--white);
-    color: var(--gray-700);
 }
 
-.social-button:hover {
+.auth-button:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-lg);
 }
 
-.google-button:hover {
-    background: #4285f4;
-    color: var(--white);
-    border-color: #4285f4;
-}
-
-.facebook-button:hover {
-    background: #1877f2;
-    color: var(--white);
-    border-color: #1877f2;
-}
-
-.social-icon {
-    font-size: var(--font-size-sm);
+.auth-button:active {
+    transform: translateY(0);
 }
 
 .auth-footer {
@@ -247,11 +197,6 @@
 .auth-footer a:hover {
     color: var(--primary-blue-dark);
     text-decoration: underline;
-}
-
-.forgot-password {
-    color: var(--primary-blue) !important;
-    font-size: var(--font-size-xs) !important;
 }
 
 @media (max-width: 768px) {
@@ -286,7 +231,7 @@
         <div class="auth-card">
             <div class="auth-header">
                 <h1>Covoit2025</h1>
-                <p>Bon retour ! Connectez-vous à votre compte</p>
+                <p>Créez votre nouveau mot de passe</p>
             </div>
             
             @if(session('success'))
@@ -302,47 +247,46 @@
                     {{ session('error') }}
                 </div>
             @endif
+
+            <div class="password-requirements">
+                <strong>Votre mot de passe doit :</strong>
+                <ul>
+                    <li>Contenir au moins 6 caractères</li>
+                    <li>Être confirmé correctement</li>
+                </ul>
+            </div>
             
-            <form method="POST" action="/connexion" class="auth-form">
+            <form method="POST" action="{{ url('/reset-password') }}" class="auth-form">
                 @csrf
+                
+                <input type="hidden" name="token" value="{{ $token }}">
+                <input type="hidden" name="email" value="{{ $email }}">
+                
                 <div class="form-group">
-                    <label for="courriel" class="form-label">Adresse email</label>
-                    <input type="email" id="courriel" name="courriel" class="form-input" placeholder="votre@email.com" required>
+                    <label for="email_display" class="form-label">Adresse email</label>
+                    <input type="email" id="email_display" class="form-input" value="{{ $email }}" disabled>
                 </div>
                 
                 <div class="form-group">
-                    <label for="mot_de_passe" class="form-label">Mot de passe</label>
-                    <input type="password" id="mot_de_passe" name="mot_de_passe" class="form-input" placeholder="••••••••" required>
+                    <label for="password" class="form-label">Nouveau mot de passe</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="Entrez votre nouveau mot de passe" required>
+                    @error('password')
+                        <span style="color: #dc3545; font-size: 13px; margin-top: 5px; display: block;">{{ $message }}</span>
+                    @enderror
                 </div>
                 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="remember" name="remember">
-                    <label for="remember" class="checkbox-label">Se souvenir de moi</label>
+                <div class="form-group">
+                    <label for="password_confirmation" class="form-label">Confirmer le mot de passe</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" placeholder="Confirmez votre mot de passe" required>
                 </div>
                 
                 <button type="submit" class="auth-button">
-                    <i class="fas fa-sign-in-alt"></i> Se connecter
+                    <i class="fas fa-key"></i> Réinitialiser le mot de passe
                 </button>
             </form>
             
-            <div class="divider">
-                <span>ou continuer avec</span>
-            </div>
-            
-            <div class="social-buttons">
-                <button class="social-button google-button">
-                    <span class="social-icon">🌐</span>
-                    Google
-                </button>
-                <button class="social-button facebook-button">
-                    <span class="social-icon">📘</span>
-                    Facebook
-                </button>
-            </div>
-            
             <div class="auth-footer">
-                <p>Pas encore de compte ? <a href="/inscription">Créer un compte</a></p>
-                <p><a href="/forgot-password" class="forgot-password">Mot de passe oublié ?</a></p>
+                <p><a href="/connexion">Retour à la connexion</a></p>
             </div>
         </div>
     </div>

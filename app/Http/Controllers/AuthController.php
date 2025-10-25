@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BienvenueMail;
 
 class AuthController extends Controller
 {
@@ -80,6 +82,16 @@ class AuthController extends Controller
                 'MotDePasse' => Hash::make($motDePasse),
                 'Solde' => 1000.00
             ]);
+
+            $nouvelUtilisateur = DB::table('Utilisateurs')
+                ->where('Courriel', $courriel)
+                ->first();
+
+            try {
+                Mail::to($courriel)->send(new BienvenueMail($nouvelUtilisateur));
+            } catch (\Exception $e) {
+                \Log::error('Erreur lors de l\'envoi de l\'email de bienvenue: ' . $e->getMessage());
+            }
             
             return redirect('/connexion')->with('success', 'Compte créé avec succès ! Vous pouvez maintenant vous connecter');
         } catch (\Exception $e) {

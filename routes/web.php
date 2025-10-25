@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\TrajetController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\MotDePasseController;
 
 
 Route::get('/', function () {
@@ -64,6 +65,11 @@ Route::post('/inscription', [AuthController::class, 'traiterInscription']);
 
 Route::get('/deconnexion', [AuthController::class, 'deconnexion']);
 
+Route::get('/forgot-password', [MotDePasseController::class, 'showRequestForm'])->name('password.request');
+Route::post('/forgot-password', [MotDePasseController::class, 'sendResetLink'])->name('password.email');
+Route::get('/reset-password', [MotDePasseController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [MotDePasseController::class, 'resetPassword'])->name('password.update');
+
 
 Route::post('/payer-panier/{conducteurId}/{idUtilisateur}/{paiementId}', [CartController::class, 'payerPanier'])->name('payer.panier');
 Route::post('/update-places', [CartController::class, 'updatePlaces'])->name('update.places');
@@ -77,6 +83,8 @@ Route::post('/reservations', [TrajetController::class, 'reserve'])->name('reserv
 Route::get('/publier', [TrajetController::class, 'create'])->name('trajets.create');
 Route::post('/publier', [TrajetController::class, 'store'])->name('trajets.store');
 Route::get('/rechercher', [TrajetController::class, 'index'])->name('trajets.index');
+Route::put('/trajets/{id}/update', [TrajetController::class, 'updateTrajet'])->name('trajets.update');
+Route::delete('/trajets/{id}/cancel', [TrajetController::class, 'cancelTrajet'])->name('trajets.cancel');
 
 
 Route::get('/trajets/search', [TrajetController::class, 'search']);
