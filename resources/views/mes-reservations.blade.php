@@ -143,7 +143,7 @@
 <!-- Modal modification réservation -->
 <div class="modal fade" id="modifyReservationModal" tabindex="-1" aria-labelledby="modifyReservationModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <form id="modifyReservationForm" method="POST" action="">
                 @csrf
