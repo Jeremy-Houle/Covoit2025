@@ -10,6 +10,10 @@ class TrajetController extends Controller
 {
     public function create()
     {
+        $userId = session('utilisateur_id');
+        if (!$userId) {
+            return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
+        }
         return view('publier');
     }
 
@@ -57,7 +61,7 @@ class TrajetController extends Controller
             $q->where('Fumeur', 1);
         }
 
-        $trajets = $q->orderBy('DateTrajet','asc')->limit(100)->get();
+        $trajets = $q->orderBy('DateTrajet', 'asc')->limit(100)->get();
 
         return response()->json($trajets);
     }
@@ -118,4 +122,4 @@ class TrajetController extends Controller
         }
     }
 }
-}
+
