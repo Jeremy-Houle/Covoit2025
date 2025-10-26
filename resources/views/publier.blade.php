@@ -9,7 +9,7 @@
 @section('content')
     <div class="publish-container" style="padding-top: 100px; text-align: center;">
         <div class="container-ss">
-            <div class=" map" id="map">
+            <div class=" map" id="map"> 
 
             </div>
             <div class="form-card">
