@@ -3,7 +3,7 @@
 @section('title', 'Publier - Covoit2025')
 
 @push('styles')
-    @vite(['resources/css/publier.css'])
+    <link rel="stylesheet" href="{{ asset('css/publier.css') }}?v={{ time() }}">
 @endpush
 
 @section('content')

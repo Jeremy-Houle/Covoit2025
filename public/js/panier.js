@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('modalDate').textContent = date;
             document.getElementById('modalHeure').textContent = heure;
             document.getElementById('modalPlaces').textContent = places;
-            document.getElementById('modalMontant').textContent = `${parseFloat(montant).toFixed(2)} $`;
+            document.getElementById('modalMontant').textContent = `${montant} $`;
             
             const confirmForm = document.getElementById('confirmPaymentForm');
             if (confirmForm) {
@@ -300,49 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const placesCountElement = document.querySelector(`.places-count[data-paiement-id="${paiementId}"]`);
                 const currentPlaces = parseInt(placesCountElement.textContent);
                 
-                if (!this.disabled && this.dataset.maxReached !== 'true') {
-                    this.disabled = true;
-                    this.style.opacity = '0.5';
-                    
-                    updatePlaces(paiementId, currentPlaces + 1);
-                    
-                    setTimeout(() => {
-                        if (this.disabled) {
-                            this.disabled = false;
-                            this.style.opacity = '1';
-                        }
-                    }, 1000);
-                }
+                updatePlaces(paiementId, currentPlaces + 1);
             });
-        });
-    }
-    
-    function initializeButtonsState() {
-        const placesCountElements = document.querySelectorAll('.places-count');
-        placesCountElements.forEach(element => {
-            const paiementId = element.dataset.paiementId;
-            const currentPlaces = parseInt(element.textContent);
-            
-            // Récupérer les places disponibles pour ce trajet
-            const trajetId = element.dataset.trajetId;
-            if (trajetId) {
-                fetch(`/trajets/${trajetId}/availability`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.places_disponibles !== undefined) {
-                            const maxPlaces = currentPlaces + data.places_disponibles;
-                            updateButtonsState(paiementId, currentPlaces, maxPlaces);
-                        } else {
-                            updateButtonsState(paiementId, currentPlaces);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erreur lors de la récupération des places disponibles:', error);
-                        updateButtonsState(paiementId, currentPlaces);
-                    });
-            } else {
-                updateButtonsState(paiementId, currentPlaces);
-            }
         });
     }
 
@@ -390,19 +349,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     payButton.dataset.montant = data.new_amount;
                 }
 
-                const summaryPriceElement = document.querySelector(`.summary-price[data-paiement-id="${paiementId}"]`);
-                if (summaryPriceElement) {
-                    summaryPriceElement.textContent = `${parseFloat(data.new_amount).toFixed(2)} $`;
-                }
-
                 updateGeneralTotal();
-                updateButtonsState(paiementId, data.places, data.places_disponibles + data.places);
+                updateButtonsState(paiementId, data.places);
             } else {
                 placesCountElement.textContent = originalText;
-                
-                if (data.max_places) {
-                    updateButtonsState(paiementId, parseInt(originalText), data.max_places - parseInt(originalText));
-                }
+                alert(data.message || 'Erreur lors de la mise à jour');
             }
         })
         .catch(error => {
@@ -413,33 +364,12 @@ document.addEventListener('DOMContentLoaded', () => {
         .finally(() => {
             minusButton.disabled = false;
             plusButton.disabled = false;
-            plusButton.style.opacity = '1';
-            
-            if (plusButton.dataset.maxReached !== 'true') {
-                plusButton.dataset.maxReached = 'false';
-            }
         });
     }
 
-    function updateButtonsState(paiementId, currentPlaces, maxPlaces = null) {
+    function updateButtonsState(paiementId, currentPlaces) {
         const minusButton = document.querySelector(`.btn-places-minus[data-paiement-id="${paiementId}"]`);
-        const plusButton = document.querySelector(`.btn-places-plus[data-paiement-id="${paiementId}"]`);
-        
         minusButton.disabled = currentPlaces <= 1;
-        
-        if (maxPlaces) {
-            if (currentPlaces >= maxPlaces) {
-                plusButton.disabled = true;
-                plusButton.dataset.maxReached = 'true';
-                plusButton.style.opacity = '0.5';
-                plusButton.title = `Maximum atteint: ${maxPlaces} places`;
-            } else {
-                plusButton.disabled = false;
-                plusButton.dataset.maxReached = 'false';
-                plusButton.style.opacity = '1';
-                plusButton.title = `Places disponibles: ${maxPlaces - currentPlaces}`;
-            }
-        }
     }
 
     function updateGeneralTotal() {
@@ -460,67 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function initRemoveButtons() {
-        const removeButtons = document.querySelectorAll('.btn-remove');
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-        const deleteTrajetInfo = document.getElementById('deleteTrajetInfo');
-        
-        let currentPaiementId = null;
-        
-        removeButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const paiementId = this.dataset.paiementId;
-                const depart = this.dataset.depart;
-                const destination = this.dataset.destination;
-                
-                currentPaiementId = paiementId;
-                
-                deleteTrajetInfo.textContent = `Trajet : ${depart} → ${destination}`;
-                
-                deleteModal.show();
-            });
-        });
-        
-        confirmDeleteBtn.addEventListener('click', function() {
-            if (currentPaiementId) {
-                deleteModal.hide();
-                removeFromCart(currentPaiementId);
-                currentPaiementId = null;
-            }
-        });
-        
-        document.getElementById('deleteConfirmationModal').addEventListener('hidden.bs.modal', function() {
-            currentPaiementId = null;
-        });
-    }
-
-    function removeFromCart(paiementId) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/remove-from-cart';
-        
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = window.csrfToken;
-        form.appendChild(csrfToken);
-        
-        
-        const paiementInput = document.createElement('input');
-        paiementInput.type = 'hidden';
-        paiementInput.name = 'paiement_id';
-        paiementInput.value = paiementId;
-        form.appendChild(paiementInput);
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
-
     initPlacesControls();
-    
-    initializeButtonsState();
-    
-    initRemoveButtons();
 
 });
+

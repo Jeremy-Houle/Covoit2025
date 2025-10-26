@@ -106,13 +106,6 @@
             <!-- Actions -->
             @if(!$isConducteur)
             <div class="reservation-actions">
-                <!-- Modifier (ouvre modal) -->
-                <button type="button" class="btn-update" data-bs-toggle="modal" data-bs-target="#modifyReservationModal"
-                    data-reservation-id="{{ $resa->IdReservation }}" data-trajet-id="{{ $resa->IdTrajet }}"
-                    data-current-reserved="{{ $resa->PlacesReservees }}">
-                    <i class="fas fa-edit"></i> Modifier
-                </button>
-
                 <!-- Annuler -->
                 <form action="{{ route('mes-reservations.destroy', $resa->IdReservation) }}" method="POST" class="cancel-form">
                     @csrf
@@ -121,6 +114,12 @@
                         <i class="fas fa-trash-alt"></i> Annuler
                     </button>
                 </form>
+                <!-- Modifier (ouvre modal) -->
+                <button type="button" class="btn-update" data-bs-toggle="modal" data-bs-target="#modifyReservationModal"
+                    data-reservation-id="{{ $resa->IdReservation }}" data-trajet-id="{{ $resa->IdTrajet }}"
+                    data-current-reserved="{{ $resa->PlacesReservees }}">
+                    <i class="fas fa-edit"></i> Modifier
+                </button>
             </div>
             @endif
 
