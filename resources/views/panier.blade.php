@@ -205,7 +205,7 @@
 
 
 <div class="modal fade" id="paymentConfirmationModal" tabindex="-1" aria-labelledby="paymentConfirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content payment-modal">
             <div class="modal-header payment-modal-header">
                 <div class="payment-header-content">
@@ -224,11 +224,8 @@
             
             <div class="modal-body payment-modal-body">
                 <div class="confirmation-section">
-                    <div class="confirmation-icon">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
-                    <h4 class="confirmation-title">Êtes-vous sûr de vouloir payer ce montant ?</h4>
-                    <p class="confirmation-text">Cette action est irréversible. Veuillez vérifier tous les détails ci-dessous.</p>
+                    <h4 class="confirmation-title">Confirmer le paiement</h4>
+                    <p class="confirmation-text">Vérifiez les détails avant de procéder</p>
                 </div>
 
                 <div class="trajet-summary-card">
@@ -244,9 +241,7 @@
                         <div class="trajet-detail-item">
                             <span class="detail-label">Trajet</span>
                             <span class="detail-value">
-                                <span id="modalDepart"></span> 
-                                <i class="fas fa-arrow-right"></i> 
-                                <span id="modalDestination"></span>
+                                <span id="modalDepart"></span> → <span id="modalDestination"></span>
                             </span>
                         </div>
                         <div class="trajet-detail-item">
@@ -256,7 +251,7 @@
                             </span>
                         </div>
                         <div class="trajet-detail-item">
-                            <span class="detail-label">Nombre de places</span>
+                            <span class="detail-label">Places</span>
                             <span class="detail-value" id="modalPlaces"></span>
                         </div>
                     </div>
@@ -270,16 +265,12 @@
                     <div class="amount-display-large">
                         <span id="modalMontant" class="amount-value-large"></span>
                     </div>
-                    <div class="amount-note">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Montant final incluant tous les frais</span>
-                    </div>
                 </div>
 
                 <div class="payment-options-section">
                     <h6 class="payment-options-title">
                         <i class="fas fa-credit-card"></i>
-                        Choisissez votre méthode de paiement
+                        Méthode de paiement
                     </h6>
                     
                     <div class="payment-options-grid">
@@ -289,14 +280,13 @@
                                     <i class="fas fa-wallet"></i>
                                 </div>
                                 <div class="payment-option-info">
-                                    <h6>Payer avec mon solde</h6>
-                                    <p>Utilisez votre solde disponible</p>
+                                    <h6>Solde</h6>
+                                    <p>Utilisez votre solde</p>
                                 </div>
                             </div>
                             <div class="payment-option-action">
                                 <button type="button" class="btn btn-solde" id="btn-payer-solde">
-                                    <i class="fas fa-check"></i>
-                                    Confirmer
+                                    Payer
                                 </button>
                             </div>
                         </div>
@@ -307,8 +297,8 @@
                                     <i class="fab fa-paypal"></i>
                                 </div>
                                 <div class="payment-option-info">
-                                    <h6>Payer avec PayPal</h6>
-                                    <p>Paiement sécurisé via PayPal</p>
+                                    <h6>PayPal</h6>
+                                    <p>Paiement sécurisé</p>
                                 </div>
                             </div>
                             <div class="payment-option-action">
@@ -321,13 +311,8 @@
             
             <div class="modal-footer payment-modal-footer">
                 <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> 
                     Annuler
                 </button>
-                <div class="security-note">
-                    <i class="fas fa-lock"></i>
-                    <span>Paiement 100% sécurisé</span>
-                </div>
             </div>
         </div>
     </div>

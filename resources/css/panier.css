@@ -700,7 +700,7 @@ body:not(.modal-open) .modal-backdrop {
 }
 
 .payment-modal-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     color: white;
     border: none;
     padding: 24px;
@@ -736,81 +736,71 @@ body:not(.modal-open) .modal-backdrop {
 }
 
 .payment-modal-body {
-    padding: 32px;
+    padding: 20px;
     background: #f8fafc;
+    max-height: 85vh;
+    overflow-y: auto;
 }
 
 .confirmation-section {
     text-align: center;
-    margin-bottom: 32px;
-    padding: 24px;
+    margin-bottom: 6px;
+    padding: 8px;
     background: white;
-    border-radius: 12px;
-    border: 2px solid #e2e8f0;
-}
-
-.confirmation-icon {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 24px;
-    color: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
 }
 
 .confirmation-title {
     color: #2d3748;
     font-weight: 700;
-    margin-bottom: 8px;
-    font-size: 22px;
+    margin-bottom: 4px;
+    font-size: 16px;
 }
 
 .confirmation-text {
     color: #718096;
     margin: 0;
-    font-size: 16px;
+    font-size: 12px;
 }
 
 .trajet-summary-card, .amount-summary-card {
     background: white;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
 }
 
 .trajet-header, .amount-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: 6px;
+    margin-bottom: 8px;
     color: #4a5568;
     font-weight: 600;
+    font-size: 13px;
 }
 
 .trajet-header i, .amount-header i {
-    color: #667eea;
+    color: #2563eb;
 }
 
 .trajet-details-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 8px;
 }
 
 .trajet-detail-item {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .detail-label {
-    font-size: 12px;
+    font-size: 10px;
     color: #718096;
     font-weight: 500;
     text-transform: uppercase;
@@ -820,7 +810,7 @@ body:not(.modal-open) .modal-backdrop {
 .detail-value {
     font-weight: 600;
     color: #2d3748;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .detail-value i {
@@ -830,14 +820,14 @@ body:not(.modal-open) .modal-backdrop {
 
 .amount-display-large {
     text-align: center;
-    margin: 16px 0;
+    margin: 8px 0;
 }
 
 .amount-value-large {
-    font-size: 36px;
+    font-size: 24px;
     font-weight: 800;
     color: #2d3748;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -847,68 +837,69 @@ body:not(.modal-open) .modal-backdrop {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
     color: #718096;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .amount-note i {
-    color: #667eea;
+    color: #2563eb;
 }
 
 .payment-options-section {
-    margin-top: 32px;
+    margin-top: 8px;
 }
 
 .payment-options-title {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     color: #4a5568;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
+    font-size: 13px;
 }
 
 .payment-options-title i {
-    color: #667eea;
+    color: #2563eb;
 }
 
 .payment-options-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 8px;
 }
 
 .payment-option-card {
     background: white;
-    border-radius: 12px;
-    padding: 20px;
-    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .payment-option-card:hover {
-    border-color: #667eea;
+    border-color: #2563eb;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
 }
 
 .payment-option-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
 .payment-option-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .solde-icon {
@@ -925,13 +916,13 @@ body:not(.modal-open) .modal-backdrop {
     margin: 0;
     font-weight: 600;
     color: #2d3748;
-    font-size: 16px;
+    font-size: 13px;
 }
 
 .payment-option-info p {
-    margin: 4px 0 0 0;
+    margin: 1px 0 0 0;
     color: #718096;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 .payment-option-action {
@@ -943,11 +934,12 @@ body:not(.modal-open) .modal-backdrop {
     background: linear-gradient(135deg, #28a745, #20c997);
     border: none;
     color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
     font-weight: 600;
     transition: all 0.3s ease;
     width: 100%;
+    font-size: 12px;
 }
 
 .btn-solde:hover {
@@ -960,8 +952,8 @@ body:not(.modal-open) .modal-backdrop {
     background: #e2e8f0;
     border: none;
     color: #4a5568;
-    padding: 12px 24px;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
     font-weight: 600;
     transition: all 0.3s ease;
 }
@@ -974,9 +966,9 @@ body:not(.modal-open) .modal-backdrop {
 .payment-modal-footer {
     background: #f7fafc;
     border-top: 1px solid #e2e8f0;
-    padding: 20px 32px;
+    padding: 8px 12px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 }
 
@@ -1204,7 +1196,8 @@ body:not(.modal-open) .modal-backdrop {
     }
     
     .payment-modal-body {
-        padding: 20px;
+        padding: 4px;
+        max-height: 45vh;
     }
     
     .trajet-details-grid {
@@ -1216,17 +1209,42 @@ body:not(.modal-open) .modal-backdrop {
     }
     
     .amount-value-large {
-        font-size: 28px;
+        font-size: 16px;
     }
     
     .confirmation-title {
-        font-size: 18px;
+        font-size: 12px;
+    }
+    
+    .confirmation-text {
+        font-size: 9px;
+    }
+    
+    .confirmation-section {
+        padding: 4px;
+        margin-bottom: 4px;
+    }
+    
+    .confirmation-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+    
+    .trajet-summary-card, .amount-summary-card {
+        padding: 4px;
+        margin-bottom: 4px;
+    }
+    
+    .payment-option-card {
+        padding: 4px;
     }
     
     .payment-modal-footer {
         flex-direction: column;
-        gap: 12px;
+        gap: 4px;
         text-align: center;
+        padding: 4px 6px;
     }
 }
 
