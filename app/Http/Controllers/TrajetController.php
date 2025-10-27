@@ -18,6 +18,7 @@ class TrajetController extends Controller
         if (!$userId) {
             return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
         }
+
         return view('publier');
     }
 
@@ -33,7 +34,7 @@ class TrajetController extends Controller
             'HeureTrajet' => 'required',
             'PlacesDisponibles' => 'required|integer|min:1',
             'Prix' => 'required|numeric|min:0',
-            'AnimauxAcceptes' => 'boolean',
+            'AnimauxAcceptes' => 'nullable|boolean',
             'TypeConversation' => 'nullable|string|max:20',
             'Musique' => 'nullable|boolean',
             'Fumeur' => 'nullable|boolean',
@@ -52,19 +53,21 @@ class TrajetController extends Controller
 
     public function search(Request $request)
     {
-        $q = DB::table('Trajets')->select('*');
+        $query = DB::table('Trajets')->select('*');
 
-        if ($v = $request->input('Depart')) {
-            $q->where('Depart', 'like', '%' . trim($v) . '%');
-        }
-        if ($v = $request->input('Destination')) {
-            $q->where('Destination', 'like', '%' . trim($v) . '%');
-        }
-        if ($request->filled('Fumeur')) {
-            $q->where('Fumeur', 1);
+        if ($depart = $request->input('Depart')) {
+            $query->where('Depart', 'like', '%' . trim($depart) . '%');
         }
 
-        $trajets = $q->orderBy('DateTrajet', 'asc')->limit(100)->get();
+        if ($destination = $request->input('Destination')) {
+            $query->where('Destination', 'like', '%' . trim($destination) . '%');
+        }
+
+        if ($request->boolean('Fumeur')) {
+            $query->where('Fumeur', 1);
+        }
+
+        $trajets = $query->orderBy('DateTrajet', 'asc')->limit(100)->get();
 
         return response()->json($trajets);
     }
@@ -87,15 +90,17 @@ class TrajetController extends Controller
         try {
             $result = DB::transaction(function () use ($idTrajet, $places, $userId) {
                 $trajet = DB::table('Trajets')->where('IdTrajet', $idTrajet)->lockForUpdate()->first();
+
                 if (!$trajet) {
                     return ['error' => 'Trajet introuvable', 'status' => 404];
                 }
+
                 $dispo = (int) ($trajet->PlacesDisponibles ?? 0);
                 if ($dispo < $places) {
                     return ['error' => 'Pas assez de places disponibles', 'status' => 422];
                 }
 
-                $idResa = DB::table('Reservations')->insertGetId([
+                $idReservation = DB::table('Reservations')->insertGetId([
                     'IdTrajet' => $idTrajet,
                     'IdPassager' => $userId,
                     'Distance' => null,
@@ -106,25 +111,25 @@ class TrajetController extends Controller
                     ->where('IdTrajet', $idTrajet)
                     ->update(['PlacesDisponibles' => DB::raw("PlacesDisponibles - {$places}")]);
 
-                
                 try {
                     $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
                     $trajetInfo = DB::table('Trajets')->where('IdTrajet', $idTrajet)->first();
-                    $reservation = (object)[
-                        'IdReservation' => $idResa,
-                        'PlacesReservees' => $places
-                    ];
-                    
+
                     if ($passager && $trajetInfo) {
+                        $reservation = (object)[
+                            'IdReservation' => $idReservation,
+                            'PlacesReservees' => $places
+                        ];
+
                         Mail::to($passager->Courriel)->send(
                             new TrajetConfirmeMail($trajetInfo, $passager, $reservation, 'confirmed')
                         );
                     }
                 } catch (\Exception $e) {
-                    Log::error('Erreur lors de l\'envoi de l\'email de confirmation: ' . $e->getMessage());
+                    Log::error("Erreur lors de l'envoi du courriel de confirmation : {$e->getMessage()}");
                 }
 
-                return ['success' => true, 'IdReservation' => $idResa, 'status' => 201];
+                return ['success' => true, 'IdReservation' => $idReservation, 'status' => 201];
             });
 
             if (isset($result['error'])) {
@@ -133,11 +138,10 @@ class TrajetController extends Controller
 
             return response()->json(['message' => 'Réservation ajoutée', 'IdReservation' => $result['IdReservation']], 201);
         } catch (\Exception $e) {
-            //Log::error('Erreur réservation : ' . $e->getMessage());
+            Log::error('Erreur réservation : ' . $e->getMessage());
             return response()->json(['error' => 'Erreur serveur lors de la réservation'], 500);
         }
     }
-}
 
     public function updateTrajet(Request $request, $id)
     {
@@ -147,9 +151,9 @@ class TrajetController extends Controller
         }
 
         $trajet = DB::table('Trajets')->where('IdTrajet', $id)->first();
-        
+
         if (!$trajet || $trajet->IdConducteur != $userId) {
-            return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n\'êtes pas le conducteur.');
+            return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
         }
 
         $request->validate([
@@ -179,7 +183,7 @@ class TrajetController extends Controller
                     new TrajetAnnuleMail($trajetUpdated, $resa, $conducteur, 'modified')
                 );
             } catch (\Exception $e) {
-                Log::error('Erreur lors de l\'envoi de l\'email de modification au passager ' . $resa->IdPassager . ': ' . $e->getMessage());
+                Log::error("Erreur lors de l'envoi de l'email de modification au passager {$resa->IdPassager} : {$e->getMessage()}");
             }
         }
 
@@ -194,9 +198,9 @@ class TrajetController extends Controller
         }
 
         $trajet = DB::table('Trajets')->where('IdTrajet', $id)->first();
-        
+
         if (!$trajet || $trajet->IdConducteur != $userId) {
-            return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n\'êtes pas le conducteur.');
+            return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
         }
 
         $conducteur = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
@@ -213,7 +217,7 @@ class TrajetController extends Controller
                     new TrajetAnnuleMail($trajet, $resa, $conducteur, 'cancelled')
                 );
             } catch (\Exception $e) {
-                Log::error('Erreur lors de l\'envoi de l\'email d\'annulation au passager ' . $resa->IdPassager . ': ' . $e->getMessage());
+                Log::error("Erreur lors de l'envoi de l'email d'annulation au passager {$resa->IdPassager} : {$e->getMessage()}");
             }
         }
 
@@ -222,7 +226,6 @@ class TrajetController extends Controller
             ->update(['Statut' => 'Annulé']);
 
         DB::table('Reservations')->where('IdTrajet', $id)->delete();
-
         DB::table('Trajets')->where('IdTrajet', $id)->delete();
 
         return redirect('/mes-reservations')->with('success', 'Trajet annulé et passagers notifiés. Les remboursements seront traités automatiquement.');
