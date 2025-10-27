@@ -6,6 +6,8 @@
     @vite(['resources/js/rechercher.js'])
     <script>
         window.csrfToken = '{{ csrf_token() }}';
+        // expose le rôle de l'utilisateur au JS (vide si non connecté)
+        window.userRole = {!! json_encode(session('utilisateur_role', '')) !!};
     </script>
 @endpush
 
@@ -24,6 +26,11 @@
 
         <!-- AJOUTER : container pour la carte -->
         <div id="map" style="height:400px; width:100%; margin-top:16px;"></div>
+
+        <!-- AJOUT : container pour les réservations de l'utilisateur -->
+        <div id="myReservations" style="margin-top: 12px;">
+            <!-- Rempli dynamiquement par resources/js/rechercher.js -->
+        </div>
 
         <!-- AJOUT : container pour les résultats sous la carte -->
         <div id="results" style="margin-top: 8px;">

@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\TrajetController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\LesMessageController;
 
 
 Route::get('/', function () {
@@ -72,7 +73,7 @@ Route::get('/edit-profil', [ProfilController::class, 'edit'])->name('profil.edit
 Route::post('/edit-profil', [ProfilController::class, 'update'])->name('profil.update');
 
 Route::get('/trajets/search', [TrajetController::class, 'search']);
-Route::post('/reservations', [TrajetController::class, 'reserve'])->name('reservations.store');
+Route::post('/reservations', [ReservationController::class, 'store'])->middleware('web');
 Route::get('/publier', [TrajetController::class, 'create'])->name('trajets.create');
 Route::post('/publier', [TrajetController::class, 'store'])->name('trajets.store');
 Route::get('/rechercher', [TrajetController::class, 'index'])->name('trajets.index');
@@ -90,3 +91,10 @@ Route::get('/trajets/{id}/availability', function($id) {
     }
     return response()->json(['places_disponibles' => (int)$trajet->PlacesDisponibles]);
 });
+
+Route::get('/api/reservations', [ReservationController::class, 'myReservations'])->middleware('auth');
+
+
+// rendre les routes de messages publiques (sans auth)
+Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
+Route::post('/messages', [LesMessageController::class, 'store'])->name('messages.store');

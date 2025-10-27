@@ -5,10 +5,69 @@ document.addEventListener('DOMContentLoaded', () => {
     console.debug("DOM ready - attach search listener");
     const form = document.getElementById('searchForm');
     const resultsEl = document.getElementById('results');
+    const myResEl = document.getElementById('myReservations'); // <--- NEW
     if (!form || !resultsEl) {
         console.error('searchForm ou results introuvable');
         return;
     }
+
+    // fonction pour charger les réservations de l'utilisateur
+    async function loadMyReservations() {
+        if (!myResEl) return;
+        myResEl.innerHTML = '<p>Chargement de vos réservations…</p>';
+        try {
+            let res = await fetch('/api/reservations', {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (res.status === 404) {
+                res = await fetch('/reservations', {
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+            }
+
+            if (res.status === 401 || res.status === 403) {
+                myResEl.innerHTML = '<p>Vous devez être connecté pour voir vos réservations.</p>';
+                console.warn('Accès refusé:', res.status);
+                return;
+            }
+
+            const ct = res.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+                const data = await res.json();
+                if (!Array.isArray(data) || data.length === 0) {
+                    myResEl.innerHTML = '<p>Aucune réservation pour le moment.</p>';
+                } else {
+                    myResEl.innerHTML = data.map(r => {
+                        const trajet = r.Trajet || r.trajet || {};
+                        const titre = trajet.NomConducteur || trajet.IdTrajet ? `Trajet #${trajet.IdTrajet || ''}` : 'Réservation';
+                        const depart = trajet.Depart || r.Depart || '—';
+                        const dest = trajet.Destination || r.Destination || '—';
+                        const places = r.PlacesReservees ?? r.places ?? 1;
+                        const date = trajet.DateTrajet || r.DateTrajet || '';
+                        return `
+                            <div class="reservation card mb-2 p-2" data-id="${r.IdReservation || r.id || ''}">
+                                <div><strong>${titre}</strong></div>
+                                <div>Départ: ${depart} — Destination: ${dest}</div>
+                                <div>Date: ${date} — Places: ${places}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } else {
+                const text = await res.text();
+                myResEl.innerHTML = text || '<p>Aucune réservation pour le moment.</p>';
+            }
+        } catch (err) {
+            console.error('Erreur chargement réservations :', err);
+            myResEl.innerHTML = '<p>Impossible de charger vos réservations (erreur réseau).</p>';
+        }
+    }
+
+    // charger à l'ouverture
+    loadMyReservations();
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -37,23 +96,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 console.log('Trajets complets reçus :', data);
 
-                console.debug('Payload JSON reçu (extrait):', Array.isArray(data) ? data.slice(0,5) : data);
-                // rendu (extrait) :
                 if (!Array.isArray(data) || data.length === 0) {
                     resultsEl.innerHTML = '<p>Aucun trajet trouvé.</p>';
                 } else {
-                    resultsEl.innerHTML = data.map(t => `
+                    // render en évitant le bouton "Ajouter" pour les conducteurs
+                    resultsEl.innerHTML = data.map(t => {
+                        const maxPlaces = Math.max(0, Number(t.PlacesDisponibles) || 0);
+                        // build options (au moins 1 option si PlacesDisponibles inconnu)
+                        const optCount = Math.max(1, maxPlaces);
+                        const options = Array.from({length: optCount}, (_, i) => {
+                            const val = i + 1;
+                            const disabled = (val > maxPlaces) ? 'disabled' : '';
+                            return `<option value="${val}" ${disabled}>${val}</option>`;
+                        }).join('');
+
+                        const addButton = (window.userRole === 'Conducteur')
+                            ? ''
+                            : `
+                            <div class="reserve-controls" style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:6px;">
+                                <select class="places-select form-select form-select-sm" data-id="${t.IdTrajet}" style="width:48px;max-width:48px;padding:.12rem .25rem;font-size:.82rem;height:30px;" ${maxPlaces === 0 ? 'disabled' : ''}>
+                                    ${options}
+                                </select>
+                                <button class="btn-add btn btn-sm btn-primary" data-id="${t.IdTrajet}" ${maxPlaces === 0 ? 'disabled' : ''}>Reserver ce trajet</button>
+                            </div>
+                        `;
+
+                        return `
                         <div class="trajet card mb-2 p-2" data-id="${t.IdTrajet}">
                             <div><strong>${t.NomConducteur || 'Conducteur'}</strong></div>
                             <div>Départ: ${t.Depart} — Destination: ${t.Destination}</div>
                             <div>Date: ${t.DateTrajet} — Heure: ${t.HeureTrajet}</div>
                             <div>Places: <span class="places-dispo">${t.PlacesDisponibles}</span> — Prix: ${Number(t.Prix).toFixed(2)}$</div>
-                            <div style="margin-top:6px;">
-                                <button class="btn-add btn btn-sm btn-primary" data-id="${t.IdTrajet}" data-places="1">Ajouter au panier</button>
-                            </div>
+                            ${addButton}
                         </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
+
+                // rafraichir les réservations de l'utilisateur après recherche (optionnel)
+                loadMyReservations();
             } else {
                 const text = await res.text();
                 console.debug('Payload texte reçu (début):', text.slice(0,300));
@@ -71,7 +152,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = ev.target.closest('.btn-add');
         if (!btn) return;
         const idTrajet = btn.dataset.id;
-        const places = Number(btn.dataset.places || 1);
+
+        // récupérer la sélection de places dans la même carte
+        const card = btn.closest('.trajet');
+        const select = card && card.querySelector('.places-select');
+        const places = Number(select?.value || 1);
+
+        // validation simple : ne pas dépasser les places dispo affichées
+        const placesEl = card && card.querySelector('.places-dispo');
+        const dispo = placesEl ? Number(placesEl.textContent) : null;
+        if (dispo !== null && places > dispo) {
+            alert('Le nombre de places demandé dépasse les places disponibles.');
+            return;
+        }
 
         btn.disabled = true;
         const origText = btn.textContent;
@@ -96,13 +189,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (res.ok) {
                 // mettre à jour l'affichage des places
-                const card = btn.closest('.trajet');
-                const placesEl = card && card.querySelector('.places-dispo');
                 if (placesEl) {
                     const newVal = Math.max(0, Number(placesEl.textContent) - places);
                     placesEl.textContent = newVal;
                 }
                 btn.textContent = 'Ajouté';
+                // rafraichir les réservations de l'utilisateur après ajout
+                loadMyReservations();
                 setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 1200);
             } else {
                 console.error('Erreur ajout réserve', payload);

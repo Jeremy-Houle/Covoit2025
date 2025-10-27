@@ -3,11 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class ReservationController extends Controller
 {
+    public function myReservations(Request $request)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // exemple : récupérer réservations avec trajet lié
+        $reservations = $user->reservations()->with('trajet')->get();
+
+        return response()->json($reservations);
+    }
+
     /*
     public function index()
     {
@@ -52,72 +66,60 @@ class ReservationController extends Controller
     public function index()
 {
     $utilisateurId = session('utilisateur_id');
-    $role = session('utilisateur_role'); // 'conducteur' ou 'passager'
+    $role = session('utilisateur_role') ?? 'Passager';
 
     if (!$utilisateurId) {
         return redirect('/connexion')->with('error', 'Veuillez vous connecter pour voir vos réservations.');
     }
 
-    if ($role === 'Conducteur') {
-        // 🚗 Si l'utilisateur est conducteur : voir les réservations reçues sur SES trajets
+    if (strtolower($role) === 'conducteur') {
+        // Réservations reçues pour les trajets où l'utilisateur est conducteur
         $reservations = DB::table('Reservations as r')
             ->join('Trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
-            ->join('Utilisateurs as u', 'r.IdPassager', '=', 'u.IdUtilisateur') // le passager
+            ->join('Utilisateurs as p', 'r.IdPassager', '=', 'p.IdUtilisateur')
+            ->where('t.IdConducteur', $utilisateurId)
             ->select(
-                'r.IdReservation',
-                'r.PlacesReservees',
+                'r.*',
                 't.IdTrajet',
                 't.Depart',
                 't.Destination',
                 't.DateTrajet',
                 't.HeureTrajet',
                 't.Prix',
-                'u.Nom as NomPassager',
-                'u.Prenom as PrenomPassager'
+                't.PlacesDisponibles',
+                't.IdConducteur',
+                'p.IdUtilisateur as IdPassager',
+                'p.Nom as NomPassager',
+                'p.Prenom as PrenomPassager'
             )
-            ->where('t.IdConducteur', $utilisateurId)
+            ->orderBy('r.DateReservation', 'desc')
             ->get();
     } else {
-        // 🧳 Si c’est un passager : voir SES propres réservations
+        // Réservations du passager connecté ; joindre le trajet pour obtenir le conducteur
         $reservations = DB::table('Reservations as r')
             ->join('Trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
-            ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
+            ->join('Utilisateurs as c', 't.IdConducteur', '=', 'c.IdUtilisateur')
+            ->where('r.IdPassager', $utilisateurId)
             ->select(
-                'r.IdReservation',
-                'r.PlacesReservees',
+                'r.*',
                 't.IdTrajet',
                 't.Depart',
                 't.Destination',
                 't.DateTrajet',
                 't.HeureTrajet',
                 't.Prix',
-                'u.Nom as NomConducteur',
-                'u.Prenom as PrenomConducteur'
+                't.PlacesDisponibles',
+                't.IdConducteur',
+                'c.IdUtilisateur as IdConducteur',
+                'c.Nom as NomConducteur',
+                'c.Prenom as PrenomConducteur'
             )
-            ->where('r.IdPassager', $utilisateurId)
+            ->orderBy('r.DateReservation', 'desc')
             ->get();
     }
 
     return view('mes-reservations', compact('reservations'));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     //  Modifier une réservation (nombre de places)
 public function update(Request $request, $id)
@@ -195,5 +197,50 @@ public function update(Request $request, $id)
         DB::table('Reservations')->where('IdReservation', $id)->delete();
 
         return redirect('/mes-reservations')->with('success', 'Réservation annulée.');
+    }
+    // Créer uniquement une entrée de paiement (ne pas créer de réservation)
+    public function store(Request $request)
+    {
+        // obtenir l'utilisateur (Auth ou session)
+        $userId = Auth::id() ?: session('utilisateur_id');
+        if (! $userId) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $request->validate([
+            'IdTrajet' => 'required|integer|exists:Trajets,IdTrajet',
+            'PlacesReservees' => 'required|integer|min:1'
+        ]);
+
+        $idTrajet = (int) $request->input('IdTrajet');
+        $places = (int) $request->input('PlacesReservees');
+
+        try {
+            $paiementId = DB::transaction(function () use ($userId, $idTrajet, $places) {
+                // récupérer le trajet pour calcul du montant (lecture simple)
+                $trajet = DB::table('Trajets')->where('IdTrajet', $idTrajet)->first();
+                if (! $trajet) {
+                    throw new \Exception('Trajet introuvable');
+                }
+
+                $prixUnitaire = isset($trajet->Prix) ? floatval($trajet->Prix) : 0.0;
+                $montant = round($prixUnitaire * $places, 2);
+
+                // insérer un paiement — aucune modification des Reservations ou Trajets
+                return DB::table('Paiements')->insertGetId([
+                    'IdUtilisateur' => $userId,
+                    'IdTrajet' => $idTrajet,
+                    'NombrePlaces' => $places,
+                    'Montant' => $montant,
+                    'Statut' => 'En attente',
+                    'MethodePaiement' => 'Carte Crédit',
+                    'DateCreation' => Carbon::now()
+                ], 'IdPaiement');
+            });
+
+            return response()->json(['success' => true, 'IdPaiement' => $paiementId], 201);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 }

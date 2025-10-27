@@ -55,16 +55,22 @@
 
             <!-- Header info conducteur -->
             <div class="reservation-header">
-                @if(!$isConducteur)
-                <div class="conducteur-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span class="conducteur-nom">{{ $resa->PrenomConducteur }} {{ $resa->NomConducteur }}</span>
-                </div>
+                @if($isConducteur)
+                    <div class="conducteur-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="conducteur-nom">Trajet #{{ $resa->IdTrajet }}</span>
+                        <div class="small text-muted">Réservé par : {{ $resa->PrenomPassager ?? $resa->Prenom }} {{ $resa->NomPassager ?? $resa->Nom }}</div>
+                    </div>
+                @else
+                    <div class="conducteur-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="conducteur-nom">{{ $resa->PrenomConducteur }} {{ $resa->NomConducteur }}</span>
+                    </div>
                 @endif
-                <div class="reservation-status">
-                    <span class="badge badge-reservation">Réservé</span>
-                </div>
-            </div>
+                 <div class="reservation-status">
+                     <span class="badge badge-reservation">Réservé</span>
+                 </div>
+             </div>
 
             <!-- Trajet visuel -->
             <div class="reservation-route">
@@ -104,25 +110,40 @@
             </div>
 
             <!-- Actions -->
-            @if(!$isConducteur)
             <div class="reservation-actions">
-                <!-- Modifier (ouvre modal) -->
-                <button type="button" class="btn-update" data-bs-toggle="modal" data-bs-target="#modifyReservationModal"
-                    data-reservation-id="{{ $resa->IdReservation }}" data-trajet-id="{{ $resa->IdTrajet }}"
-                    data-current-reserved="{{ $resa->PlacesReservees }}">
-                    <i class="fas fa-edit"></i> Modifier
-                </button>
+                @if($isConducteur)
+                    <!-- Conducteur : contacter le passager / marquer comme confirmé -->
+                    <a href="{{ route('messages.show', $resa->IdPassager ?? $resa->IdPassager) }}" class="btn-contact btn btn-sm btn-outline-primary" title="Contacter le passager">
+                        <i class="fas fa-envelope"></i> Contacter le passager
+                    </a>
+                    <!-- Optionnel : bouton pour confirmer ou annuler côté conducteur (implémenter backend si besoin) -->
+                    <form action="{{ url('/mes-reservations/'.$resa->IdReservation.'/update') }}" method="POST" style="display:inline-block;">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="PlacesReservees" value="{{ $resa->PlacesReservees }}">
+                        <button type="submit" class="btn btn-sm btn-success" title="Confirmer la réservation">Confirmer</button>
+                    </form>
+                @else
+                    <!-- Passager : contacter le conducteur / modifier / annuler -->
+                    <a href="{{ route('messages.show', $resa->IdConducteur) }}" class="btn-contact btn btn-sm btn-outline-primary" title="Contacter le conducteur">
+                        <i class="fas fa-envelope"></i> Contacter le conducteur
+                    </a>
 
-                <!-- Annuler -->
-                <form action="{{ route('mes-reservations.destroy', $resa->IdReservation) }}" method="POST" class="cancel-form">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn-cancel">
-                        <i class="fas fa-trash-alt"></i> Annuler
+                    <button type="button" class="btn-update" data-bs-toggle="modal" data-bs-target="#modifyReservationModal"
+                        data-reservation-id="{{ $resa->IdReservation }}" data-trajet-id="{{ $resa->IdTrajet }}"
+                        data-current-reserved="{{ $resa->PlacesReservees }}">
+                        <i class="fas fa-edit"></i> Modifier
                     </button>
-                </form>
+
+                    <form action="{{ route('mes-reservations.destroy', $resa->IdReservation) }}" method="POST" class="cancel-form" style="display:inline-block;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-cancel">
+                            <i class="fas fa-trash-alt"></i> Annuler
+                        </button>
+                    </form>
+                @endif
             </div>
-            @endif
 
         </div>
         @empty

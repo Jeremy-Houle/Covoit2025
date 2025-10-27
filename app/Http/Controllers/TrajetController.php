@@ -113,9 +113,8 @@ class TrajetController extends Controller
 
             return response()->json(['message' => 'Réservation ajoutée', 'IdReservation' => $result['IdReservation']], 201);
         } catch (\Exception $e) {
-            Log::error('Erreur réservation : ' . $e->getMessage());
+            //Log::error('Erreur réservation : ' . $e->getMessage());
             return response()->json(['error' => 'Erreur serveur lors de la réservation'], 500);
         }
     }
-}
 }
