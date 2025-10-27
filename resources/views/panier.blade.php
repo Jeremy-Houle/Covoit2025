@@ -2,21 +2,24 @@
 
 @section('title', 'Mon Panier - Covoit2025')
 
+@push('head')
+<meta http-equiv="Permissions-Policy" content="unload=*">
+@endpush
+
 @push('styles')
-@vite(['resources/css/panier.css'])
+<link rel="stylesheet" href="{{ asset('css/panier.css') }}?v={{ time() }}">
 @endpush
 
 @push('scripts')
-@vite(['resources/js/panier.js'])
+<script src="{{ asset('js/panier.js') }}?v={{ time() }}"></script>
 <script>
     window.csrfToken = '{{ csrf_token() }}';
 </script>
 @endpush
-
+<script src="https://www.paypal.com/sdk/js?client-id=AWQqeyvmMlkT1LYUxQ-WRRLHao1rtwanQXVP9LTSYtoyCmJ1JKcKimTRLI5oVZ3kEBbRXQ2n0JqSXt9v&currency=CAD&enable-funding=paypal&disable-funding=card,credit&components=buttons"></script>
 @section('content')
 <div class="panier-page">
     <div class="panier-container">
-        <!-- Header Section -->
         <div class="panier-header">
             <h1 class="panier-title">
                 <i class="fas fa-shopping-cart"></i> Mon Panier
@@ -31,7 +34,7 @@
                 </div>
                 <h3>Votre panier est vide</h3>
                 <p>Vous n'avez aucun trajet réservé pour le moment.</p>
-                <a href="/" class="btn">
+                <a href="/rechercher" class="btn">
                     <i class="fas fa-search"></i> Rechercher des trajets
                 </a>
             </div>
@@ -119,7 +122,7 @@
                                                     {{ $paiement->NombrePlaces <= 1 ? 'disabled' : '' }}>
                                                 <i class="fas fa-minus"></i>
                                             </button>
-                                            <span class="places-count" data-paiement-id="{{ $paiement->IdPaiement }}">{{ $paiement->NombrePlaces }}</span>
+                                            <span class="places-count" data-paiement-id="{{ $paiement->IdPaiement }}" data-trajet-id="{{ $paiement->IdTrajet }}">{{ $paiement->NombrePlaces }}</span>
                                             <button type="button" class="btn-places btn-places-plus" 
                                                     data-paiement-id="{{ $paiement->IdPaiement }}">
                                                 <i class="fas fa-plus"></i>
@@ -150,6 +153,14 @@
                                     <i class="fas fa-credit-card"></i>
                                     Payer ce trajet
                                 </button>
+                                
+                                <button type="button" class="btn btn-remove" 
+                                        data-paiement-id="{{ $paiement->IdPaiement }}"
+                                        data-depart="{{ $paiement->Depart }}"
+                                        data-destination="{{ $paiement->Destination }}">
+                                    <i class="fas fa-trash"></i>
+                                    Supprimer
+                                </button>
                             </div>
                         </div>
                     @endforeach
@@ -167,7 +178,7 @@
                                         <i class="fas fa-arrow-right" style="color: var(--gray-400); font-size: 12px;"></i>
                                         <span class="route-text">{{ $paiement->Destination }}</span>
                                     </div>
-                                    <div class="summary-price">
+                                    <div class="summary-price" data-paiement-id="{{ $paiement->IdPaiement }}">
                                         {{ $paiement->Montant }} $
                                     </div>
                                 </div>
@@ -194,53 +205,346 @@
 
 
 <div class="modal fade" id="paymentConfirmationModal" tabindex="-1" aria-labelledby="paymentConfirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentConfirmationModalLabel">
-                    <i class="fas fa-credit-card"></i> Confirmation de paiement
-                </h5>
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content payment-modal">
+            <div class="modal-header payment-modal-header">
+                <div class="payment-header-content">
+                    <div class="payment-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="payment-title-section">
+                        <h5 class="modal-title" id="paymentConfirmationModalLabel">
+                            Confirmation de paiement sécurisé
+                        </h5>
+                        <p class="payment-subtitle">Vérifiez les détails avant de procéder au paiement</p>
+                    </div>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="payment-summary">
-                    <h6><i class="fas fa-route"></i> Détails du trajet</h6>
-                    <div class="trajet-details-modal">
-                        <p><strong>Conducteur :</strong> <span id="modalConducteur"></span></p>
-                        <p><strong>Trajet :</strong> <span id="modalDepart"></span> → <span id="modalDestination"></span></p>
-                        <p><strong>Date :</strong> <span id="modalDate"></span> à <span id="modalHeure"></span></p>
-                        <p><strong>Places :</strong> <span id="modalPlaces"></span></p>
+            
+            <div class="modal-body payment-modal-body">
+                <div class="confirmation-section">
+                    <h4 class="confirmation-title">Confirmer le paiement</h4>
+                    <p class="confirmation-text">Vérifiez les détails avant de procéder</p>
+                </div>
+
+                <div class="trajet-summary-card">
+                    <div class="trajet-header">
+                        <i class="fas fa-route"></i>
+                        <h6>Détails du trajet</h6>
                     </div>
-                    
-                    <hr>
-                    
-                    <div class="payment-amount">
-                        <h6><i class="fas fa-dollar-sign"></i> Montant à payer</h6>
-                        <div class="amount-display">
-                            <span id="modalMontant" class="amount-value"></span>
+                    <div class="trajet-details-grid">
+                        <div class="trajet-detail-item">
+                            <span class="detail-label">Conducteur</span>
+                            <span class="detail-value" id="modalConducteur"></span>
+                        </div>
+                        <div class="trajet-detail-item">
+                            <span class="detail-label">Trajet</span>
+                            <span class="detail-value">
+                                <span id="modalDepart"></span> → <span id="modalDestination"></span>
+                            </span>
+                        </div>
+                        <div class="trajet-detail-item">
+                            <span class="detail-label">Date & Heure</span>
+                            <span class="detail-value">
+                                <span id="modalDate"></span> à <span id="modalHeure"></span>
+                            </span>
+                        </div>
+                        <div class="trajet-detail-item">
+                            <span class="detail-label">Places</span>
+                            <span class="detail-value" id="modalPlaces"></span>
                         </div>
                     </div>
+                </div>
+                
+                <div class="amount-summary-card">
+                    <div class="amount-header">
+                        <i class="fas fa-dollar-sign"></i>
+                        <h6>Montant à payer</h6>
+                    </div>
+                    <div class="amount-display-large">
+                        <span id="modalMontant" class="amount-value-large"></span>
+                    </div>
+                </div>
+
+                <div class="payment-options-section">
+                    <h6 class="payment-options-title">
+                        <i class="fas fa-credit-card"></i>
+                        Méthode de paiement
+                    </h6>
                     
-                    <div class="payment-warning">
-                        
-                           
-                       
+                    <div class="payment-options-grid">
+                        <div class="payment-option-card" id="solde-option">
+                            <div class="payment-option-header">
+                                <div class="payment-option-icon solde-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="payment-option-info">
+                                    <h6>Solde</h6>
+                                    <p>Utilisez votre solde</p>
+                                </div>
+                            </div>
+                            <div class="payment-option-action">
+                                <button type="button" class="btn btn-solde" id="btn-payer-solde">
+                                    Payer
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="payment-option-card" id="paypal-option">
+                            <div class="payment-option-header">
+                                <div class="payment-option-icon paypal-icon">
+                                    <i class="fab fa-paypal"></i>
+                                </div>
+                                <div class="payment-option-info">
+                                    <h6>PayPal</h6>
+                                    <p>Paiement sécurisé</p>
+                                </div>
+                            </div>
+                            <div class="payment-option-action">
+                                <div id="modal-paypal-button-container"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Annuler
+            
+            <div class="modal-footer payment-modal-footer">
+                <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
+                    Annuler
                 </button>
-                <form id="confirmPaymentForm" method="POST" style="display: inline;">
-                    @csrf
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-credit-card"></i> Confirmer le paiement
-                    </button>
-                </form>
             </div>
         </div>
     </div>
 </div>
 
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentPaymentData = {};
+    
+    const payButtons = document.querySelectorAll('.btn-pay');
+    payButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            currentPaymentData = {
+                conducteurId: this.dataset.conducteurId,
+                utilisateurId: this.dataset.utilisateurId,
+                paiementId: this.dataset.paiementId,
+                montant: this.dataset.montant,
+                conducteurNom: this.dataset.conducteurNom,
+                depart: this.dataset.depart,
+                destination: this.dataset.destination,
+                date: this.dataset.date,
+                heure: this.dataset.heure,
+                places: this.dataset.places
+            };
+            
+            document.getElementById('modalConducteur').textContent = currentPaymentData.conducteurNom;
+            document.getElementById('modalDepart').textContent = currentPaymentData.depart;
+            document.getElementById('modalDestination').textContent = currentPaymentData.destination;
+            document.getElementById('modalDate').textContent = currentPaymentData.date;
+            document.getElementById('modalHeure').textContent = currentPaymentData.heure;
+            document.getElementById('modalPlaces').textContent = currentPaymentData.places;
+            document.getElementById('modalMontant').textContent = `${currentPaymentData.montant} $`;
+            
+          
+            createPayPalButton();
+            
+         
+            const modal = document.getElementById('paymentConfirmationModal');
+            if (modal) {
+                const bootstrapModal = new bootstrap.Modal(modal, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                bootstrapModal.show();
+            }
+        });
+    });
+    
+    document.getElementById('btn-payer-solde').addEventListener('click', function() {
+        payerAvecSolde();
+    });
+    
+    function payerAvecSolde() {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/payer-panier/${currentPaymentData.conducteurId}/${currentPaymentData.utilisateurId}/${currentPaymentData.paiementId}`;
+        form.style.display = 'none';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = window.csrfToken;
+        form.appendChild(csrfInput);
+        
+        const paymentTypeInput = document.createElement('input');
+        paymentTypeInput.type = 'hidden';
+        paymentTypeInput.name = 'payment_type';
+        paymentTypeInput.value = 'solde';
+        form.appendChild(paymentTypeInput);
+        
+        const amountInput = document.createElement('input');
+        amountInput.type = 'hidden';
+        amountInput.name = 'amount';
+        amountInput.value = currentPaymentData.montant;
+        form.appendChild(amountInput);
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('paymentConfirmationModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+    
+    function createPayPalButton() {
+       
+        const container = document.getElementById('modal-paypal-button-container');
+        container.innerHTML = '';
+        
+        if (typeof paypal === 'undefined') {
+            console.error('PayPal SDK non chargé');
+            container.innerHTML = '<div class="alert alert-warning">Erreur de chargement PayPal</div>';
+            return;
+        }
+        
+       
+        paypal.Buttons({
+            fundingSource: paypal.FUNDING.PAYPAL,
+            disableFunding: ['card', 'credit'],
+            
+            style: {
+                layout: 'vertical',
+                color: 'gold',
+                shape: 'rect',
+                label: 'paypal',
+                height: 45
+            },
+            
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: { 
+                            value: currentPaymentData.montant,
+                            currency_code: 'CAD'
+                        }
+                    }]
+                });
+            },
+            
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    console.log('Paiement PayPal approuvé:', details);
+                    
+                  
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('paymentConfirmationModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/payer-panier/${currentPaymentData.conducteurId}/${currentPaymentData.utilisateurId}/${currentPaymentData.paiementId}`;
+                    form.style.display = 'none';
+                    
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = window.csrfToken;
+                    form.appendChild(csrfInput);
+                    
+                    const paymentTypeInput = document.createElement('input');
+                    paymentTypeInput.type = 'hidden';
+                    paymentTypeInput.name = 'payment_type';
+                    paymentTypeInput.value = 'paypal';
+                    form.appendChild(paymentTypeInput);
+                    
+                    const paypalOrderInput = document.createElement('input');
+                    paypalOrderInput.type = 'hidden';
+                    paypalOrderInput.name = 'paypal_order_id';
+                    paypalOrderInput.value = details.id;
+                    form.appendChild(paypalOrderInput);
+                    
+                    const paypalStatusInput = document.createElement('input');
+                    paypalStatusInput.type = 'hidden';
+                    paypalStatusInput.name = 'paypal_status';
+                    paypalStatusInput.value = details.status;
+                    form.appendChild(paypalStatusInput);
+                    
+                    const amountInput = document.createElement('input');
+                    amountInput.type = 'hidden';
+                    amountInput.name = 'amount';
+                    amountInput.value = currentPaymentData.montant;
+                    form.appendChild(amountInput);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            },
+            
+            onError: function(err) {
+                console.error('Erreur PayPal:', err);
+                alert('Erreur PayPal: ' + err.message);
+            }
+        }).render('#modal-paypal-button-container').catch(function(err) {
+            console.error('Erreur lors du rendu du bouton PayPal:', err);
+            container.innerHTML = '<div class="alert alert-danger">Erreur de chargement du bouton PayPal</div>';
+        });
+    }
+});
+</script>
+
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content delete-modal">
+            <div class="modal-header delete-modal-header">
+                <div class="delete-header-content">
+                    <div class="delete-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="delete-title-section">
+                        <h5 class="modal-title" id="deleteConfirmationModalLabel">
+                            Confirmer la suppression
+                        </h5>
+                        <p class="delete-subtitle">Cette action est irréversible</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body delete-modal-body">
+                <div class="confirmation-section">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <div class="confirmation-content">
+                        <h6 class="confirmation-title">Supprimer ce trajet du panier ?</h6>
+                        <p class="confirmation-text" id="deleteTrajetInfo">
+                        </p>
+                        <div class="warning-note">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Les places seront remises disponibles dans le trajet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer delete-modal-footer">
+                <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Annuler
+                </button>
+                <button type="button" class="btn btn-delete" id="confirmDeleteBtn">
+                    <i class="fas fa-trash"></i>
+                    Supprimer définitivement
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

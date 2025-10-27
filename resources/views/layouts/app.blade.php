@@ -29,10 +29,18 @@
             <button class="navbar-toggle" id="navbarToggle" aria-label="Menu" style="display:none;">
                 <i class="fa fa-bars"></i>
             </button>
+            @php
+                    $userId = session('utilisateur_id');
+                    if ($userId) {
+                        $role = session('utilisateur_role');
+                    }
+            @endphp
             <div class="navbar-center">
                 <a href="/">Accueil</a>
                 <a href="/rechercher">Rechercher</a>
-                <a href="/publier">Publier</a>
+                @if ($userId && $role = 'Conducteur')
+                    <a href="/publier">Publier</a>
+                @endif
                 <a href="/mes-reservations">Mes Réservations</a>
                 <a href="/tarifs">Tarifs</a>
                 <a href="/about">À propos</a>

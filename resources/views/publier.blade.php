@@ -3,16 +3,22 @@
 @section('title', 'Publier - Covoit2025')
 
 @push('styles')
-    @vite(['resources/css/publier.css'])
+    <link rel="stylesheet" href="{{ asset('css/publier.css') }}?v={{ time() }}">
 @endpush
 
 @section('content')
-    <div class="container" style="padding-top: 100px; text-align: center;">
+    <div class="publish-container" style="padding-top: 100px; text-align: center;">
         <div class="container-ss">
-            <div class="shadowed-card map" id="map" style="padding: 15%;">
+            <div class=" map" id="map"> 
 
             </div>
-            <div class="shadowed-card">
+            <div class="form-card">
+                @if(session('success'))
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ session('success') }}
+                    </div>
+                @endif
                 <h3 style="margin-bottom: 20px;">Publier un trajet</h3>
                 <form action="{{ route('trajets.store') }}" method="POST" id="trajetForm">
                     <div class="scroll-view ">
@@ -40,10 +46,7 @@
                         <label for="Prix">Prix ($):</label>
                         <input type="number" step="0.01" name="Prix" id="Prix" required><br>
 
-                        <label for="AnimauxAcceptes">
-                            <input type="checkbox" name="AnimauxAcceptes" id="AnimauxAcceptes" value="1">
-                            Animaux Acceptés
-                        </label><br>
+
 
                         <label for="TypeConversation">Type de conversation:</label>
                         <select name="TypeConversation" id="TypeConversation" required>
@@ -51,20 +54,25 @@
                             <option value="Normal">Normal</option>
                             <option value="Bavard">Bavard</option>
                         </select><br>
+                        <div class="option-group" style="margin-top: 20px;">
+                            <label for="AnimauxAcceptes">
+                                <input type="checkbox" name="AnimauxAcceptes" id="AnimauxAcceptes" value="1">
+                                <span>Animaux Acceptés</span>
+                            </label>
 
-                        <label for="Musique">
-                            <input type="checkbox" name="Musique" id="Musique" value="1">
-                            Musique
-                        </label><br>
+                            <label for="Musique">
+                                <input type="checkbox" name="Musique" id="Musique" value="1">
+                                <span>Musique</span>
+                            </label>
 
-                        <label for="Fumeur">
-                            <input type="checkbox" name="Fumeur" id="Fumeur" value="1">
-                            Fumeur
-                        </label><br>
+                            <label for="Fumeur">
+                                <input type="checkbox" name="Fumeur" id="Fumeur" value="1">
+                                <span>Fumeur</span>
+                            </label>
+                        </div>
 
                     </div>
-                    <button type="submit" hidden id="submitTrajet">Créer Trajet</button>
-                    <button id="verifyTrajet">Vérifier Trajet</button>
+                    <button type="submit" id="submitTrajet">Créer Trajet</button>
                 </form>
             </div>
         </div>
@@ -79,16 +87,49 @@
             map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: 45.5019, lng: -73.5674 },
                 zoom: 10,
+                styles: [
+                    {
+                        "featureType": "all",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#e5e7eb" }]
+                    },
+                    {
+                        "featureType": "all",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#444444" }]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#cbd5e1" }]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#93c5fd" }]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#f3f4f6" }]
+                    }
+                ]
             });
 
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer({ map });
 
             departAutocomplete = new google.maps.places.Autocomplete(
-                document.getElementById("Depart")
+                document.getElementById("Depart"), {
+                componentRestrictions: { country: "ca" },
+                fields: ["geometry", "name"]
+            }
             );
             destinationAutocomplete = new google.maps.places.Autocomplete(
-                document.getElementById("Destination")
+                document.getElementById("Destination"), {
+                componentRestrictions: { country: "ca" },
+                fields: ["geometry", "name"]
+            }
             );
 
             departAutocomplete.bindTo("bounds", map);
@@ -98,23 +139,18 @@
                 const place = departAutocomplete.getPlace();
                 if (!place.geometry) return;
                 addMarker("depart", place.geometry.location);
+                afficherTrajet();
             });
 
             destinationAutocomplete.addListener("place_changed", () => {
                 const place = destinationAutocomplete.getPlace();
                 if (!place.geometry) return;
                 addMarker("destination", place.geometry.location);
+                afficherTrajet();
             });
 
-            document.getElementById("verifyTrajet").addEventListener("click", function (e) {
-                e.preventDefault(); 
-
-                afficherTrajet(); 
-
-                document.getElementById("verifyTrajet").setAttribute("hidden", true);
-                document.getElementById("submitTrajet").removeAttribute("hidden");
-            });
         }
+
 
         function addMarker(type, position) {
             const color = type === "depart" ? "red" : "blue";
@@ -143,10 +179,8 @@
             const destination = document.getElementById("Destination").value;
 
             if (!depart || !destination) {
-                alert("Veuillez remplir les deux champs.");
-                return;
+                return
             }
-
             const request = {
                 origin: depart,
                 destination: destination,
@@ -164,6 +198,9 @@
                     alert("Erreur: " + status);
                 }
             });
+
+
+
         }
 
         window.initMap = initMap;

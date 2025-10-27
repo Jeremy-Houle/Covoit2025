@@ -5,62 +5,123 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ConfirmationPaiementMail;
 
 class CartController extends Controller
 {
-    public function payerPanier($p_conducteurId, $p_idUtilisateur, $p_Idpaiement)
-    {
-        try {
-            // Log de débogage
-            Log::info('Tentative de paiement', [
-                'conducteur_id' => $p_conducteurId,
-                'utilisateur_id' => $p_idUtilisateur,
-                'paiement_id' => $p_Idpaiement
-            ]);
+    
+    public function payerPanier(Request $request, $p_conducteurId, $p_idUtilisateur, $p_Idpaiement)
+{
+    try {
+        $paymentType = $request->input('payment_type', 'solde'); 
+        $paypalOrderId = $request->input('paypal_order_id');
+        $paypalStatus = $request->input('paypal_status');
+        
+        Log::info('Tentative de paiement', [
+            'conducteur_id' => $p_conducteurId,
+            'utilisateur_id' => $p_idUtilisateur,
+            'paiement_id' => $p_Idpaiement,
+            'payment_type' => $paymentType,
+            'paypal_order_id' => $paypalOrderId
+        ]);
+        
+        $paiement = DB::table('Paiements')
+            ->where('IdPaiement', $p_Idpaiement)
+            ->where('IdUtilisateur', $p_idUtilisateur)
+            ->first();
 
-            // Vérifier les fonds avant d'appeler la procédure
-            $paiement = DB::table('Paiements')
-                ->where('IdPaiement', $p_Idpaiement)
-                ->where('IdUtilisateur', $p_idUtilisateur)
-                ->first();
-            
-            if (!$paiement) {
-                throw new \Exception('Paiement introuvable');
-            }
-            
-            $utilisateur = DB::table('Utilisateurs')
-                ->where('IdUtilisateur', $p_idUtilisateur)
-                ->first();
-            
-            $soldeActuel = $utilisateur->Solde ?? 0;
-            $montantPaiement = $paiement->Montant;
-            
-            if ($soldeActuel < $montantPaiement) {
-                throw new \Exception("Fonds insuffisants. Solde disponible: {$soldeActuel}$, Montant requis: {$montantPaiement}$");
-            }
-            
-            // Exécuter la procédure stockée
-            DB::statement("CALL PayerPanier(?, ?, ?)", [$p_conducteurId, $p_idUtilisateur, $p_Idpaiement]);
-            
-            Log::info('Paiement effectué avec succès', [
-                'conducteur_id' => $p_conducteurId,
-                'utilisateur_id' => $p_idUtilisateur,
-                'paiement_id' => $p_Idpaiement
-            ]);
-
-            return redirect()->route('cart')->with('payment_success', 'Paiement effectué avec succès !');
-            
-        } catch (\Exception $e) {
-            Log::error('Erreur lors du paiement', [
-                'error' => $e->getMessage(),
-                'conducteur_id' => $p_conducteurId,
-                'utilisateur_id' => $p_idUtilisateur,
-                'paiement_id' => $p_Idpaiement
-            ]);
-
-            return redirect()->route('cart')->with('error', 'Erreur lors du paiement: ' . $e->getMessage());
+        if (!$paiement) {
+            throw new \Exception("Paiement introuvable (#{$p_Idpaiement})");
         }
+
+        $trajet = DB::table('Trajets')
+            ->where('IdTrajet', $paiement->IdTrajet)
+            ->first();
+
+        if (!$trajet) {
+            throw new \Exception("Trajet introuvable pour le paiement #{$p_Idpaiement}");
+        }
+
+        $utilisateur = DB::table('Utilisateurs')
+            ->where('IdUtilisateur', $p_idUtilisateur)
+            ->first();
+
+        if (!$utilisateur) {
+            throw new \Exception("Utilisateur introuvable (#{$p_idUtilisateur})");
+        }
+
+        $montantAttendu = $trajet->Prix * $paiement->NombrePlaces;
+
+        if ($paymentType === 'paypal') {
+            if (!$paypalOrderId || !$paypalStatus || $paypalStatus !== 'COMPLETED') {
+                throw new \Exception("Paiement PayPal non confirmé");
+            }
+            
+            Log::info('Paiement PayPal confirmé', [
+                'order_id' => $paypalOrderId,
+                'status' => $paypalStatus,
+                'montant' => $montantAttendu
+            ]);
+            
+        } else {
+            $soldeActuel = $utilisateur->Solde ?? 0;
+            
+            if ($soldeActuel < $montantAttendu) {
+                throw new \Exception("Fonds insuffisants. Solde actuel: {$soldeActuel}$, requis: {$montantAttendu}$");
+            }
+            
+            Log::info('Paiement avec solde', [
+                'solde_actuel' => $soldeActuel,
+                'montant' => $montantAttendu
+            ]);
+        }
+
+        DB::statement("CALL PayerPanier(?, ?, ?, ?)", [
+            $p_conducteurId,
+            $p_idUtilisateur,
+            $p_Idpaiement,
+            $paymentType
+        ]);
+
+        Log::info('Paiement effectué avec succès', [
+            'conducteur_id' => $p_conducteurId,
+            'utilisateur_id' => $p_idUtilisateur,
+            'paiement_id' => $p_Idpaiement,
+            'montant' => $montantAttendu,
+            'payment_type' => $paymentType
+        ]);
+
+        try {
+            Mail::to($utilisateur->Courriel)->send(
+                new ConfirmationPaiementMail($paiement, $trajet, $utilisateur)
+            );
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'envoi de l\'email de confirmation: ' . $e->getMessage());
+        }
+        
+        $message = $paymentType === 'paypal' 
+            ? "Paiement PayPal de " . number_format($montantAttendu, 2) . "$ effectué avec succès !"
+            : "Paiement de " . number_format($montantAttendu, 2) . "$ effectué avec succès avec votre solde !";
+            
+        return redirect()->route('cart')->with('payment_success', $message);
+        
+    } catch (\Exception $e) {
+        Log::error('Erreur lors du paiement', [
+            'error' => $e->getMessage(),
+            'conducteur_id' => $p_conducteurId,
+            'utilisateur_id' => $p_idUtilisateur,
+            'paiement_id' => $p_Idpaiement,
+            'payment_type' => $request->input('payment_type', 'solde')
+        ]);
+
+        if (strpos($e->getMessage(), 'Fonds insuffisants') !== false) {
+            return redirect()->route('cart')->with('error', 'Fonds insuffisants');
+        }
+        
+        return redirect()->route('cart')->with('error', 'Erreur lors du paiement : ' . $e->getMessage());
     }
+}
 
     public function getidConducteur($p_Idpaiement)
     {
@@ -82,12 +143,12 @@ class CartController extends Controller
             $newPlaces = $request->input('places');
             $userId = session('utilisateur_id', 1);
 
-            // Valider les données
+           
             if (!$paiementId || !$newPlaces || $newPlaces < 1) {
                 return response()->json(['success' => false, 'message' => 'Données invalides']);
             }
 
-            // Vérifier que le paiement appartient à l'utilisateur
+            
             $paiement = DB::table('Paiements')
                 ->where('IdPaiement', $paiementId)
                 ->where('IdUtilisateur', $userId)
@@ -97,19 +158,51 @@ class CartController extends Controller
                 return response()->json(['success' => false, 'message' => 'Paiement introuvable']);
             }
 
-            // Appeler la procédure stockée
-            DB::statement("CALL ModifierNombrePlaces(?, ?)", [$paiementId, $newPlaces]);
+            $trajet = DB::table('Trajets')
+                ->where('IdTrajet', $paiement->IdTrajet)
+                ->first();
 
-            // Récupérer les données mises à jour
+            if (!$trajet) {
+                return response()->json(['success' => false, 'message' => 'Trajet introuvable']);
+            }
+
+            $placesDisponibles = (int)$trajet->PlacesDisponibles;
+            $placesActuelles = (int)$paiement->NombrePlaces;
+            $difference = $newPlaces - $placesActuelles;
+
+            if ($difference >= $placesDisponibles) {
+                return response()->json([
+                    'success' => false, 
+                    'max_places' => $placesActuelles + $placesDisponibles
+                ]);
+            }
+
+            try {
+                DB::statement("CALL ModifierNombrePlaces(?, ?)", [$paiementId, $newPlaces]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => $e->getMessage()
+                ]);
+            }
+
             $updatedPaiement = DB::table('Paiements')
                 ->where('IdPaiement', $paiementId)
                 ->first();
 
+            $updatedTrajet = DB::table('Trajets')
+                ->where('IdTrajet', $paiement->IdTrajet)
+                ->first();
+
+            $prixParPersonne = (float)($paiement->Montant / $paiement->NombrePlaces);
+            $nouveauMontantTotal = $prixParPersonne * $updatedPaiement->NombrePlaces;
+            
             return response()->json([
                 'success' => true,
                 'places' => (int)$updatedPaiement->NombrePlaces,
-                'new_amount' => (float)$updatedPaiement->Montant,
-                'price_per_place' => (float)($updatedPaiement->Montant / $updatedPaiement->NombrePlaces)
+                'new_amount' => $nouveauMontantTotal,
+                'price_per_place' => $prixParPersonne,
+                'places_disponibles' => (int)$updatedTrajet->PlacesDisponibles
             ]);
 
         } catch (\Exception $e) {
@@ -120,6 +213,58 @@ class CartController extends Controller
             ]);
 
             return response()->json(['success' => false, 'message' => 'Erreur lors de la mise à jour']);
+        }
+    }
+
+    public function removeFromCart(Request $request)
+    {
+        try {
+            $paiementId = $request->input('paiement_id');
+            $userId = session('utilisateur_id', 1);
+
+            if (!$paiementId) {
+                return response()->json(['success' => false, 'message' => 'ID de paiement manquant']);
+            }
+
+            $paiement = DB::table('Paiements')
+                ->where('IdPaiement', $paiementId)
+                ->where('IdUtilisateur', $userId)
+                ->first();
+
+            if (!$paiement) {
+                return response()->json(['success' => false, 'message' => 'Paiement introuvable']);
+            }
+
+            $trajet = DB::table('Trajets')
+                ->where('IdTrajet', $paiement->IdTrajet)
+                ->first();
+
+            if ($trajet) {
+                DB::table('Trajets')
+                    ->where('IdTrajet', $paiement->IdTrajet)
+                    ->increment('PlacesDisponibles', $paiement->NombrePlaces);
+            }
+
+            DB::table('Paiements')
+                ->where('IdPaiement', $paiementId)
+                ->where('IdUtilisateur', $userId)
+                ->delete();
+
+            Log::info('Paiement supprimé du panier', [
+                'paiement_id' => $paiementId,
+                'utilisateur_id' => $userId,
+                'places_remises' => $paiement->NombrePlaces
+            ]);
+
+            return redirect()->route('cart')->with('success', 'Trajet supprimé du panier');
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la suppression du paiement', [
+                'paiement_id' => $request->input('paiement_id'),
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('cart')->with('error', 'Erreur lors de la suppression');
         }
     }
 }

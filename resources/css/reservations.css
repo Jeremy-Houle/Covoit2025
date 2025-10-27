@@ -110,11 +110,11 @@
 }
 
 .route-arrow img {
-    width: 200px;       
+    width: 200px;      
     height: auto;
     flex-shrink: 0;
     display: block;
-    margin: 0 10px;  
+    margin: 0 10px;   
 }
 
 .reservation-details {
@@ -226,6 +226,7 @@
     transform: translateY(-10px);
 }
 
+
 @media (max-width: 1024px) {
     .reservation-details {
         flex-direction: column;
@@ -252,3 +253,4 @@
         width: 50px;
     }
 }
+
