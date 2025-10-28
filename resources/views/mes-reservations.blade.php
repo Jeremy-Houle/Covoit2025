@@ -11,7 +11,6 @@
 <div class="reservations-page">
     <div class="reservations-container">
 
-        <!-- Header Section -->
         <div class="reservations-header">
             <h1 class="reservations-title">
                 <i class="fas fa-calendar-alt"></i> Mes réservations
@@ -19,7 +18,6 @@
             <p class="reservations-subtitle">Gérez vos réservations de covoiturage</p>
         </div>
 
-        <!-- Alerts -->
         @if(session('success'))
             <div class="alert success" id="success-alert">
                 <i class="fas fa-check-circle"></i> {{ session('success') }}
@@ -32,7 +30,6 @@
         @endif
 
         <script>
-            // Fade out smooth des alertes
             setTimeout(() => {
                 const successAlert = document.getElementById('success-alert');
                 const errorAlert = document.getElementById('error-alert');
@@ -53,7 +50,6 @@
 
         <div class="reservation-card">
 
-            <!-- Header info conducteur -->
             <div class="reservation-header">
                 @if($isConducteur)
                     <div class="conducteur-info">
@@ -72,7 +68,6 @@
                  </div>
              </div>
 
-            <!-- Trajet visuel -->
             <div class="reservation-route">
                 <div class="route-points">
                     <div class="depart">
@@ -89,7 +84,6 @@
                 </div>
             </div>
 
-            <!-- Détails trajet -->
             <div class="reservation-details">
                 <div class="detail-item">
                     <i class="fas fa-calendar-alt"></i>
@@ -109,14 +103,11 @@
                 </div>
             </div>
 
-            <!-- Actions -->
             <div class="reservation-actions">
                 @if($isConducteur)
-                    <!-- Conducteur : contacter le passager / marquer comme confirmé -->
                     <a href="{{ route('messages.show', $resa->IdPassager ?? $resa->IdPassager) }}" class="btn-contact btn btn-sm btn-outline-primary" title="Contacter le passager">
                         <i class="fas fa-envelope"></i> Contacter le passager
                     </a>
-                    <!-- Optionnel : bouton pour confirmer ou annuler côté conducteur (implémenter backend si besoin) -->
                     <form action="{{ url('/mes-reservations/'.$resa->IdReservation.'/update') }}" method="POST" style="display:inline-block;">
                         @csrf
                         @method('PUT')
@@ -124,7 +115,6 @@
                         <button type="submit" class="btn btn-sm btn-success" title="Confirmer la réservation">Confirmer</button>
                     </form>
                 @else
-                    <!-- Passager : contacter le conducteur / modifier / annuler -->
                     <a href="{{ route('messages.show', $resa->IdConducteur) }}" class="btn-contact btn btn-sm btn-outline-primary" title="Contacter le conducteur">
                         <i class="fas fa-envelope"></i> Contacter le conducteur
                     </a>
@@ -160,9 +150,8 @@
         @endforelse
 
     </div>
-</div>
+        </div>
 
-<!-- Modal modification réservation -->
 <div class="modal fade" id="modifyReservationModal" tabindex="-1" aria-labelledby="modifyReservationModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -219,14 +208,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('availableSeats').innerText = placesDisponibles;
 
-        // ✅ On définit le maximum possible (places disponibles + déjà réservées)
         const maxPossible = placesDisponibles + currentReserved;
         const newPlacesInput = document.getElementById('newPlaces');
         newPlacesInput.max = maxPossible;
         newPlacesInput.min = 1;
         newPlacesInput.value = currentReserved;
 
-        // ✅ Empêche d'entrer plus que max directement au clavier
         newPlacesInput.addEventListener('input', () => {
             let val = parseInt(newPlacesInput.value, 10);
             const max = parseInt(newPlacesInput.max, 10);
@@ -236,7 +223,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ✅ Validation avant envoi du formulaire
     document.getElementById('modifyReservationForm').addEventListener('submit', function(e){
         const input = document.getElementById('newPlaces');
         const min = parseInt(input.min,10);
@@ -253,7 +239,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ✅ Confirmation d'annulation avec SweetAlert2
     const cancelForms = document.querySelectorAll('.cancel-form');
     cancelForms.forEach(form => {
         form.addEventListener('submit', function(e){

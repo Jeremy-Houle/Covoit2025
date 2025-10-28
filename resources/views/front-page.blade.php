@@ -122,6 +122,11 @@
 .how-it-works-section {
     padding: var(--spacing-3xl) 0;
     background: var(--gray-50);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .section-title {
@@ -130,6 +135,7 @@
     font-weight: 700;
     color: var(--primary-blue);
     margin-bottom: var(--spacing-3xl);
+    width: 100%;
 }
 
 .steps-grid {
@@ -139,6 +145,8 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--spacing-lg);
+    width: 100%;
+    justify-items: center;
 }
 
 .step-card {
@@ -204,6 +212,11 @@
 .why-choose-section {
     padding: var(--spacing-3xl) 0;
     background: var(--light-blue);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .benefits-grid {
@@ -213,6 +226,8 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--spacing-lg);
+    width: 100%;
+    justify-items: center;
 }
 
 .benefit-card {

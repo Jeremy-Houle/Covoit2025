@@ -461,8 +461,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initRemoveButtons() {
+        console.log('Initialisation des boutons supprimer...');
         const removeButtons = document.querySelectorAll('.btn-remove');
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+        console.log('Nombre de boutons trouvés:', removeButtons.length);
+        
+        const modalElement = document.getElementById('deleteConfirmationModal');
+        if (!modalElement) {
+            console.error('Modal deleteConfirmationModal introuvable !');
+            return;
+        }
+        
+        const deleteModal = new bootstrap.Modal(modalElement);
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         const deleteTrajetInfo = document.getElementById('deleteTrajetInfo');
         
@@ -470,27 +479,34 @@ document.addEventListener('DOMContentLoaded', () => {
         
         removeButtons.forEach(button => {
             button.addEventListener('click', function() {
+                console.log('Bouton supprimer cliqué !');
                 const paiementId = this.dataset.paiementId;
                 const depart = this.dataset.depart;
                 const destination = this.dataset.destination;
                 
+                console.log('Paiement à supprimer:', paiementId, depart, destination);
                 currentPaiementId = paiementId;
                 
-                deleteTrajetInfo.textContent = `Trajet : ${depart} → ${destination}`;
+                if (deleteTrajetInfo) {
+                    deleteTrajetInfo.textContent = `Trajet : ${depart} → ${destination}`;
+                }
                 
                 deleteModal.show();
             });
         });
         
-        confirmDeleteBtn.addEventListener('click', function() {
-            if (currentPaiementId) {
-                deleteModal.hide();
-                removeFromCart(currentPaiementId);
-                currentPaiementId = null;
-            }
-        });
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', function() {
+                console.log('Confirmation de suppression pour:', currentPaiementId);
+                if (currentPaiementId) {
+                    deleteModal.hide();
+                    removeFromCart(currentPaiementId);
+                    currentPaiementId = null;
+                }
+            });
+        }
         
-        document.getElementById('deleteConfirmationModal').addEventListener('hidden.bs.modal', function() {
+        modalElement.addEventListener('hidden.bs.modal', function() {
             currentPaiementId = null;
         });
     }

@@ -1,17 +1,15 @@
-// code chargé par @vite
 console.log("rechercher.js chargé");
 
 document.addEventListener('DOMContentLoaded', () => {
     console.debug("DOM ready - attach search listener");
     const form = document.getElementById('searchForm');
     const resultsEl = document.getElementById('results');
-    const myResEl = document.getElementById('myReservations'); // <--- NEW
+    const myResEl = document.getElementById('myReservations');
     if (!form || !resultsEl) {
         console.error('searchForm ou results introuvable');
         return;
     }
 
-    // fonction pour charger les réservations de l'utilisateur
     async function loadMyReservations() {
         if (!myResEl) return;
         myResEl.innerHTML = '<p>Chargement de vos réservations…</p>';
@@ -66,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // charger à l'ouverture
     loadMyReservations();
 
     form.addEventListener('submit', async (e) => {
@@ -90,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.debug('Réponse reçue - status:', res.status, 'headers:', [...res.headers.entries()]);
 
-            // tenter de lire JSON sinon texte
             const contentType = res.headers.get('content-type') || '';
             if (contentType.includes('application/json')) {
                 const data = await res.json();
@@ -99,10 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!Array.isArray(data) || data.length === 0) {
                     resultsEl.innerHTML = '<p>Aucun trajet trouvé.</p>';
                 } else {
-                    // render en évitant le bouton "Ajouter" pour les conducteurs
                     resultsEl.innerHTML = data.map(t => {
                         const maxPlaces = Math.max(0, Number(t.PlacesDisponibles) || 0);
-                        // build options (au moins 1 option si PlacesDisponibles inconnu)
                         const optCount = Math.max(1, maxPlaces);
                         const options = Array.from({length: optCount}, (_, i) => {
                             const val = i + 1;
@@ -117,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <select class="places-select form-select form-select-sm" data-id="${t.IdTrajet}" style="width:48px;max-width:48px;padding:.12rem .25rem;font-size:.82rem;height:30px;" ${maxPlaces === 0 ? 'disabled' : ''}>
                                     ${options}
                                 </select>
-                                <button type="button" class="btn-add btn btn-sm btn-primary" data-id="${t.IdTrajet}" ${maxPlaces === 0 ? 'disabled' : ''}>Reserver ce trajet</button>
+                                <button type="button" class="btn-add btn btn-sm btn-primary" data-id="${t.IdTrajet}" ${maxPlaces === 0 ? 'disabled' : ''}>Réserver ce trajet</button>
                             </div>
                         `;
 
@@ -133,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div>Date: ${t.DateTrajet} — Heure: ${t.HeureTrajet}</div>
                             <div>Places: <span class="places-dispo">${t.PlacesDisponibles}</span> — Prix: ${Number(t.Prix).toFixed(2)}$</div>
                             ${addButton}
-                            <!-- panneau détails (vide caché, pourra être rempli ou togglé) -->
                             <div class="trajet-details" style="display:none;margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;">
                                 <div><strong>Détails complets</strong></div>
                                 <div>ID Trajet : ${t.IdTrajet}</div>
@@ -148,12 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }).join('');
                 }
 
-                // rafraichir les réservations de l'utilisateur après recherche (optionnel)
                 loadMyReservations();
             } else {
                 const text = await res.text();
                 console.debug('Payload texte reçu (début):', text.slice(0,300));
-                // injecter fragment HTML si le serveur renvoie HTML
                 resultsEl.innerHTML = text;
             }
         } catch (err) {
@@ -162,79 +153,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // délégation d'événement pour boutons dans la liste de résultats
-    resultsEl.addEventListener('click', async (ev) => {
-        // Détails (toggle / fetch if missing)
-        const detailsBtn = ev.target.closest('.btn-details');
-        if (detailsBtn) {
-            const card = detailsBtn.closest('.trajet');
-            if (!card) return;
-            let detailsPanel = card.querySelector('.trajet-details');
-            // si panel existe déjà : toggle affichage
-            if (detailsPanel) {
-                const isHidden = !detailsPanel.offsetParent || detailsPanel.style.display === 'none' || detailsPanel.style.display === '';
-                detailsPanel.style.display = isHidden ? 'block' : 'none';
-                if (isHidden) detailsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
-            }
-
-            // sinon : tenter de récupérer les détails via API et créer le panneau
-            const id = detailsBtn.dataset.id;
-            try {
-                const res = await fetch(`/trajets/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
-                if (res.ok) {
-                    const t = await res.json();
-                    detailsPanel = document.createElement('div');
-                    detailsPanel.className = 'trajet-details';
-                    detailsPanel.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;';
-                    detailsPanel.innerHTML = `
-                        <div><strong>Détails complets</strong></div>
-                        <div>ID Trajet : ${t.IdTrajet ?? '—'}</div>
-                        <div>Conducteur : ${t.NomConducteur ?? '—'} (ID ${t.IdConducteur ?? '—'})</div>
-                        <div>Distance : ${t.Distance ?? '—'}</div>
-                        <div>Départ : ${t.Depart ?? '—'}</div>
-                        <div>Destination : ${t.Destination ?? '—'}</div>
-                        <div>Date / Heure : ${t.DateTrajet ?? '—'} ${t.HeureTrajet ?? ''}</div>
-                        <div>Places disponibles : ${t.PlacesDisponibles ?? '—'}</div>
-                        <div>Prix : ${Number(t.Prix ?? 0).toFixed(2)}$</div>
-                        <div>Animaux acceptés : ${t.AnimauxAcceptes ? 'Oui' : 'Non'}</div>
-                        <div>Type conversation : ${t.TypeConversation ?? '—'}</div>
-                        <div>Musique : ${t.Musique ? 'Oui' : 'Non'} — Fumeur : ${t.Fumeur ? 'Oui' : 'Non'}</div>
-                        ${t.Description ? `<div style="margin-top:6px;">Description : ${t.Description}</div>` : ''}
-                    `;
-                    card.appendChild(detailsPanel);
-                    detailsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    console.warn('Impossible charger détails trajet', id, res.status);
-                    // créer panneau d'erreur visible
-                    detailsPanel = document.createElement('div');
-                    detailsPanel.className = 'trajet-details';
-                    detailsPanel.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;color:#a00;';
-                    detailsPanel.textContent = 'Détails non disponibles';
-                    card.appendChild(detailsPanel);
-                }
-            } catch (err) {
-                console.error('Erreur fetch détails trajet', err);
-                const fallback = document.createElement('div');
-                fallback.className = 'trajet-details';
-                fallback.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;color:#a00;';
-                fallback.textContent = 'Erreur réseau lors du chargement des détails';
-                card.appendChild(fallback);
-            }
+    async function handleDetailsClick(detailsBtn) {
+        const card = detailsBtn.closest('.trajet');
+        if (!card) return;
+        let detailsPanel = card.querySelector('.trajet-details');
+        
+        if (detailsPanel) {
+            const isHidden = !detailsPanel.offsetParent || detailsPanel.style.display === 'none' || detailsPanel.style.display === '';
+            detailsPanel.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) detailsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
 
-        // --- réservation existante ---
-        const btn = ev.target.closest('.btn-add');
-        if (!btn) return;
+        const id = detailsBtn.dataset.id;
+        try {
+            const res = await fetch(`/trajets/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+            if (res.ok) {
+                const t = await res.json();
+                detailsPanel = document.createElement('div');
+                detailsPanel.className = 'trajet-details';
+                detailsPanel.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;';
+                detailsPanel.innerHTML = `
+                    <div><strong>Détails complets</strong></div>
+                    <div>ID Trajet : ${t.IdTrajet ?? '—'}</div>
+                    <div>Conducteur : ${t.NomConducteur ?? '—'} (ID ${t.IdConducteur ?? '—'})</div>
+                    <div>Distance : ${t.Distance ?? '—'}</div>
+                    <div>Départ : ${t.Depart ?? '—'}</div>
+                    <div>Destination : ${t.Destination ?? '—'}</div>
+                    <div>Date / Heure : ${t.DateTrajet ?? '—'} ${t.HeureTrajet ?? ''}</div>
+                    <div>Places disponibles : ${t.PlacesDisponibles ?? '—'}</div>
+                    <div>Prix : ${Number(t.Prix ?? 0).toFixed(2)}$</div>
+                    <div>Animaux acceptés : ${t.AnimauxAcceptes ? 'Oui' : 'Non'}</div>
+                    <div>Type conversation : ${t.TypeConversation ?? '—'}</div>
+                    <div>Musique : ${t.Musique ? 'Oui' : 'Non'} — Fumeur : ${t.Fumeur ? 'Oui' : 'Non'}</div>
+                    ${t.Description ? `<div style="margin-top:6px;">Description : ${t.Description}</div>` : ''}
+                `;
+                card.appendChild(detailsPanel);
+                detailsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                console.warn('Impossible charger détails trajet', id, res.status);
+                detailsPanel = document.createElement('div');
+                detailsPanel.className = 'trajet-details';
+                detailsPanel.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;color:#a00;';
+                detailsPanel.textContent = 'Détails non disponibles';
+                card.appendChild(detailsPanel);
+            }
+        } catch (err) {
+            console.error('Erreur fetch détails trajet', err);
+            const fallback = document.createElement('div');
+            fallback.className = 'trajet-details';
+            fallback.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;color:#a00;';
+            fallback.textContent = 'Erreur réseau lors du chargement des détails';
+            card.appendChild(fallback);
+        }
+    }
+
+    async function handleReserveClick(btn) {
+        console.log('Bouton réserver cliqué !', btn);
         const idTrajet = btn.dataset.id;
 
-        // récupérer la sélection de places dans la même carte
         const card = btn.closest('.trajet');
         const select = card && card.querySelector('.places-select');
         const places = Number(select?.value || 1);
 
-        // validation simple : ne pas dépasser les places dispo affichées
         const placesEl = card && card.querySelector('.places-dispo');
         const dispo = placesEl ? Number(placesEl.textContent) : null;
         if (dispo !== null && places > dispo) {
@@ -264,15 +245,15 @@ document.addEventListener('DOMContentLoaded', () => {
             else payload = { message: await res.text() };
 
             if (res.ok) {
-                // mettre à jour l'affichage des places
                 if (placesEl) {
                     const newVal = Math.max(0, Number(placesEl.textContent) - places);
                     placesEl.textContent = newVal;
                 }
-                btn.textContent = 'Ajouté';
-                // rafraichir les réservations de l'utilisateur après ajout
-                loadMyReservations();
-                setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 1200);
+                btn.textContent = 'Redirection vers le panier...';
+                
+                setTimeout(() => {
+                    window.location.href = '/cart';
+                }, 500);
             } else {
                 console.error('Erreur ajout réserve', payload);
                 alert(payload.error || payload.message || 'Erreur lors de l\'ajout');
@@ -280,10 +261,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = false;
             }
         } catch (err) {
-            console.error(err);
+            console.error('Erreur:', err);
             alert('Erreur réseau lors de l\'ajout');
             btn.textContent = origText;
             btn.disabled = false;
+        }
+    }
+
+    function handleTrajetClick(ev) {
+        const detailsBtn = ev.target.closest('.btn-details');
+        if (detailsBtn) {
+            handleDetailsClick(detailsBtn);
+            return;
+        }
+
+        const btn = ev.target.closest('.btn-add');
+        if (btn) {
+            handleReserveClick(btn);
+            return;
+        }
+    }
+
+    resultsEl.addEventListener('click', handleTrajetClick);
+    
+    document.addEventListener('click', function(ev) {
+        const trajet = ev.target.closest('.trajet');
+        if (trajet && trajet.closest('#results')) {
+            return;
+        }
+        if (trajet) {
+            handleTrajetClick(ev);
         }
     });
 });

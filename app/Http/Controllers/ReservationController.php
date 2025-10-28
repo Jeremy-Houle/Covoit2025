@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
-    /**
-     * Afficher les réservations de l'utilisateur connecté
-     */
     public function index()
     {
         $utilisateurId = session('utilisateur_id');
@@ -25,14 +22,12 @@ class ReservationController extends Controller
             return redirect('/connexion')->with('error', 'Veuillez vous connecter pour voir vos réservations.');
         }
 
-        // Supprimer les réservations invalides
         DB::table('Reservations')
             ->whereNull('IdPassager')
             ->orWhere('PlacesReservees', '<=', 0)
             ->delete();
 
         if (strtolower($role) === 'conducteur') {
-            // Réservations pour les trajets où l'utilisateur est conducteur
             $reservations = DB::table('Trajets as t')
                 ->join('Reservations as r', 't.IdTrajet', '=', 'r.IdTrajet')
                 ->leftJoin('Utilisateurs as u', 'r.IdPassager', '=', 'u.IdUtilisateur')
@@ -58,7 +53,6 @@ class ReservationController extends Controller
                 ->havingRaw('SUM(r.PlacesReservees) > 0')
                 ->get();
         } else {
-            // Réservations du passager connecté
             $reservations = DB::table('Reservations as r')
                 ->join('Trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
                 ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
@@ -82,9 +76,6 @@ class ReservationController extends Controller
         return view('mes-reservations', compact('reservations'));
     }
 
-    /**
-     * Mettre à jour une réservation existante (nombre de places)
-     */
     public function update(Request $request, $id)
     {
         $userId = session('utilisateur_id');
@@ -110,7 +101,6 @@ class ReservationController extends Controller
             return redirect('/mes-reservations')->with('error', 'Pas assez de places disponibles.');
         }
 
-        // Mise à jour de la réservation et des places disponibles
         DB::table('Reservations')->where('IdReservation', $id)
             ->update(['PlacesReservees' => $request->PlacesReservees]);
 
@@ -120,7 +110,6 @@ class ReservationController extends Controller
             DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)->increment('PlacesDisponibles', abs($diff));
         }
 
-        // Envoi d'email de confirmation
         try {
             $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
             if ($passager) {
@@ -136,9 +125,6 @@ class ReservationController extends Controller
         return redirect('/mes-reservations')->with('success', 'Réservation mise à jour.');
     }
 
-    /**
-     * Annuler une réservation
-     */
     public function destroy($id)
     {
         $userId = session('utilisateur_id');
@@ -152,17 +138,14 @@ class ReservationController extends Controller
         $trajet = DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)->first();
         $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
 
-        // Réincrémenter les places disponibles
         DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)
             ->increment('PlacesDisponibles', $reservation->PlacesReservees);
 
-        // Marquer le paiement comme annulé
         DB::table('Paiements')
             ->where('IdTrajet', $reservation->IdTrajet)
             ->where('IdUtilisateur', $userId)
             ->update(['Statut' => 'Annulé']);
 
-        // Envoi d'email d'annulation
         try {
             if ($passager && $trajet) {
                 Mail::to($passager->Courriel)->send(
@@ -173,14 +156,13 @@ class ReservationController extends Controller
             Log::error('Erreur email annulation réservation : ' . $e->getMessage());
         }
 
-        // Supprimer la réservation
         DB::table('Reservations')->where('IdReservation', $id)->delete();
 
         return redirect('/mes-reservations')->with('success', 'Réservation annulée.');
     }
+    
     public function store(Request $request)
     {
-        // obtenir l'utilisateur (Auth ou session)
         $userId = Auth::id() ?: session('utilisateur_id');
         if (! $userId) {
             return response()->json(['message' => 'Unauthorized'], 401);
@@ -196,7 +178,6 @@ class ReservationController extends Controller
 
         try {
             $paiementId = DB::transaction(function () use ($userId, $idTrajet, $places) {
-                // récupérer le trajet pour calcul du montant (lecture simple)
                 $trajet = DB::table('Trajets')->where('IdTrajet', $idTrajet)->first();
                 if (! $trajet) {
                     throw new \Exception('Trajet introuvable');
@@ -205,7 +186,6 @@ class ReservationController extends Controller
                 $prixUnitaire = isset($trajet->Prix) ? floatval($trajet->Prix) : 0.0;
                 $montant = round($prixUnitaire * $places, 2);
 
-                // insérer un paiement — aucune modification des Reservations ou Trajets
                 return DB::table('Paiements')->insertGetId([
                     'IdUtilisateur' => $userId,
                     'IdTrajet' => $idTrajet,

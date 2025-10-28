@@ -237,6 +237,19 @@
                     <input type="password" class="form-control" id="MotDePasse_confirmation" name="MotDePasse_confirmation" placeholder="Confirmer le nouveau mot de passe">
                 </div>
 
+                <div class="form-group" style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 2px solid var(--gray-200);">
+                    <label for="Role" class="form-label">
+                        <i class="fas fa-user-tag" style="color: var(--primary-blue);"></i> Type de compte
+                    </label>
+                    <select name="Role" id="Role" class="form-control" style="cursor: pointer;">
+                        <option value="Passager" {{ $user->Role === 'Passager' ? 'selected' : '' }}>👤 Passager</option>
+                        <option value="Conducteur" {{ $user->Role === 'Conducteur' ? 'selected' : '' }}>🚗 Conducteur</option>
+                    </select>
+                    <small style="display: block; margin-top: 8px; color: var(--gray-600); font-size: 0.85rem;">
+                        <i class="fas fa-info-circle"></i> Changez votre rôle selon vos besoins. Les conducteurs peuvent publier des trajets.
+                    </small>
+                </div>
+
                 <div class="form-actions">
                     <a href="/profil" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Annuler

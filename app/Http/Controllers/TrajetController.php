@@ -12,6 +12,23 @@ use App\Mail\TrajetAnnuleMail;
 
 class TrajetController extends Controller
 {
+    private function normalizeString($string)
+    {
+        $string = strtolower(trim($string));
+        
+        $string = str_replace(
+            ['é', 'è', 'ê', 'ë', 'à', 'â', 'ä', 'ô', 'ö', 'û', 'ü', 'ù', 'î', 'ï', 'ç',
+             'É', 'È', 'Ê', 'Ë', 'À', 'Â', 'Ä', 'Ô', 'Ö', 'Û', 'Ü', 'Ù', 'Î', 'Ï', 'Ç'],
+            ['e', 'e', 'e', 'e', 'a', 'a', 'a', 'o', 'o', 'u', 'u', 'u', 'i', 'i', 'c',
+             'e', 'e', 'e', 'e', 'a', 'a', 'a', 'o', 'o', 'u', 'u', 'u', 'i', 'i', 'c'],
+            $string
+        );
+        
+        $string = preg_replace('/[^a-z0-9]/', '', $string);
+        
+        return $string;
+    }
+
     public function create()
     {
         $userId = session('utilisateur_id');
@@ -56,11 +73,25 @@ class TrajetController extends Controller
         $query = DB::table('Trajets')->select('*');
 
         if ($depart = $request->input('Depart')) {
-            $query->where('Depart', 'like', '%' . $depart . '%');
+            $departNormalized = $this->normalizeString($depart);
+            $query->whereRaw(
+                'REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                    LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(Depart, "é", "e"), "è", "e"), "ê", "e"), "à", "a"), "ô", "o"), "û", "u")),
+                    " ", ""), ",", ""), "-", ""), ".", ""), "(", ""), ")", ""), "qc", ""), "canada", ""), "québec", "quebec"), "montréal", "montreal")
+                LIKE ?',
+                ['%' . $departNormalized . '%']
+            );
         }
 
         if ($destination = $request->input('Destination')) {
-            $query->where('Destination', 'like', '%' . $destination . '%');
+            $destinationNormalized = $this->normalizeString($destination);
+            $query->whereRaw(
+                'REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                    LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(Destination, "é", "e"), "è", "e"), "ê", "e"), "à", "a"), "ô", "o"), "û", "u")),
+                    " ", ""), ",", ""), "-", ""), ".", ""), "(", ""), ")", ""), "qc", ""), "canada", ""), "québec", "quebec"), "montréal", "montreal")
+                LIKE ?',
+                ['%' . $destinationNormalized . '%']
+            );
         }
 
         if ($date = $request->input('DateTrajet')) {
@@ -79,7 +110,6 @@ class TrajetController extends Controller
             }
         }
 
-        // Type de conversation
         if ($type = $request->input('TypeConversation')) {
             $allowed = ['Silencieux', 'Normal', 'Bavard'];
             if (in_array($type, $allowed)) {
@@ -87,16 +117,13 @@ class TrajetController extends Controller
             }
         }
 
-        // AnimauxAcceptes (checkbox envoie '1' si coché)
         $animaux = $request->input('AnimauxAcceptes');
         if ($animaux !== null && $animaux !== '') {
-            // accepter 0 ou 1 ; ici checkbox ne renvoie que 1, donc filtrera les trajets avec AnimauxAcceptes = 1
             if (in_array($animaux, ['0', '1', 0, 1], true)) {
                 $query->where('AnimauxAcceptes', intval($animaux));
             }
         }
 
-        // Musique
         $musique = $request->input('Musique');
         if ($musique !== null && $musique !== '') {
             if (in_array($musique, ['0', '1', 0, 1], true)) {
@@ -104,7 +131,6 @@ class TrajetController extends Controller
             }
         }
 
-        // Fumeur
         $fumeur = $request->input('Fumeur');
         if ($fumeur !== null && $fumeur !== '') {
             if (in_array($fumeur, ['0', '1', 0, 1], true)) {

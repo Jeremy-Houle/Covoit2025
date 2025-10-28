@@ -35,6 +35,7 @@ public function update(Request $request)
         'Nom' => 'required|string|max:50',
         'Courriel' => 'required|email|unique:Utilisateurs,Courriel,' . $userId . ',IdUtilisateur',
         'MotDePasse' => 'nullable|min:6|confirmed',
+        'Role' => 'required|in:Passager,Conducteur',
     ]);
 
     $oldUser = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
@@ -43,6 +44,7 @@ public function update(Request $request)
         'Prenom' => $request->Prenom,
         'Nom' => $request->Nom,
         'Courriel' => $request->Courriel,
+        'Role' => $request->Role,
     ];
 
     $changedFields = [];
@@ -54,6 +56,10 @@ public function update(Request $request)
     }
     if ($oldUser->Courriel !== $request->Courriel) {
         $changedFields['Courriel'] = $request->Courriel;
+    }
+    if ($oldUser->Role !== $request->Role) {
+        $changedFields['Rôle'] = $request->Role;
+        session(['utilisateur_role' => $request->Role]);
     }
 
     if ($request->MotDePasse) {

@@ -7,73 +7,133 @@
 @endpush
 
 @section('content')
-    <div class="publish-container" style="padding-top: 100px; text-align: center;">
-        <div class="container-ss">
-            <div class=" map" id="map"> 
-
+    <div class="publier-page">
+        <div class="container" style="padding-top: 100px;">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fa fa-plus-circle"></i> Publier un trajet
+                </h1>
+                <p class="page-subtitle">Partagez votre trajet et trouvez des covoitureurs</p>
             </div>
-            <div class="form-card">
-                @if(session('success'))
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-circle"></i>
-                        {{ session('success') }}
+
+            @if(session('success'))
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <div class="publier-layout">
+                <div class="map-section">
+                    <div class="map-container-publier">
+                        <div id="map"></div>
                     </div>
-                @endif
-                <h3 style="margin-bottom: 20px;">Publier un trajet</h3>
-                <form action="{{ route('trajets.store') }}" method="POST" id="trajetForm">
-                    <div class="scroll-view ">
+                    <div class="map-info">
+                        <i class="fa fa-info-circle"></i>
+                        <span>Utilisez les champs de recherche pour définir votre itinéraire sur la carte</span>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <form action="{{ route('trajets.store') }}" method="POST" id="trajetForm" class="modern-form">
                         @csrf
                         <input type="hidden" name="IdConducteur" value="{{ session('utilisateur_id') }}">
                         <input type="hidden" name="NomConducteur" value="{{ session('utilisateur_prenom') }}">
                         <input type="hidden" name="Distance" id="Distance">
 
+                        <div class="form-group-title">
+                            <i class="fa fa-route"></i> Itinéraire
+                        </div>
 
-                        <label for="Depart">Départ:</label>
-                        <input type="text" name="Depart" id="Depart" maxlength="150" required><br>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="Depart"><i class="fa fa-map-marker-alt"></i> Ville de départ</label>
+                                <input type="text" name="Depart" id="Depart" placeholder="Ex: Montréal, QC" maxlength="150" required>
+                            </div>
 
-                        <label for="Destination">Destination:</label>
-                        <input type="text" name="Destination" id="Destination" maxlength="150" required><br>
+                            <div class="form-group">
+                                <label for="Destination"><i class="fa fa-flag-checkered"></i> Ville d'arrivée</label>
+                                <input type="text" name="Destination" id="Destination" placeholder="Ex: Québec, QC" maxlength="150" required>
+                            </div>
+                        </div>
 
-                        <label for="DateTrajet">Date du trajet:</label>
-                        <input type="date" name="DateTrajet" id="DateTrajet" required><br>
+                        <div class="form-group-title">
+                            <i class="fa fa-calendar"></i> Date et heure
+                        </div>
 
-                        <label for="HeureTrajet">Heure du trajet:</label>
-                        <input type="time" name="HeureTrajet" id="HeureTrajet" required><br>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="DateTrajet"><i class="fa fa-calendar-day"></i> Date du trajet</label>
+                                <input type="date" name="DateTrajet" id="DateTrajet" required>
+                            </div>
 
-                        <label for="PlacesDisponibles">Places disponibles:</label>
-                        <input type="number" name="PlacesDisponibles" id="PlacesDisponibles" min="1" required><br>
+                            <div class="form-group">
+                                <label for="HeureTrajet"><i class="fa fa-clock"></i> Heure de départ</label>
+                                <input type="time" name="HeureTrajet" id="HeureTrajet" required>
+                            </div>
+                        </div>
 
-                        <label for="Prix">Prix ($):</label>
-                        <input type="number" step="0.01" name="Prix" id="Prix" required><br>
+                        <div class="form-group-title">
+                            <i class="fa fa-users"></i> Places et tarif
+                        </div>
 
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="PlacesDisponibles"><i class="fa fa-chair"></i> Places disponibles</label>
+                                <input type="number" name="PlacesDisponibles" id="PlacesDisponibles" min="1" max="6" placeholder="1-6" required>
+                            </div>
 
+                            <div class="form-group">
+                                <label for="Prix"><i class="fa fa-dollar-sign"></i> Prix par place</label>
+                                <input type="number" step="0.01" name="Prix" id="Prix" placeholder="0.00" required>
+                            </div>
+                        </div>
 
-                        <label for="TypeConversation">Type de conversation:</label>
-                        <select name="TypeConversation" id="TypeConversation" required>
-                            <option value="Silencieux">Silencieux</option>
-                            <option value="Normal">Normal</option>
-                            <option value="Bavard">Bavard</option>
-                        </select><br>
-                        <div class="option-group" style="margin-top: 20px;">
-                            <label for="AnimauxAcceptes">
+                        <div class="form-group-title">
+                            <i class="fa fa-cog"></i> Préférences
+                        </div>
+
+                        <div class="form-group">
+                            <label for="TypeConversation"><i class="fa fa-comments"></i> Type de conversation</label>
+                            <select name="TypeConversation" id="TypeConversation" class="form-select" required>
+                                <option value="Silencieux">🤫 Silencieux</option>
+                                <option value="Normal" selected>💬 Normal</option>
+                                <option value="Bavard">🗣️ Bavard</option>
+                            </select>
+                        </div>
+
+                        <div class="preferences-grid">
+                            <label class="checkbox-card">
                                 <input type="checkbox" name="AnimauxAcceptes" id="AnimauxAcceptes" value="1">
-                                <span>Animaux Acceptés</span>
+                                <span class="checkbox-content">
+                                    <i class="fa fa-paw"></i>
+                                    <span>Animaux acceptés</span>
+                                </span>
                             </label>
 
-                            <label for="Musique">
+                            <label class="checkbox-card">
                                 <input type="checkbox" name="Musique" id="Musique" value="1">
-                                <span>Musique</span>
+                                <span class="checkbox-content">
+                                    <i class="fa fa-music"></i>
+                                    <span>Musique</span>
+                                </span>
                             </label>
 
-                            <label for="Fumeur">
+                            <label class="checkbox-card">
                                 <input type="checkbox" name="Fumeur" id="Fumeur" value="1">
-                                <span>Fumeur</span>
+                                <span class="checkbox-content">
+                                    <i class="fa fa-smoking"></i>
+                                    <span>Fumeur</span>
+                                </span>
                             </label>
                         </div>
 
-                    </div>
-                    <button type="submit" id="submitTrajet">Créer Trajet</button>
-                </form>
+                        <button type="submit" id="submitTrajet" class="btn-submit">
+                            <i class="fa fa-paper-plane"></i>
+                            <span>Publier le trajet</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
