@@ -23,6 +23,7 @@
                 <div style="flex:1; min-width:0;">
                     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;align-items:center;margin-bottom:12px;">
                         <input type="text" name="Depart" id="Depart" placeholder="Départ" class="form-control" style="max-width:280px;">
+                        <button type="button" id="swapBtn" class="btn btn-outline-secondary" title="Intervertir départ/destination" style="height:38px;align-self:center;">⇄</button>
                         <input type="text" name="Destination" id="Destination" placeholder="Destination" class="form-control" style="max-width:280px;">
                         <input type="date" name="DateTrajet" class="form-control" style="max-width:170px;">
                     </div>
@@ -124,47 +125,187 @@
         let destinationAutocomplete;
         let departMarker;
         let destinationMarker;
+        let directionsService;
+        let directionsRenderer;
 
         window.initMap = function () {
             map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: 45.5017, lng: -73.5673 },
                 zoom: 6,
             });
+
+            // Directions
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: false, preserveViewport: false });
+            directionsRenderer.setMap(map);
+
             const departInput = document.getElementById("Depart");
             const destinationInput = document.getElementById("Destination");
+            const form = document.getElementById("searchForm");
+            const swapBtn = document.getElementById("swapBtn");
 
             departAutocomplete = new google.maps.places.Autocomplete(departInput);
             destinationAutocomplete = new google.maps.places.Autocomplete(destinationInput);
 
+            function drawRoute() {
+                if (!departMarker || !destinationMarker) {
+                    directionsRenderer.set('directions', null);
+                    return;
+                }
+
+                const request = {
+                    origin: departMarker.getPosition(),
+                    destination: destinationMarker.getPosition(),
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    drivingOptions: { departureTime: new Date() }
+                };
+
+                directionsService.route(request, (result, status) => {
+                    if (status === google.maps.DirectionsStatus.OK || status === 'OK') {
+                        directionsRenderer.setDirections(result);
+                        try {
+                            const bounds = new google.maps.LatLngBounds();
+                            const leg = result.routes[0].legs[0];
+                            bounds.extend(leg.start_location);
+                            bounds.extend(leg.end_location);
+                            map.fitBounds(bounds);
+                        } catch (e) {}
+                    } else {
+                        directionsRenderer.set('directions', null);
+                    }
+                });
+            }
+
+            function clearRoute() {
+                if (directionsRenderer) directionsRenderer.set('directions', null);
+            }
+
+            function placeToMarker(place, isDepart) {
+                if (!place || !place.geometry) return;
+                const location = place.geometry.location;
+                if (isDepart) {
+                    if (departMarker) departMarker.setMap(null);
+                    departMarker = new google.maps.Marker({
+                        map: map,
+                        position: location,
+                        title: "Départ",
+                        icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                    });
+                } else {
+                    if (destinationMarker) destinationMarker.setMap(null);
+                    destinationMarker = new google.maps.Marker({
+                        map: map,
+                        position: location,
+                        title: "Destination",
+                        icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    });
+                }
+                drawRoute();
+            }
+
+            function removeDepartMarker() {
+                if (departMarker) {
+                    departMarker.setMap(null);
+                    departMarker = null;
+                }
+                clearRoute();
+            }
+            function removeDestinationMarker() {
+                if (destinationMarker) {
+                    destinationMarker.setMap(null);
+                    destinationMarker = null;
+                }
+                clearRoute();
+            }
+
+            // swap handler: values + marker refs + icons/titles
+            if (swapBtn) {
+                swapBtn.addEventListener('click', () => {
+                    // swap input values
+                    const tmpVal = departInput.value;
+                    departInput.value = destinationInput.value;
+                    destinationInput.value = tmpVal;
+
+                    // swap marker references
+                    const tmpMarker = departMarker;
+                    departMarker = destinationMarker;
+                    destinationMarker = tmpMarker;
+
+                    // update marker titles/icons to match leur nouveau rôle
+                    if (departMarker) {
+                        departMarker.setTitle('Départ');
+                        departMarker.setIcon("http://maps.google.com/mapfiles/ms/icons/red-dot.png");
+                    }
+                    if (destinationMarker) {
+                        destinationMarker.setTitle('Destination');
+                        destinationMarker.setIcon("http://maps.google.com/mapfiles/ms/icons/blue-dot.png");
+                    }
+
+                    // redraw route (will clear if one is missing)
+                    drawRoute();
+                });
+            }
+
             departAutocomplete.addListener('place_changed', () => {
                 const place = departAutocomplete.getPlace();
-                if (!place.geometry) return;
-
-                const location = place.geometry.location;
-                if (departMarker) departMarker.setMap(null);
-                departMarker = new google.maps.Marker({
-                    map: map,
-                    position: location,
-                    title: "Départ",
-                    icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                });
-                map.setCenter(location);
+                if (!place || !place.geometry) return;
+                placeToMarker(place, true);
             });
 
             destinationAutocomplete.addListener('place_changed', () => {
                 const place = destinationAutocomplete.getPlace();
-                if (!place.geometry) return;
-
-                const location = place.geometry.location;
-                if (destinationMarker) destinationMarker.setMap(null);
-                destinationMarker = new google.maps.Marker({
-                    map: map,
-                    position: location,
-                    title: "Destination",
-                    icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                });
-                map.setCenter(location);
+                if (!place || !place.geometry) return;
+                placeToMarker(place, false);
             });
+
+            // si l'utilisateur vide le champ (supprime texte), enlever le marker correspondant
+            departInput.addEventListener('input', () => {
+                if (!departInput.value || departInput.value.trim() === '') {
+                    removeDepartMarker();
+                }
+            });
+            destinationInput.addEventListener('input', () => {
+                if (!destinationInput.value || destinationInput.value.trim() === '') {
+                    removeDestinationMarker();
+                }
+            });
+
+            // si le champ perd le focus et aucun marker n'existe mais les deux valeurs sont présentes essayer de géocoder
+            departInput.addEventListener('blur', () => {
+                if (!departMarker && departInput.value && destinationInput.value) {
+                    const geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ address: departInput.value }, (results, status) => {
+                        if (status === 'OK' && results[0]) {
+                            placeToMarker(results[0], true);
+                        }
+                    });
+                }
+            });
+            destinationInput.addEventListener('blur', () => {
+                if (!destinationMarker && departInput.value && destinationInput.value) {
+                    const geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ address: destinationInput.value }, (results, status) => {
+                        if (status === 'OK' && results[0]) {
+                            placeToMarker(results[0], false);
+                        }
+                    });
+                }
+            });
+
+            // gérer reset du formulaire (bouton Réinitialiser)
+            if (form) {
+                form.addEventListener('reset', () => {
+                    // timeout pour laisser le navigateur vider les champs avant nettoyage
+                    setTimeout(() => {
+                        removeDepartMarker();
+                        removeDestinationMarker();
+                        clearRoute();
+                        // recentrer la carte si vous voulez
+                        map.setCenter({ lat: 45.5017, lng: -73.5673 });
+                        map.setZoom(6);
+                    }, 50);
+                });
+            }
         }
     </script>
 
