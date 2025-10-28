@@ -1169,11 +1169,13 @@ header {
   border-radius: var(--border-radius);
   margin-top: var(--spacing-md);
   animation: slideDown 0.3s ease-out;
+
 }
 
 .trajet .trajet-details > div {
   padding: 4px 0;
   color: var(--gray-700);
+
 }
 
 .trajet .trajet-details strong {
@@ -1181,6 +1183,7 @@ header {
   display: block;
   margin-bottom: 8px;
   font-size: var(--font-size-lg);
+
 }
 
 .filter-buttons {

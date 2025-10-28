@@ -43,16 +43,25 @@
                 <p>Recherche de trajet</p>
               </div>
             </a>
-
-            <a href="/publier" class="action-card">
-              <div class="action-icon">
-                <i class="fas fa-plus"></i>
-              </div>
-              <div class="action-content">
-                <h3>Publier</h3>
-                <p>Publier un trajet</p>
-              </div>
-            </a>
+                @php
+                      $userId = session('utilisateur_id');
+                      $role = null;
+                      if ($userId) {
+                          $role = session('utilisateur_role');
+                      }
+                @endphp
+            @if ($userId && $role === 'Conducteur')
+              <a href="/publier" class="action-card">
+                <div class="action-icon">
+                  <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-content">
+                  <h3>Publier</h3>
+                  <p>Publier un trajet</p>
+                </div>
+              </a>
+              
+            @endif
 
             <a href="/mes-reservations" class="action-card">
               <div class="action-icon">

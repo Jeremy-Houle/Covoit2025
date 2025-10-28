@@ -48,12 +48,14 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="Depart"><i class="fa fa-map-marker-alt"></i> Ville de départ</label>
-                                <input type="text" name="Depart" id="Depart" placeholder="Ex: Montréal, QC" maxlength="150" required>
+                                <input type="text" name="Depart" id="Depart" placeholder="Ex: Montréal, QC" maxlength="150"
+                                    required>
                             </div>
 
                             <div class="form-group">
                                 <label for="Destination"><i class="fa fa-flag-checkered"></i> Ville d'arrivée</label>
-                                <input type="text" name="Destination" id="Destination" placeholder="Ex: Québec, QC" maxlength="150" required>
+                                <input type="text" name="Destination" id="Destination" placeholder="Ex: Québec, QC"
+                                    maxlength="150" required>
                             </div>
                         </div>
 
@@ -80,7 +82,8 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="PlacesDisponibles"><i class="fa fa-chair"></i> Places disponibles</label>
-                                <input type="number" name="PlacesDisponibles" id="PlacesDisponibles" min="1" max="6" placeholder="1-6" required>
+                                <input type="number" name="PlacesDisponibles" id="PlacesDisponibles" min="1" max="6"
+                                    placeholder="1-6" required>
                             </div>
 
                             <div class="form-group">
@@ -147,80 +150,53 @@
             map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: 45.5019, lng: -73.5674 },
                 zoom: 10,
-                styles: [
-                    {
-                        "featureType": "all",
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#e5e7eb" }]
-                    },
-                    {
-                        "featureType": "all",
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#444444" }]
-                    },
-                    {
-                        "featureType": "road",
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#cbd5e1" }]
-                    },
-                    {
-                        "featureType": "water",
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#93c5fd" }]
-                    },
-                    {
-                        "featureType": "poi",
-                        "elementType": "geometry",
-                        "stylers": [{ "color": "#f3f4f6" }]
-                    }
-                ]
             });
 
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer({ map });
 
-            departAutocomplete = new google.maps.places.Autocomplete(
-                document.getElementById("Depart"), {
-                componentRestrictions: { country: "ca" },
-                fields: ["geometry", "name"]
-            }
-            );
-            destinationAutocomplete = new google.maps.places.Autocomplete(
-                document.getElementById("Destination"), {
-                componentRestrictions: { country: "ca" },
-                fields: ["geometry", "name"]
-            }
-            );
+            setTimeout(() => {
+                departAutocomplete = new google.maps.places.Autocomplete(
+                    document.getElementById("Depart"),
+                    { componentRestrictions: { country: "ca" }, fields: ["geometry", "name"] }
+                );
+                destinationAutocomplete = new google.maps.places.Autocomplete(
+                    document.getElementById("Destination"),
+                    { componentRestrictions: { country: "ca" }, fields: ["geometry", "name"] }
+                );
 
-            departAutocomplete.bindTo("bounds", map);
-            destinationAutocomplete.bindTo("bounds", map);
+                departAutocomplete.bindTo("bounds", map);
+                destinationAutocomplete.bindTo("bounds", map);
 
-            departAutocomplete.addListener("place_changed", () => {
-                const place = departAutocomplete.getPlace();
-                if (!place.geometry) return;
-                addMarker("depart", place.geometry.location);
-                afficherTrajet();
-            });
+                departAutocomplete.addListener("place_changed", () => {
+                    const place = departAutocomplete.getPlace();
+                    if (!place.geometry) return;
+                    addMarker("depart", place.geometry.location);
+                    afficherTrajet();
+                });
 
-            destinationAutocomplete.addListener("place_changed", () => {
-                const place = destinationAutocomplete.getPlace();
-                if (!place.geometry) return;
-                addMarker("destination", place.geometry.location);
-                afficherTrajet();
-            });
+                destinationAutocomplete.addListener("place_changed", () => {
+                    const place = destinationAutocomplete.getPlace();
+                    if (!place.geometry) return;
+                    addMarker("destination", place.geometry.location);
+                    afficherTrajet();
+                });
 
+                const autocompleteService = new google.maps.places.AutocompleteService();
+                const placesService = new google.maps.places.PlacesService(map);
+
+                setupEnterSelect("Depart", "depart", autocompleteService, placesService);
+                setupEnterSelect("Destination", "destination", autocompleteService, placesService);
+
+            }, 100);
         }
-
 
         function addMarker(type, position) {
             const color = type === "depart" ? "red" : "blue";
-
             const marker = new google.maps.Marker({
                 position,
                 map,
-                icon: {
-                    url: `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png`,
-                },
+                icon: { url: `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png` },
             });
 
             if (type === "depart") {
@@ -237,32 +213,53 @@
         function afficherTrajet() {
             const depart = document.getElementById("Depart").value;
             const destination = document.getElementById("Destination").value;
+            if (!depart || !destination) return;
 
-            if (!depart || !destination) {
-                return
-            }
-            const request = {
-                origin: depart,
-                destination: destination,
-                travelMode: google.maps.TravelMode.DRIVING,
-            };
+            directionsService.route(
+                {
+                    origin: depart,
+                    destination: destination,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                },
+                (result, status) => {
+                    if (status === google.maps.DirectionsStatus.OK) {
+                        directionsRenderer.setDirections(result);
+                        const distance = result.routes[0].legs[0].distance.value / 1000;
+                        document.getElementById("Distance").value = distance.toFixed(2);
+                    }
+                }
+            );
+        }
 
-            directionsService.route(request, (result, status) => {
-                if (status === google.maps.DirectionsStatus.OK) {
-                    directionsRenderer.setDirections(result);
+        function setupEnterSelect(inputId, type, autocompleteService, placesService) {
+            const input = document.getElementById(inputId);
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key == "Tab") {
+                    e.preventDefault();
+                    const query = input.value.trim();
+                    if (!query) return;
 
-                    const distance = result.routes[0].legs[0].distance.value / 1000;
-                    document.getElementById("Distance").value = distance.toFixed(2);
-
-                } else {
-                    alert("Erreur: " + status);
+                    autocompleteService.getPlacePredictions(
+                        { input: query, componentRestrictions: { country: "ca" } },
+                        (predictions, status) => {
+                            if (status === google.maps.places.PlacesServiceStatus.OK && predictions?.length > 0) {
+                                const first = predictions[0];
+                                placesService.getDetails({ placeId: first.place_id }, (place, status2) => {
+                                    if (status2 === google.maps.places.PlacesServiceStatus.OK && place.geometry) {
+                                        addMarker(type, place.geometry.location);
+                                        input.value = place.formatted_address || place.name;
+                                        afficherTrajet();
+                                        
+                                    }
+                                });
+                            }
+                        }
+                    );
                 }
             });
-
-
-
         }
 
         window.initMap = initMap;
+
     </script>
 @endsection
