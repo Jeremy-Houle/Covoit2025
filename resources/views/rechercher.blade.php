@@ -98,23 +98,24 @@
 
                 <!-- Droite : filtres / options -->
                 <aside style="width:320px;border-left:1px solid #eee;padding-left:12px;box-sizing:border-box;">
-                    <h4 style="margin-top:0;margin-bottom:8px;">Filtres & Options</h4>
+                    <h4 style="margin-top:0;margin-bottom:8px;">Spécifique</h4>
+                    <p style="margin:0 0 8px 0;color:#666;font-size:0.9rem;">Affinez votre recherche avec ces critères :</p>
 
                     <div style="margin-bottom:12px;">
-                        <!-- ligne : label + champ numérique -->
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
                             <label style="margin:0;font-weight:600;">Prix max :</label>
                             <input type="number" id="PrixMaxNumber" name="PrixMax" min="0" max="2000" step="0.5" value="{{ request('PrixMax', 50) }}" class="form-control" style="width:96px;margin-left:8px;">
                         </div>
-
-                        <!-- slider en dessous, occupe toute la largeur restante -->
                         <input type="range" id="PrixMax" min="0" max="2000" step="0.5" value="{{ request('PrixMax', 50) }}" style="width:100%;">
                     </div>
 
-                    <label style="display:block;margin-bottom:8px;">
-                        Places ≥
-                        <input type="number" name="PlacesMin" min="1" placeholder="Places ≥" class="form-control" style="width:100px;">
-                    </label>
+                    <div style="margin-bottom:12px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                            <label style="margin:0;font-weight:600;">Places disponibles :</label>
+                            <!-- Champ numérique uniquement (pas de slider) -->
+                            <input type="number" id="PlacesMinNumber" name="PlacesMin" min="1" max="20" step="1" value="{{ request('PlacesMin', 1) }}" class="form-control" style="width:80px;margin-left:8px;">
+                        </div>
+                    </div>
 
                     <div style="margin-top:8px;margin-bottom:6px;font-weight:600;">Type de conversation</div>
                     <fieldset style="border:0;padding:0;margin:0 0 8px 0;">
@@ -132,16 +133,19 @@
                         </label>
                     </fieldset>
 
-                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
-                        <label style="display:flex;align-items:center;gap:8px;">
-                            <input type="checkbox" name="AnimauxAcceptes" value="1"> Animaux acceptés
-                        </label>
-                        <label style="display:flex;align-items:center;gap:8px;">
-                            <input type="checkbox" name="Musique" value="1"> Musique
-                        </label>
-                        <label style="display:flex;align-items:center;gap:8px;">
-                            <input type="checkbox" name="Fumeur" value="1"> Fumeur
-                        </label>
+                    <div style="margin-top:12px;">
+                        <h5 style="margin:0 0 8px 0;font-weight:600;">Filtre spécifique</h5>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <label style="display:flex;align-items:center;gap:8px;">
+                                <input type="checkbox" name="AnimauxAcceptes" value="1"> Animaux acceptés
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;">
+                                <input type="checkbox" name="Musique" value="1"> Musique
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;">
+                                <input type="checkbox" name="Fumeur" value="1"> Fumeur
+                            </label>
+                        </div>
                     </div>
 
                     <div style="margin-top:14px;">
@@ -153,7 +157,7 @@
         </form>
     </div>
     <script>
-        // Sync slider <-> number input (affiche la valeur dans le champ numérique uniquement)
+        // Sync Prix slider <-> number input (Places reste uniquement en champ numérique)
         (function () {
             const slider = document.getElementById('PrixMax');
             const number = document.getElementById('PrixMaxNumber');
@@ -169,7 +173,6 @@
                     n = Math.round(n / step) * step;
                     return n;
                 };
-
                 const updateFromSlider = () => {
                     const v = clamp(slider.value);
                     slider.value = v;
@@ -180,10 +183,7 @@
                     number.value = v;
                     slider.value = v;
                 };
-
-                // initial sync
                 updateFromSlider();
-
                 slider.addEventListener('input', updateFromSlider);
                 number.addEventListener('input', updateFromNumber);
                 number.addEventListener('change', updateFromNumber);
