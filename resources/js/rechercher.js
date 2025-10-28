@@ -10,61 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    async function loadMyReservations() {
-        if (!myResEl) return;
-        myResEl.innerHTML = '<p>Chargement de vos réservations…</p>';
-        try {
-            let res = await fetch('/api/reservations', {
-                credentials: 'same-origin',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
 
-            if (res.status === 404) {
-                res = await fetch('/reservations', {
-                    credentials: 'same-origin',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-            }
+    
 
-            if (res.status === 401 || res.status === 403) {
-                myResEl.innerHTML = '<p>Vous devez être connecté pour voir vos réservations.</p>';
-                console.warn('Accès refusé:', res.status);
-                return;
-            }
-
-            const ct = res.headers.get('content-type') || '';
-            if (ct.includes('application/json')) {
-                const data = await res.json();
-                if (!Array.isArray(data) || data.length === 0) {
-                    myResEl.innerHTML = '<p>Aucune réservation pour le moment.</p>';
-                } else {
-                    myResEl.innerHTML = data.map(r => {
-                        const trajet = r.Trajet || r.trajet || {};
-                        const titre = trajet.NomConducteur || trajet.IdTrajet ? `Trajet #${trajet.IdTrajet || ''}` : 'Réservation';
-                        const depart = trajet.Depart || r.Depart || '—';
-                        const dest = trajet.Destination || r.Destination || '—';
-                        const places = r.PlacesReservees ?? r.places ?? 1;
-                        const date = trajet.DateTrajet || r.DateTrajet || '';
-                        return `
-                            <div class="reservation card mb-2 p-2" data-id="${r.IdReservation || r.id || ''}">
-                                <div><strong>${titre}</strong></div>
-                                <div>Départ: ${depart} — Destination: ${dest}</div>
-                                <div>Date: ${date} — Places: ${places}</div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-            } else {
-                const text = await res.text();
-                myResEl.innerHTML = text || '<p>Aucune réservation pour le moment.</p>';
-            }
-        } catch (err) {
-            console.error('Erreur chargement réservations :', err);
-            myResEl.innerHTML = '<p>Impossible de charger vos réservations (erreur réseau).</p>';
-        }
-    }
-
-    loadMyReservations();
+  
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
