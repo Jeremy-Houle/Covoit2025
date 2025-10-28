@@ -45,7 +45,13 @@
                                     $isConducteur = (strtolower($userRole) === 'conducteur');
                                 @endphp
                                 <div class="trajet card mb-2 p-2" data-id="{{ $t->IdTrajet }}">
-                                    <div><strong>{{ $t->NomConducteur ?? "Trajet #{$t->IdTrajet}" }}</strong></div>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div><strong>{{ $t->NomConducteur ?? "Trajet #{$t->IdTrajet}" }}</strong></div>
+                                        <div style="display:flex;gap:6px;">
+                                            <button type="button" class="btn-details btn btn-sm btn-outline-secondary" data-id="{{ $t->IdTrajet }}">Détails</button>
+                                        </div>
+                                    </div>
+
                                     <div>Départ: {{ $t->Depart }} — Destination: {{ $t->Destination }}</div>
                                     <div>Date: {{ $t->DateTrajet }} — Heure: {{ $t->HeureTrajet }}</div>
                                     <div>Places: <span class="places-dispo">{{ $t->PlacesDisponibles }}</span> — Prix: {{ number_format($t->Prix, 2) }}$</div>
@@ -59,10 +65,29 @@
                                                     <option value="{{ $i }}" {{ $i > $maxPlaces ? 'disabled' : '' }}>{{ $i }}</option>
                                                 @endfor
                                             </select>
-                                            <button class="btn-add btn btn-sm btn-primary" data-id="{{ $t->IdTrajet }}" 
+                                            <button type="button" class="btn-add btn btn-sm btn-primary" data-id="{{ $t->IdTrajet }}" 
                                                 {{ $maxPlaces === 0 ? 'disabled' : '' }}>Réserver ce trajet</button>
                                         </div>
                                     @endif
+
+                                    <!-- panneau détails (caché par défaut) -->
+                                    <div class="trajet-details" style="display:none;margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:0.95rem;">
+                                        <div><strong>Détails complets</strong></div>
+                                        <div>Conducteur : {{ $t->NomConducteur }} </div>
+                                        <div>Distance : {{ $t->Distance ?? '—' }}</div>
+                                        <div>Départ : {{ $t->Depart }}</div>
+                                        <div>Destination : {{ $t->Destination }}</div>
+                                        <div>Date / Heure : {{ $t->DateTrajet }} {{ $t->HeureTrajet }}</div>
+                                        <div>Places disponibles : {{ $t->PlacesDisponibles }}</div>
+                                        <div>Prix par place : {{ number_format($t->Prix,2) }}$</div>
+                                        <div>Animaux acceptés : {{ $t->AnimauxAcceptes ? 'Oui' : 'Non' }}</div>
+                                        <div>Type conversation : {{ $t->TypeConversation ?? '—' }}</div>
+                                        <div>Musique : {{ $t->Musique ? 'Oui' : 'Non' }}</div>
+                                        <div>Fumeur : {{ $t->Fumeur ? 'Oui' : 'Non' }}</div>
+                                        @if(isset($t->Description))
+                                            <div style="margin-top:6px;">Description : {{ $t->Description }}</div>
+                                        @endif
+                                    </div>
                                 </div>
                             @empty
                                 <p>Aucun trajet trouvé.</p>
@@ -75,25 +100,37 @@
                 <aside style="width:320px;border-left:1px solid #eee;padding-left:12px;box-sizing:border-box;">
                     <h4 style="margin-top:0;margin-bottom:8px;">Filtres & Options</h4>
 
-                    <label style="display:block;margin-bottom:8px;">
-                        Prix max
-                        <input type="number" name="PrixMax" step="0.01" min="0" placeholder="Prix max" class="form-control" style="width:140px;">
-                    </label>
+                    <div style="margin-bottom:12px;">
+                        <!-- ligne : label + champ numérique -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                            <label style="margin:0;font-weight:600;">Prix max :</label>
+                            <input type="number" id="PrixMaxNumber" name="PrixMax" min="0" max="2000" step="0.5" value="{{ request('PrixMax', 50) }}" class="form-control" style="width:96px;margin-left:8px;">
+                        </div>
+
+                        <!-- slider en dessous, occupe toute la largeur restante -->
+                        <input type="range" id="PrixMax" min="0" max="2000" step="0.5" value="{{ request('PrixMax', 50) }}" style="width:100%;">
+                    </div>
 
                     <label style="display:block;margin-bottom:8px;">
                         Places ≥
                         <input type="number" name="PlacesMin" min="1" placeholder="Places ≥" class="form-control" style="width:100px;">
                     </label>
 
-                    <label style="display:block;margin-bottom:8px;">
-                        TypeConversation
-                        <select name="TypeConversation" class="form-control" style="width:160px;">
-                            <option value="">Type conv.</option>
-                            <option value="Silencieux">Silencieux</option>
-                            <option value="Normal">Normal</option>
-                            <option value="Bavard">Bavard</option>
-                        </select>
-                    </label>
+                    <div style="margin-top:8px;margin-bottom:6px;font-weight:600;">Type de conversation</div>
+                    <fieldset style="border:0;padding:0;margin:0 0 8px 0;">
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                            <input type="radio" name="TypeConversation" value="" {{ request('TypeConversation') === '' ? 'checked' : '' }}> Tous
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                            <input type="radio" name="TypeConversation" value="Silencieux" {{ request('TypeConversation') === 'Silencieux' ? 'checked' : '' }}> Silencieux
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                            <input type="radio" name="TypeConversation" value="Normal" {{ request('TypeConversation') === 'Normal' ? 'checked' : '' }}> Normal
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                            <input type="radio" name="TypeConversation" value="Bavard" {{ request('TypeConversation') === 'Bavard' ? 'checked' : '' }}> Bavard
+                        </label>
+                    </fieldset>
 
                     <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
                         <label style="display:flex;align-items:center;gap:8px;">
@@ -115,9 +152,44 @@
             </div>
         </form>
     </div>
-
-
     <script>
+        // Sync slider <-> number input (affiche la valeur dans le champ numérique uniquement)
+        (function () {
+            const slider = document.getElementById('PrixMax');
+            const number = document.getElementById('PrixMaxNumber');
+            if (slider && number) {
+                const clamp = (v) => {
+                    const min = parseFloat(slider.min) || 0;
+                    const max = parseFloat(slider.max) || 0;
+                    let n = parseFloat(v);
+                    if (isNaN(n)) n = min;
+                    if (n < min) n = min;
+                    if (n > max) n = max;
+                    const step = parseFloat(slider.step) || 1;
+                    n = Math.round(n / step) * step;
+                    return n;
+                };
+
+                const updateFromSlider = () => {
+                    const v = clamp(slider.value);
+                    slider.value = v;
+                    number.value = v;
+                };
+                const updateFromNumber = () => {
+                    const v = clamp(number.value);
+                    number.value = v;
+                    slider.value = v;
+                };
+
+                // initial sync
+                updateFromSlider();
+
+                slider.addEventListener('input', updateFromSlider);
+                number.addEventListener('input', updateFromNumber);
+                number.addEventListener('change', updateFromNumber);
+            }
+        })();
+
         let pointDepart;
         let pointDestination;
         let map;

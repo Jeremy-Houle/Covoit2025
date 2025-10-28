@@ -117,17 +117,32 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <select class="places-select form-select form-select-sm" data-id="${t.IdTrajet}" style="width:48px;max-width:48px;padding:.12rem .25rem;font-size:.82rem;height:30px;" ${maxPlaces === 0 ? 'disabled' : ''}>
                                     ${options}
                                 </select>
-                                <button class="btn-add btn btn-sm btn-primary" data-id="${t.IdTrajet}" ${maxPlaces === 0 ? 'disabled' : ''}>Reserver ce trajet</button>
+                                <button type="button" class="btn-add btn btn-sm btn-primary" data-id="${t.IdTrajet}" ${maxPlaces === 0 ? 'disabled' : ''}>Reserver ce trajet</button>
                             </div>
                         `;
 
                         return `
                         <div class="trajet card mb-2 p-2" data-id="${t.IdTrajet}">
-                            <div><strong>${t.NomConducteur || 'Conducteur'}</strong></div>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div><strong>${t.NomConducteur || 'Conducteur'}</strong></div>
+                                <div style="display:flex;gap:6px;">
+                                    <button type="button" class="btn-details btn btn-sm btn-outline-secondary" data-id="${t.IdTrajet}">Détails</button>
+                                </div>
+                            </div>
                             <div>Départ: ${t.Depart} — Destination: ${t.Destination}</div>
                             <div>Date: ${t.DateTrajet} — Heure: ${t.HeureTrajet}</div>
                             <div>Places: <span class="places-dispo">${t.PlacesDisponibles}</span> — Prix: ${Number(t.Prix).toFixed(2)}$</div>
                             ${addButton}
+                            <!-- panneau détails (vide caché, pourra être rempli ou togglé) -->
+                            <div class="trajet-details" style="display:none;margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;">
+                                <div><strong>Détails complets</strong></div>
+                                <div>ID Trajet : ${t.IdTrajet}</div>
+                                <div>Conducteur : ${t.NomConducteur || '—'} (ID ${t.IdConducteur || '—'})</div>
+                                <div>Distance : ${t.Distance ?? '—'}</div>
+                                <div>Animaux acceptés : ${t.AnimauxAcceptes ? 'Oui' : 'Non'}</div>
+                                <div>Type conversation : ${t.TypeConversation ?? '—'}</div>
+                                <div>Musique : ${t.Musique ? 'Oui' : 'Non'} — Fumeur : ${t.Fumeur ? 'Oui' : 'Non'}</div>
+                            </div>
                         </div>
                         `;
                     }).join('');
@@ -147,8 +162,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // délégation d'événement pour bouton "Ajouter"
+    // délégation d'événement pour boutons dans la liste de résultats
     resultsEl.addEventListener('click', async (ev) => {
+        // Détails (toggle / fetch if missing)
+        const detailsBtn = ev.target.closest('.btn-details');
+        if (detailsBtn) {
+            const card = detailsBtn.closest('.trajet');
+            if (!card) return;
+            let detailsPanel = card.querySelector('.trajet-details');
+            // si panel existe déjà : toggle affichage
+            if (detailsPanel) {
+                const isHidden = !detailsPanel.offsetParent || detailsPanel.style.display === 'none' || detailsPanel.style.display === '';
+                detailsPanel.style.display = isHidden ? 'block' : 'none';
+                if (isHidden) detailsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            // sinon : tenter de récupérer les détails via API et créer le panneau
+            const id = detailsBtn.dataset.id;
+            try {
+                const res = await fetch(`/trajets/${id}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+                if (res.ok) {
+                    const t = await res.json();
+                    detailsPanel = document.createElement('div');
+                    detailsPanel.className = 'trajet-details';
+                    detailsPanel.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;';
+                    detailsPanel.innerHTML = `
+                        <div><strong>Détails complets</strong></div>
+                        <div>ID Trajet : ${t.IdTrajet ?? '—'}</div>
+                        <div>Conducteur : ${t.NomConducteur ?? '—'} (ID ${t.IdConducteur ?? '—'})</div>
+                        <div>Distance : ${t.Distance ?? '—'}</div>
+                        <div>Départ : ${t.Depart ?? '—'}</div>
+                        <div>Destination : ${t.Destination ?? '—'}</div>
+                        <div>Date / Heure : ${t.DateTrajet ?? '—'} ${t.HeureTrajet ?? ''}</div>
+                        <div>Places disponibles : ${t.PlacesDisponibles ?? '—'}</div>
+                        <div>Prix : ${Number(t.Prix ?? 0).toFixed(2)}$</div>
+                        <div>Animaux acceptés : ${t.AnimauxAcceptes ? 'Oui' : 'Non'}</div>
+                        <div>Type conversation : ${t.TypeConversation ?? '—'}</div>
+                        <div>Musique : ${t.Musique ? 'Oui' : 'Non'} — Fumeur : ${t.Fumeur ? 'Oui' : 'Non'}</div>
+                        ${t.Description ? `<div style="margin-top:6px;">Description : ${t.Description}</div>` : ''}
+                    `;
+                    card.appendChild(detailsPanel);
+                    detailsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    console.warn('Impossible charger détails trajet', id, res.status);
+                    // créer panneau d'erreur visible
+                    detailsPanel = document.createElement('div');
+                    detailsPanel.className = 'trajet-details';
+                    detailsPanel.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;color:#a00;';
+                    detailsPanel.textContent = 'Détails non disponibles';
+                    card.appendChild(detailsPanel);
+                }
+            } catch (err) {
+                console.error('Erreur fetch détails trajet', err);
+                const fallback = document.createElement('div');
+                fallback.className = 'trajet-details';
+                fallback.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;color:#a00;';
+                fallback.textContent = 'Erreur réseau lors du chargement des détails';
+                card.appendChild(fallback);
+            }
+            return;
+        }
+
+        // --- réservation existante ---
         const btn = ev.target.closest('.btn-add');
         if (!btn) return;
         const idTrajet = btn.dataset.id;
