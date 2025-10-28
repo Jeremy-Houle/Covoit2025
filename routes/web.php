@@ -19,17 +19,9 @@ Route::get('/about', function () {
     return view('about');
 });
 
-// // Routes pour les pages manquantes
-// Route::get('/rechercher', function () {
-//     return view('rechercher');
-// });
-
 Route::get('/publier', function () {
     return view('publier');
 });
-// Route::get('/publier', function () {
-//     return view('publier');
-// });
 
 Route::get('/mes-reservations', function () {
     return view('mes-reservations');
@@ -100,7 +92,5 @@ Route::get('/trajets/{id}/availability', function($id) {
 
 Route::get('/api/reservations', [ReservationController::class, 'myReservations'])->middleware('auth');
 
-
-// rendre les routes de messages publiques (sans auth)
 Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
 Route::post('/messages', [LesMessageController::class, 'store'])->name('messages.store');

@@ -11,9 +11,10 @@
 @endpush
 
 @push('scripts')
-<script src="{{ asset('js/panier.js') }}?v={{ time() }}"></script>
+@vite(['resources/js/panier.js'])
 <script>
     window.csrfToken = '{{ csrf_token() }}';
+    console.log('CSRF Token:', window.csrfToken);
 </script>
 @endpush
 <script src="https://www.paypal.com/sdk/js?client-id=AWQqeyvmMlkT1LYUxQ-WRRLHao1rtwanQXVP9LTSYtoyCmJ1JKcKimTRLI5oVZ3kEBbRXQ2n0JqSXt9v&currency=CAD&enable-funding=paypal&disable-funding=card,credit&components=buttons"></script>
@@ -154,10 +155,9 @@
                                     Payer ce trajet
                                 </button>
                                 
-                                <button type="button" class="btn btn-remove" 
-                                        data-paiement-id="{{ $paiement->IdPaiement }}"
-                                        data-depart="{{ $paiement->Depart }}"
-                                        data-destination="{{ $paiement->Destination }}">
+                                <button type="button" 
+                                        class="btn btn-remove" 
+                                        onclick="supprimerDuPanier({{ $paiement->IdPaiement }}, '{{ $paiement->Depart }}', '{{ $paiement->Destination }}')">
                                     <i class="fas fa-trash"></i>
                                     Supprimer
                                 </button>
@@ -321,6 +321,35 @@
 @endsection
 
 <script>
+window.supprimerDuPanier = function(paiementId, depart, destination) {
+    console.log('supprimerDuPanier appelée:', paiementId, depart, destination);
+    
+    if (!confirm(`Voulez-vous vraiment supprimer ce trajet du panier ?\n\n${depart} → ${destination}\n\nLes places seront remises disponibles.`)) {
+        return;
+    }
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/remove-from-cart';
+    form.style.display = 'none';
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = window.csrfToken || '{{ csrf_token() }}';
+    form.appendChild(csrfToken);
+    
+    const paiementInput = document.createElement('input');
+    paiementInput.type = 'hidden';
+    paiementInput.name = 'paiement_id';
+    paiementInput.value = paiementId;
+    form.appendChild(paiementInput);
+    
+    document.body.appendChild(form);
+    console.log('Soumission du formulaire de suppression...');
+    form.submit();
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     let currentPaymentData = {};
     
