@@ -363,7 +363,6 @@
                     n = Math.round(n / step) * step;
                     return n;
                 };
-
                 const updateFromSlider = () => {
                     const v = clamp(slider.value);
                     slider.value = v;
@@ -374,9 +373,7 @@
                     number.value = v;
                     slider.value = v;
                 };
-
                 updateFromSlider();
-
                 slider.addEventListener('input', updateFromSlider);
                 number.addEventListener('input', updateFromNumber);
                 number.addEventListener('change', updateFromNumber);
