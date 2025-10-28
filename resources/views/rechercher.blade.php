@@ -13,59 +13,106 @@
 
 
 @section('content')
-    <div class="container" style="padding-top: 100px; text-align: center;">
+    <div class="container" style="padding-top: 100px;">
         <h1>Rechercher des trajets</h1>
         <p>Veuillez entrer vos critères de recherche ci-dessous :</p>
-        <div>
-            <form id="searchForm" method="GET" action="/trajets/search">
-                <input type="text" name="Depart" id="Depart" placeholder="Départ">
-                <input type="text" name="Destination" id="Destination" placeholder="Destination">
-                <button type="submit" class="btn btn-primary">Rechercher</button>
-            </form>
-        </div>
 
-        <!-- AJOUTER : container pour la carte -->
-        <div id="map" style="height:400px; width:100%; margin-top:16px;"></div>
-
-        <!-- AJOUT : container pour les réservations de l'utilisateur -->
-        <div id="myReservations" style="margin-top: 12px;">
-            <!-- Rempli dynamiquement par resources/js/rechercher.js -->
-        </div>
-
-        <!-- AJOUT : container pour les résultats sous la carte -->
-        <div id="results" style="margin-top: 8px;">
-            @isset($trajets)
-                @forelse($trajets as $t)
-                    @php
-                        $maxPlaces = max(0, (int)($t->PlacesDisponibles ?? 0));
-                        $userRole = session('utilisateur_role', '');
-                        $isConducteur = (strtolower($userRole) === 'conducteur');
-                    @endphp
-                    <div class="trajet card mb-2 p-2" data-id="{{ $t->IdTrajet }}">
-                        <div><strong>{{ $t->NomConducteur ?? "Trajet #{$t->IdTrajet}" }}</strong></div>
-                        <div>Départ: {{ $t->Depart }} — Destination: {{ $t->Destination }}</div>
-                        <div>Date: {{ $t->DateTrajet }} — Heure: {{ $t->HeureTrajet }}</div>
-                        <div>Places: <span class="places-dispo">{{ $t->PlacesDisponibles }}</span> — Prix: {{ number_format($t->Prix, 2) }}$</div>
-                        
-                        @if(!$isConducteur)
-                            <div class="reserve-controls" style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:6px;">
-                                <select class="places-select form-select form-select-sm" data-id="{{ $t->IdTrajet }}" 
-                                    style="width:48px;max-width:48px;padding:.12rem .25rem;font-size:.82rem;height:30px;" 
-                                    {{ $maxPlaces === 0 ? 'disabled' : '' }}>
-                                    @for($i = 1; $i <= max(1, $maxPlaces); $i++)
-                                        <option value="{{ $i }}" {{ $i > $maxPlaces ? 'disabled' : '' }}>{{ $i }}</option>
-                                    @endfor
-                                </select>
-                                <button class="btn-add btn btn-sm btn-primary" data-id="{{ $t->IdTrajet }}" 
-                                    {{ $maxPlaces === 0 ? 'disabled' : '' }}>Réserver ce trajet</button>
-                            </div>
-                        @endif
+        <form id="searchForm" method="GET" action="/trajets/search">
+            <div style="display:flex;gap:16px;align-items:flex-start;">
+                <!-- Gauche : recherche (Depart/Destination en haut) + carte + résultats -->
+                <div style="flex:1; min-width:0;">
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;align-items:center;margin-bottom:12px;">
+                        <input type="text" name="Depart" id="Depart" placeholder="Départ" class="form-control" style="max-width:280px;">
+                        <input type="text" name="Destination" id="Destination" placeholder="Destination" class="form-control" style="max-width:280px;">
+                        <input type="date" name="DateTrajet" class="form-control" style="max-width:170px;">
                     </div>
-                @empty
-                    <p>Aucun trajet trouvé.</p>
-                @endforelse
-            @endisset
-        </div>
+
+                    <!-- Map -->
+                    <div id="map" style="height:400px; width:100%; margin-top:8px;"></div>
+
+                    <!-- Réservations et résultats sous la carte -->
+                    <div id="myReservations" style="margin-top: 12px;">
+                        <!-- Rempli dynamiquement par resources/js/rechercher.js -->
+                    </div>
+
+                    <div id="results" style="margin-top: 8px;">
+                        @isset($trajets)
+                            @forelse($trajets as $t)
+                                @php
+                                    $maxPlaces = max(0, (int)($t->PlacesDisponibles ?? 0));
+                                    $userRole = session('utilisateur_role', '');
+                                    $isConducteur = (strtolower($userRole) === 'conducteur');
+                                @endphp
+                                <div class="trajet card mb-2 p-2" data-id="{{ $t->IdTrajet }}">
+                                    <div><strong>{{ $t->NomConducteur ?? "Trajet #{$t->IdTrajet}" }}</strong></div>
+                                    <div>Départ: {{ $t->Depart }} — Destination: {{ $t->Destination }}</div>
+                                    <div>Date: {{ $t->DateTrajet }} — Heure: {{ $t->HeureTrajet }}</div>
+                                    <div>Places: <span class="places-dispo">{{ $t->PlacesDisponibles }}</span> — Prix: {{ number_format($t->Prix, 2) }}$</div>
+
+                                    @if(!$isConducteur)
+                                        <div class="reserve-controls" style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:6px;">
+                                            <select class="places-select form-select form-select-sm" data-id="{{ $t->IdTrajet }}" 
+                                                style="width:48px;max-width:48px;padding:.12rem .25rem;font-size:.82rem;height:30px;" 
+                                                {{ $maxPlaces === 0 ? 'disabled' : '' }}>
+                                                @for($i = 1; $i <= max(1, $maxPlaces); $i++)
+                                                    <option value="{{ $i }}" {{ $i > $maxPlaces ? 'disabled' : '' }}>{{ $i }}</option>
+                                                @endfor
+                                            </select>
+                                            <button class="btn-add btn btn-sm btn-primary" data-id="{{ $t->IdTrajet }}" 
+                                                {{ $maxPlaces === 0 ? 'disabled' : '' }}>Réserver ce trajet</button>
+                                        </div>
+                                    @endif
+                                </div>
+                            @empty
+                                <p>Aucun trajet trouvé.</p>
+                            @endforelse
+                        @endisset
+                    </div>
+                </div>
+
+                <!-- Droite : filtres / options -->
+                <aside style="width:320px;border-left:1px solid #eee;padding-left:12px;box-sizing:border-box;">
+                    <h4 style="margin-top:0;margin-bottom:8px;">Filtres & Options</h4>
+
+                    <label style="display:block;margin-bottom:8px;">
+                        Prix max
+                        <input type="number" name="PrixMax" step="0.01" min="0" placeholder="Prix max" class="form-control" style="width:140px;">
+                    </label>
+
+                    <label style="display:block;margin-bottom:8px;">
+                        Places ≥
+                        <input type="number" name="PlacesMin" min="1" placeholder="Places ≥" class="form-control" style="width:100px;">
+                    </label>
+
+                    <label style="display:block;margin-bottom:8px;">
+                        TypeConversation
+                        <select name="TypeConversation" class="form-control" style="width:160px;">
+                            <option value="">Type conv.</option>
+                            <option value="Silencieux">Silencieux</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Bavard">Bavard</option>
+                        </select>
+                    </label>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+                        <label style="display:flex;align-items:center;gap:8px;">
+                            <input type="checkbox" name="AnimauxAcceptes" value="1"> Animaux acceptés
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;">
+                            <input type="checkbox" name="Musique" value="1"> Musique
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;">
+                            <input type="checkbox" name="Fumeur" value="1"> Fumeur
+                        </label>
+                    </div>
+
+                    <div style="margin-top:14px;">
+                        <button type="submit" class="btn btn-primary">Rechercher</button>
+                        <button type="reset" class="btn btn-outline-secondary" style="margin-left:8px;">Réinitialiser</button>
+                    </div>
+                </aside>
+            </div>
+        </form>
     </div>
 
 
@@ -122,23 +169,3 @@
     </script>
 
 @endsection
-
-{{-- 2. Logique géographique (recherche par proximité)
-
-Principe :
-
-Le conducteur définit des coordonnées GPS pour départ et arrivée.
-
-Le passager cherche un trajet proche de son point de départ et d’arrivée (dans un rayon de X km).
-
-Logique :
-
-Calculer la distance géographique (avec la formule de Haversine ou une fonction ST_Distance_Sphere() en SQL).
-
-Exemple :
-
-SELECT *
-FROM trajets
-WHERE ST_Distance_Sphere(point(depart_long, depart_lat), point(? , ?)) < 5000 AND ST_Distance_Sphere(point(arrivee_long,
-    arrivee_lat), point(?, ?)) < 5000; Avantage : plus réaliste pour les grandes villes. Inconvénient : nécessite de
-    gérer les coordonnées et des calculs plus lourds. -->--}}

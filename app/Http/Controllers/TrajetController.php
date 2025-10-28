@@ -56,25 +56,68 @@ class TrajetController extends Controller
         $query = DB::table('Trajets')->select('*');
 
         if ($depart = $request->input('Depart')) {
-            $query->where('Depart', 'like', '%' . trim($depart) . '%');
+            $query->where('Depart', 'like', '%' . $depart . '%');
         }
 
         if ($destination = $request->input('Destination')) {
-            $query->where('Destination', 'like', '%' . trim($destination) . '%');
+            $query->where('Destination', 'like', '%' . $destination . '%');
         }
 
-        if ($request->boolean('Fumeur')) {
-            $query->where('Fumeur', 1);
+        if ($date = $request->input('DateTrajet')) {
+            $query->whereDate('DateTrajet', $date);
+        }
+
+        if (($prixMax = $request->input('PrixMax')) !== null && $prixMax !== '') {
+            if (is_numeric($prixMax)) {
+                $query->where('Prix', '<=', floatval($prixMax));
+            }
+        }
+
+        if (($placesMin = $request->input('PlacesMin')) !== null && $placesMin !== '') {
+            if (is_numeric($placesMin)) {
+                $query->where('PlacesDisponibles', '>=', intval($placesMin));
+            }
+        }
+
+        // Type de conversation
+        if ($type = $request->input('TypeConversation')) {
+            $allowed = ['Silencieux', 'Normal', 'Bavard'];
+            if (in_array($type, $allowed)) {
+                $query->where('TypeConversation', $type);
+            }
+        }
+
+        // AnimauxAcceptes (checkbox envoie '1' si coché)
+        $animaux = $request->input('AnimauxAcceptes');
+        if ($animaux !== null && $animaux !== '') {
+            // accepter 0 ou 1 ; ici checkbox ne renvoie que 1, donc filtrera les trajets avec AnimauxAcceptes = 1
+            if (in_array($animaux, ['0', '1', 0, 1], true)) {
+                $query->where('AnimauxAcceptes', intval($animaux));
+            }
+        }
+
+        // Musique
+        $musique = $request->input('Musique');
+        if ($musique !== null && $musique !== '') {
+            if (in_array($musique, ['0', '1', 0, 1], true)) {
+                $query->where('Musique', intval($musique));
+            }
+        }
+
+        // Fumeur
+        $fumeur = $request->input('Fumeur');
+        if ($fumeur !== null && $fumeur !== '') {
+            if (in_array($fumeur, ['0', '1', 0, 1], true)) {
+                $query->where('Fumeur', intval($fumeur));
+            }
         }
 
         $trajets = $query->orderBy('DateTrajet', 'asc')->limit(100)->get();
 
-        // Si c'est une requête AJAX, retourner JSON
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json($trajets);
         }
 
-        // Sinon, retourner la vue avec les résultats
         return view('rechercher', compact('trajets'));
     }
 
