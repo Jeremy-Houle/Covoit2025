@@ -69,7 +69,13 @@ class TrajetController extends Controller
 
         $trajets = $query->orderBy('DateTrajet', 'asc')->limit(100)->get();
 
-        return response()->json($trajets);
+        // Si c'est une requête AJAX, retourner JSON
+        if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json($trajets);
+        }
+
+        // Sinon, retourner la vue avec les résultats
+        return view('rechercher', compact('trajets'));
     }
 
     public function reserve(Request $request)

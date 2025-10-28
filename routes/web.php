@@ -86,9 +86,6 @@ Route::post('/publier', [TrajetController::class, 'store'])->name('trajets.store
 Route::get('/rechercher', [TrajetController::class, 'index'])->name('trajets.index');
 Route::put('/trajets/{id}/update', [TrajetController::class, 'updateTrajet'])->name('trajets.update');
 Route::delete('/trajets/{id}/cancel', [TrajetController::class, 'cancelTrajet'])->name('trajets.cancel');
-
-
-Route::get('/trajets/search', [TrajetController::class, 'search']);
 Route::get('/mes-reservations', [ReservationController::class, 'index'])->name('mes-reservations.index');
 Route::put('/mes-reservations/{id}/update', [ReservationController::class, 'update'])->name('mes-reservations.update');
 Route::delete('/mes-reservations/{id}', [ReservationController::class, 'destroy'])->name('mes-reservations.destroy');
