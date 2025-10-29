@@ -190,7 +190,7 @@
                         <div class="total-section">
                             <div class="total-item">
                                 <span class="total-label">Total général :</span>
-                                <span class="total-amount" data-paiements="{{ $paiements->pluck('Montant')->toJson() }}">Calcul en cours...</span>
+                                <span class="total-amount" data-paiements="{{ $paiements->pluck('Montant')->toJson() }}">{{ number_format($paiements->sum('Montant'), 2) }} $</span>
                             </div>
                         </div>
 

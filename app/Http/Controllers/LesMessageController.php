@@ -17,7 +17,6 @@ class LesMessageController extends Controller
 
         $otherId = (int) $id;
 
-        // récupérer la conversation entre $userId et $otherId
         $messages = \DB::table('LesMessages')
             ->where(function($q) use ($userId, $otherId) {
                 $q->where('IdExpediteur', $userId)->where('IdDestinataire', $otherId);
@@ -28,13 +27,17 @@ class LesMessageController extends Controller
             ->orderBy('DateEnvoi')
             ->get();
 
-        // récupérer les infos de l'autre utilisateur
         $other = \DB::table('Utilisateurs')->where('IdUtilisateur', $otherId)->first();
         $otherName = $other
             ? trim(($other->Prenom ?? '') . ' ' . ($other->Nom ?? ''))
             : "Utilisateur #{$otherId}";
 
-        return view('messages.show', compact('messages', 'otherId', 'otherName'));
+        $currentUser = \DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        $currentUserName = $currentUser
+            ? trim(($currentUser->Prenom ?? '') . ' ' . ($currentUser->Nom ?? ''))
+            : "Vous";
+
+        return view('messages.show', compact('messages', 'otherId', 'otherName', 'currentUserName', 'userId'));
     }
 
     public function store(Request $request, $id)
@@ -50,13 +53,11 @@ class LesMessageController extends Controller
             return redirect()->route('message.show', $otherId);
         }
 
-        // stocker la date/heure selon le timezone de l'application
         \DB::table('LesMessages')->insert([
             'IdExpediteur'   => $userId,
             'IdDestinataire' => $otherId,
             'LeMessage'      => $text,
-            'DateEnvoi'      => Carbon::now('UTC')->format('Y-m-d H:i:s'), // stocker en UTC
-            // ajouter autres colonnes nécessaires...
+            'DateEnvoi'      => Carbon::now('UTC')->format('Y-m-d H:i:s'),
         ]);
 
         return redirect()->route('message.show', $otherId);
@@ -69,7 +70,6 @@ class LesMessageController extends Controller
             return redirect('/connexion');
         }
 
-        // récupérer tous les messages où l'utilisateur est participant (ordre décroissant)
         $messages = DB::table('LesMessages as m')
             ->select('m.*')
             ->where('m.IdExpediteur', $userId)
@@ -77,7 +77,6 @@ class LesMessageController extends Controller
             ->orderByDesc('m.DateEnvoi')
             ->get();
 
-        // collecter les ids de participants puis charger leurs infos
         $participantIds = [];
         foreach ($messages as $m) {
             $participantIds[] = $m->IdExpediteur;
@@ -86,15 +85,14 @@ class LesMessageController extends Controller
         $participantIds = array_values(array_unique($participantIds));
         $users = DB::table('Utilisateurs')->whereIn('IdUtilisateur', $participantIds)->get()->keyBy('IdUtilisateur');
 
-        // construire threads : clé = autre participant, valeur = dernier message
         $threads = [];
         foreach ($messages as $m) {
             $other = ($m->IdExpediteur == $userId) ? $m->IdDestinataire : $m->IdExpediteur;
             if (!isset($threads[$other])) {
                 $userOther = $users->get($other);
-                $m->otherName = ($userOther->Nom ?? '') . ' ' . ($userOther->Prenom ?? '');
-                // format simple date+heure
-                $m->sentAt = \Carbon\Carbon::parse($m->DateEnvoi)->locale('fr')->translatedFormat('j F Y H:i');
+                $m->otherName = trim(($userOther->Prenom ?? '') . ' ' . ($userOther->Nom ?? ''));
+                // format simple date+heure - convertir de UTC vers timezone local
+                $m->sentAt = \Carbon\Carbon::parse($m->DateEnvoi, 'UTC')->setTimezone(config('app.timezone', 'America/Toronto'))->locale('fr')->diffForHumans();
                 $threads[$other] = $m;
             }
         }

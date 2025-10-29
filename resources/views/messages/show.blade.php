@@ -1,43 +1,114 @@
 @extends('layouts.app')
 
-@section('title', 'Conversation - Message')
+@section('title', 'Conversation - Messages')
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/messages.css') }}?v={{ time() }}">
+@endpush
 
 @section('content')
-    <div class="container" style="padding-top:100px;">
-        <a href="{{ route('message.index') }}" class="btn btn-sm btn-outline-secondary mb-3">← Retour</a>
+<div class="chat-page">
+    <div class="chat-container">
+        <a href="{{ route('message.index') }}" class="chat-back-button">
+            <i class="fas fa-arrow-left"></i> Retour aux messages
+        </a>
 
-        <div class="card">
-            <div class="card-header">
-                Conversation avec {{ $otherName ?? ('Utilisateur #' . $otherId) }}
+        <div class="chat-card fade-in">
+            <div class="chat-header">
+                <div class="chat-avatar">
+                    {{ strtoupper(substr($otherName, 0, 1)) }}
+                </div>
+                <div class="chat-user-info">
+                    <h2 class="chat-user-name">{{ $otherName ?? ('Utilisateur #' . $otherId) }}</h2>
+                </div>
             </div>
 
-            <div class="card-body" style="max-height:60vh;overflow:auto;">
+            <div class="chat-body" id="chatBody">
                 @if(isset($messages) && $messages->isNotEmpty())
-                    @foreach($messages as $msg)
-                        <div style="margin-bottom:12px;">
-                            <div style="font-size:.9rem;color:#666;">
-                                <strong>{{ ($msg->IdExpediteur == session('utilisateur_id')) ? 'Vous' : ($msg->ExpediteurNom ?? 'Utilisateur') }}</strong>
-                                <small class="text-muted">
-                                    {{ \Carbon\Carbon::parse($msg->DateEnvoi)->setTimezone(config('app.timezone'))->locale('fr')->translatedFormat('j F Y H:i') }}
-                                </small>
+                    <div class="chat-messages">
+                        @foreach($messages as $msg)
+                            @php
+                                $isSent = $msg->IdExpediteur == $userId;
+                                $senderName = $isSent ? $currentUserName : $otherName;
+                                $senderInitial = strtoupper(substr($senderName, 0, 1));
+                            @endphp
+                            
+                            <div class="chat-message {{ $isSent ? 'sent' : 'received' }}">
+                                <div class="message-avatar">
+                                    {{ $senderInitial }}
+                                </div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        <p class="message-text">{{ $msg->LeMessage ?? $msg->Message ?? '' }}</p>
+                                    </div>
+                                    <div class="message-info">
+                                        <span class="message-sender">{{ $senderName }}</span>
+                                        <span class="message-time">
+                                            {{ \Carbon\Carbon::parse($msg->DateEnvoi, 'UTC')->setTimezone(config('app.timezone', 'America/Toronto'))->locale('fr')->translatedFormat('H:i') }}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div style="margin-top:6px;white-space:pre-wrap;">{{ $msg->LeMessage ?? $msg->Message ?? '' }}</div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 @else
-                    <p>Aucun message dans cette conversation.</p>
+                    <div class="empty-chat">
+                        <div class="empty-chat-icon">
+                            <i class="far fa-comments"></i>
+                        </div>
+                        <p>Aucun message dans cette conversation.</p>
+                        <p>Envoyez un message pour commencer !</p>
+                    </div>
                 @endif
             </div>
 
-            <div class="card-footer">
-                <form action="{{ route('message.send', $otherId) }}" method="POST">
+            <div class="chat-footer">
+                <form action="{{ route('message.send', $otherId) }}" method="POST" id="messageForm">
                     @csrf
-                    <div class="input-group">
-                        <input name="message" class="form-control" placeholder="Écrire un message..." required>
-                        <button class="btn btn-primary" type="submit">Envoyer</button>
+                    <div class="chat-input-group">
+                        <input 
+                            type="text" 
+                            name="message" 
+                            class="chat-input" 
+                            placeholder="Écrivez votre message..." 
+                            required
+                            autocomplete="off"
+                            id="messageInput">
+                        <button type="submit" class="chat-send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatBody = document.getElementById('chatBody');
+    const messageForm = document.getElementById('messageForm');
+    const messageInput = document.getElementById('messageInput');
+    
+    function scrollToBottom() {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+    
+    scrollToBottom();
+    
+    messageInput.focus();
+    
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            messageForm.submit();
+        }
+    });
+    
+    messageForm.addEventListener('submit', function() {
+        const sendButton = this.querySelector('.chat-send-button');
+        sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    });
+});
+</script>
 @endsection
