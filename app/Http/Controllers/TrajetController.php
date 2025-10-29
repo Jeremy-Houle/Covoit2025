@@ -74,24 +74,12 @@ class TrajetController extends Controller
 
         if ($depart = $request->input('Depart')) {
             $departNormalized = $this->normalizeString($depart);
-            $query->whereRaw(
-                'REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
-                    LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(Depart, "é", "e"), "è", "e"), "ê", "e"), "à", "a"), "ô", "o"), "û", "u")),
-                    " ", ""), ",", ""), "-", ""), ".", ""), "(", ""), ")", ""), "qc", ""), "canada", ""), "québec", "quebec"), "montréal", "montreal")
-                LIKE ?',
-                ['%' . $departNormalized . '%']
-            );
+                $query->whereRaw('LOWER(Depart) LIKE ?', ['%' . strtolower($depart) . '%']);
         }
 
         if ($destination = $request->input('Destination')) {
             $destinationNormalized = $this->normalizeString($destination);
-            $query->whereRaw(
-                'REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
-                    LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(Destination, "é", "e"), "è", "e"), "ê", "e"), "à", "a"), "ô", "o"), "û", "u")),
-                    " ", ""), ",", ""), "-", ""), ".", ""), "(", ""), ")", ""), "qc", ""), "canada", ""), "québec", "quebec"), "montréal", "montreal")
-                LIKE ?',
-                ['%' . $destinationNormalized . '%']
-            );
+                $query->whereRaw('LOWER(Destination) LIKE ?', ['%' . strtolower($destination) . '%']);
         }
 
         if ($date = $request->input('DateTrajet')) {

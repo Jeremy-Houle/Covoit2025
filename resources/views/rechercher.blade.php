@@ -204,7 +204,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('searchForm');
-            
+            form.addEventListener('submit', function(e) {
+                const depart = document.getElementById('Depart').value.trim();
+                const destination = document.getElementById('Destination').value.trim();
+                console.log('Soumission du formulaire - Départ:', depart, 'Destination:', destination);
+            });
             const slider = document.getElementById('PrixMax');
             const numberInput = document.getElementById('PrixMaxNumber');
             
@@ -389,6 +393,7 @@
         let destinationMarker;
         let directionsService;
         let directionsRenderer;
+        
 
         window.initMap = function () {
             map = new google.maps.Map(document.getElementById("map"), {
@@ -400,13 +405,21 @@
             directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: false, preserveViewport: false });
             directionsRenderer.setMap(map);
 
+
             const departInput = document.getElementById("Depart");
             const destinationInput = document.getElementById("Destination");
             const form = document.getElementById("searchForm");
             const swapBtn = document.getElementById("swapBtn");
 
-            departAutocomplete = new google.maps.places.Autocomplete(departInput);
-            destinationAutocomplete = new google.maps.places.Autocomplete(destinationInput);
+            departAutocomplete = new google.maps.places.Autocomplete(
+                    document.getElementById("Depart"),
+                    { componentRestrictions: { country: "ca" }, fields: ["geometry", "name"] }
+            );
+            destinationAutocomplete = new google.maps.places.Autocomplete(
+                    document.getElementById("Destination"),
+                    { componentRestrictions: { country: "ca" }, fields: ["geometry", "name"] }
+            );            
+            
 
             function drawRoute() {
                 if (!departMarker || !destinationMarker) {
@@ -546,6 +559,12 @@
                 }
             });
 
+            const autocompleteService = new google.maps.places.AutocompleteService();
+            const placesService = new google.maps.places.PlacesService(map);
+
+            setupEnterSelect("Depart", autocompleteService, placesService);
+            setupEnterSelect("Destination", autocompleteService, placesService);
+
             if (form) {
                 form.addEventListener('reset', () => {
                     setTimeout(() => {
@@ -557,7 +576,58 @@
                     }, 50);
                 });
             }
+
+            function setupEnterSelect(inputId, autocompleteService, placesService) {
+                const input = document.getElementById(inputId);
+                const typeIsDepart = inputId === "Depart";
+
+                input.addEventListener("blur", () => {
+                    const query = input.value.trim();
+                    if (!query) return;
+
+                    autocompleteService.getPlacePredictions(
+                        { input: query, componentRestrictions: { country: "ca" } },
+                        (predictions, status) => {
+                            if (status === google.maps.places.PlacesServiceStatus.OK && predictions?.length > 0) {
+                                const first = predictions[0];
+                                placesService.getDetails({ placeId: first.place_id }, (place, status2) => {
+                                    if (status2 === google.maps.places.PlacesServiceStatus.OK && place.geometry) {
+                                        input.value = place.formatted_address || place.name;
+                                        placeToMarker(place, typeIsDepart);
+                                        drawRoute();
+                                    }
+                                });
+                            }
+                        }
+                    );
+                });
+
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault(); 
+                        const query = input.value.trim();
+                        if (!query) return;
+
+                        autocompleteService.getPlacePredictions(
+                            { input: query, componentRestrictions: { country: "ca" } },
+                            (predictions, status) => {
+                                if (status === google.maps.places.PlacesServiceStatus.OK && predictions?.length > 0) {
+                                    const first = predictions[0];
+                                    placesService.getDetails({ placeId: first.place_id }, (place, status2) => {
+                                        if (status2 === google.maps.places.PlacesServiceStatus.OK && place.geometry) {
+                                            placeToMarker(place, typeIsDepart);
+                                            input.value = place.formatted_address || place.name;
+                                            drawRoute();
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    }
+                });
+            }
         }
+        
     </script>
 
 @endsection

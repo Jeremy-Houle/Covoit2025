@@ -249,13 +249,35 @@
                                         addMarker(type, place.geometry.location);
                                         input.value = place.formatted_address || place.name;
                                         afficherTrajet();
-                                        
+
                                     }
                                 });
                             }
                         }
                     );
                 }
+            });
+
+            input.addEventListener("blur", (e) => {
+                e.preventDefault();
+                const query = input.value.trim();
+                if (!query) return;
+                autocompleteService.getPlacePredictions(
+                    { input: query, componentRestrictions: { country: "ca" } },
+                    (predictions, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK && predictions?.length > 0) {
+                            const first = predictions[0];
+                            placesService.getDetails({ placeId: first.place_id }, (place, status2) => {
+                                if (status2 === google.maps.places.PlacesServiceStatus.OK && place.geometry) {
+                                    addMarker(type, place.geometry.location);
+                                    input.value = place.formatted_address || place.name;
+                                    afficherTrajet();
+
+                                }
+                            });
+                        }
+                    }
+                );
             });
         }
 
