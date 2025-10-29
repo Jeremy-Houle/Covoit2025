@@ -9,9 +9,11 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/css/panier.css',
                 'resources/css/profil.css',
+                'resources/css/messages.css',
+                'resources/css/reservations.css',
+                'resources/css/publier.css',
                 'resources/js/app.js',
-                'resources/js/panier.js',
-                'resources/css/publier.css'
+                'resources/js/panier.js'
             ],
             refresh: true,
         }),

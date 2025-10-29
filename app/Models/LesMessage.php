@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class LesMessage extends Model
 {
-    protected $table = 'LesMessages'; // nom exact de la table
+    protected $table = 'LesMessages'; 
 
     protected $primaryKey = 'IdMessage';
 
-    public $timestamps = false; // car vous avez un champ DateEnvoi manuel
+    public $timestamps = false; 
 
     protected $fillable = [
         'IdExpediteur',

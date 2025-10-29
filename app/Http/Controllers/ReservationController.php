@@ -32,25 +32,20 @@ class ReservationController extends Controller
                 ->join('Reservations as r', 't.IdTrajet', '=', 'r.IdTrajet')
                 ->leftJoin('Utilisateurs as u', 'r.IdPassager', '=', 'u.IdUtilisateur')
                 ->where('t.IdConducteur', $utilisateurId)
+                ->where('r.PlacesReservees', '>', 0)
                 ->select(
+                    'r.IdReservation',
+                    'r.IdPassager',
+                    'r.PlacesReservees',
                     't.IdTrajet',
                     't.Depart',
                     't.Destination',
                     't.DateTrajet',
                     't.HeureTrajet',
                     't.Prix',
-                    DB::raw('SUM(r.PlacesReservees) as PlacesReservees'),
-                    DB::raw('GROUP_CONCAT(DISTINCT CONCAT(u.Prenom, " ", u.Nom) SEPARATOR ", ") as NomsPassagers')
+                    'u.Nom as NomPassager',
+                    'u.Prenom as PrenomPassager'
                 )
-                ->groupBy(
-                    't.IdTrajet',
-                    't.Depart',
-                    't.Destination',
-                    't.DateTrajet',
-                    't.HeureTrajet',
-                    't.Prix'
-                )
-                ->havingRaw('SUM(r.PlacesReservees) > 0')
                 ->get();
         } else {
             $reservations = DB::table('Reservations as r')

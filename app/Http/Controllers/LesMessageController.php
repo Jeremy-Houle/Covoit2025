@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class LesMessageController extends Controller
 {
@@ -14,48 +15,89 @@ class LesMessageController extends Controller
             return redirect('/connexion');
         }
 
-        $destinataireId = (int) $id;
-        $destinataire = DB::table('Utilisateurs')->where('IdUtilisateur', $destinataireId)->first();
-        if (!$destinataire) {
-            abort(404);
-        }
+        $otherId = (int) $id;
 
-        // récupérer les messages entre les deux utilisateurs et joindre le nom/prénom de l'expéditeur
-        $messages = DB::table('LesMessages as m')
-            ->leftJoin('Utilisateurs as u', 'm.IdExpediteur', '=', 'u.IdUtilisateur')
-            ->select('m.*', 'u.Nom as ExpediteurNom', 'u.Prenom as ExpediteurPrenom')
-            ->where(function($q) use ($userId, $destinataireId) {
-                $q->where('m.IdExpediteur', $userId)->where('m.IdDestinataire', $destinataireId);
+        $messages = \DB::table('LesMessages')
+            ->where(function($q) use ($userId, $otherId) {
+                $q->where('IdExpediteur', $userId)->where('IdDestinataire', $otherId);
             })
-            ->orWhere(function($q) use ($userId, $destinataireId) {
-                $q->where('m.IdExpediteur', $destinataireId)->where('m.IdDestinataire', $userId);
+            ->orWhere(function($q) use ($userId, $otherId) {
+                $q->where('IdExpediteur', $otherId)->where('IdDestinataire', $userId);
             })
-            ->orderBy('m.DateEnvoi', 'asc')
+            ->orderBy('DateEnvoi')
             ->get();
 
-        return view('show', compact('messages', 'destinataire', 'destinataireId'));
+        $other = \DB::table('Utilisateurs')->where('IdUtilisateur', $otherId)->first();
+        $otherName = $other
+            ? trim(($other->Prenom ?? '') . ' ' . ($other->Nom ?? ''))
+            : "Utilisateur #{$otherId}";
+
+        $currentUser = \DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        $currentUserName = $currentUser
+            ? trim(($currentUser->Prenom ?? '') . ' ' . ($currentUser->Nom ?? ''))
+            : "Vous";
+
+        return view('messages.show', compact('messages', 'otherId', 'otherName', 'currentUserName', 'userId'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
-        $expediteur = session('utilisateur_id');
-        if (!$expediteur) {
+        $userId = session('utilisateur_id');
+        if (!$userId) {
             return redirect('/connexion');
         }
 
-        $request->validate([
-            'IdDestinataire' => 'required|integer|exists:Utilisateurs,IdUtilisateur',
-            'LeMessage' => 'required|string|max:2000'
+        $otherId = (int) $id;
+        $text = trim($request->input('message', ''));
+        if ($text === '') {
+            return redirect()->route('message.show', $otherId);
+        }
+
+        \DB::table('LesMessages')->insert([
+            'IdExpediteur'   => $userId,
+            'IdDestinataire' => $otherId,
+            'LeMessage'      => $text,
+            'DateEnvoi'      => Carbon::now('UTC')->format('Y-m-d H:i:s'),
         ]);
 
-        DB::table('LesMessages')->insert([
-            'IdExpediteur' => $expediteur,
-            'IdDestinataire' => (int) $request->input('IdDestinataire'),
-            'LeMessage' => $request->input('LeMessage')
-            // DateEnvoi utilisera la valeur par défaut
-        ]);
+        return redirect()->route('message.show', $otherId);
+    }
 
-        return redirect()->route('messages.show', (int)$request->input('IdDestinataire'))->with('success', 'Message envoyé.');
+    public function index()
+    {
+        $userId = session('utilisateur_id');
+        if (!$userId) {
+            return redirect('/connexion');
+        }
+
+        $messages = DB::table('LesMessages as m')
+            ->select('m.*')
+            ->where('m.IdExpediteur', $userId)
+            ->orWhere('m.IdDestinataire', $userId)
+            ->orderByDesc('m.DateEnvoi')
+            ->get();
+
+        $participantIds = [];
+        foreach ($messages as $m) {
+            $participantIds[] = $m->IdExpediteur;
+            $participantIds[] = $m->IdDestinataire;
+        }
+        $participantIds = array_values(array_unique($participantIds));
+        $users = DB::table('Utilisateurs')->whereIn('IdUtilisateur', $participantIds)->get()->keyBy('IdUtilisateur');
+
+        $threads = [];
+        foreach ($messages as $m) {
+            $other = ($m->IdExpediteur == $userId) ? $m->IdDestinataire : $m->IdExpediteur;
+            if (!isset($threads[$other])) {
+                $userOther = $users->get($other);
+                $m->otherName = trim(($userOther->Prenom ?? '') . ' ' . ($userOther->Nom ?? ''));
+                // format simple date+heure - convertir de UTC vers timezone local
+                $m->sentAt = \Carbon\Carbon::parse($m->DateEnvoi, 'UTC')->setTimezone(config('app.timezone', 'America/Toronto'))->locale('fr')->diffForHumans();
+                $threads[$other] = $m;
+            }
+        }
+
+        return view('messages.index', compact('threads', 'messages'));
     }
 }
 

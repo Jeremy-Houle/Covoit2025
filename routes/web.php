@@ -94,3 +94,9 @@ Route::get('/api/reservations', [ReservationController::class, 'myReservations']
 
 Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
 Route::post('/messages', [LesMessageController::class, 'store'])->name('messages.store');
+Route::get('/messages', [LesMessageController::class, 'index'])->name('messages.index');
+Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
+
+Route::get('/message', [LesMessageController::class, 'index'])->name('message.index');
+Route::get('/message/{id}', [LesMessageController::class, 'show'])->name('message.show');
+Route::post('/message/{id}', [LesMessageController::class, 'store'])->name('message.send');

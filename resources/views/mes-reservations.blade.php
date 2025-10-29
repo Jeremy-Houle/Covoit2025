@@ -54,8 +54,8 @@
                 @if($isConducteur)
                     <div class="conducteur-info">
                         <i class="fas fa-user-circle"></i>
-                        <span class="conducteur-nom">Trajet #{{ $resa->IdTrajet }}</span>
-                        <div class="small text-muted">Réservé par : {{ $resa->PrenomPassager ?? $resa->Prenom }} {{ $resa->NomPassager ?? $resa->Nom }}</div>
+                        <span class="conducteur-nom">{{ $resa->PrenomPassager }} {{ $resa->NomPassager }}</span>
+                        <div class="small text-muted">Trajet : {{ $resa->Depart }} → {{ $resa->Destination }}</div>
                     </div>
                 @else
                     <div class="conducteur-info">
@@ -105,15 +105,9 @@
 
             <div class="reservation-actions">
                 @if($isConducteur)
-                    <a href="{{ route('messages.show', $resa->IdPassager ?? $resa->IdPassager) }}" class="btn-contact btn btn-sm btn-outline-primary" title="Contacter le passager">
+                    <a href="{{ route('messages.show', $resa->IdPassager) }}" class="btn-contact btn btn-sm btn-outline-primary" title="Contacter le passager">
                         <i class="fas fa-envelope"></i> Contacter le passager
                     </a>
-                    <form action="{{ url('/mes-reservations/'.$resa->IdReservation.'/update') }}" method="POST" style="display:inline-block;">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="PlacesReservees" value="{{ $resa->PlacesReservees }}">
-                        <button type="submit" class="btn btn-sm btn-success" title="Confirmer la réservation">Confirmer</button>
-                    </form>
                 @else
                     <a href="{{ route('messages.show', $resa->IdConducteur) }}" class="btn-contact btn btn-sm btn-outline-primary" title="Contacter le conducteur">
                         <i class="fas fa-envelope"></i> Contacter le conducteur
