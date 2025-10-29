@@ -378,7 +378,7 @@
         Votre navigateur ne supporte pas les vidéos HTML5.
     </video>
     <div class="hero-content">
-        <h1 class="hero-title">Voyagez ensemble aujourd'hui,<br>économisez ensemble toujours</h1>
+        <h1 class="hero-title">Voyagez ensemble,<br>économisez ensemble </h1>
         <p class="hero-subtitle">Découvrez comment nos utilisateurs fidèles voyagent avec Covoit2025</p>
     </div>
 </section>

@@ -51,6 +51,7 @@
                             <a href="/mes-reservations" class="nav-link">Mes Réservations</a>
                         @endif
                         @if(!$userId)
+                            <a href="/rechercher" class="nav-link">Rechercher</a>
                             <a href="/about" class="nav-link">À propos</a>
                             <a href="/faq" class="nav-link">FAQ</a>
                             <a href="/contact" class="nav-link">Contact</a>

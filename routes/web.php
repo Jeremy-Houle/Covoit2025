@@ -40,6 +40,10 @@ Route::get('/contact', function () {
 });
 
 Route::get('/cart', function () {
+    $userId = session('utilisateur_id');
+    if (!$userId) {
+        return redirect('/connexion')->with('error', 'Veuillez vous connecter pour consulter votre panier.');
+    }
     $paiements = DB::table('Paiements as p')
         ->join('Trajets as t', 'p.IdTrajet', '=', 't.IdTrajet')
         ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
