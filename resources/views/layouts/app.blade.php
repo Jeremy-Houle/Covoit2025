@@ -57,6 +57,7 @@
                         
                         @if($userId)
                             <a href="/cart" class="nav-link"><i class="fa fa-shopping-cart"></i> <span class="nav-text">Panier</span></a>
+                            <a href="{{ route('messages.index') }}" class="nav-link"><i class="fa fa-comments"></i> <span class="nav-text">Messages</span></a>
                         @endif
                     </div>
                     <div class="navbar-right">

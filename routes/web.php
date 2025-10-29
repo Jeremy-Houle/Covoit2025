@@ -94,3 +94,12 @@ Route::get('/api/reservations', [ReservationController::class, 'myReservations']
 
 Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
 Route::post('/messages', [LesMessageController::class, 'store'])->name('messages.store');
+Route::get('/messages', [LesMessageController::class, 'index'])->name('messages.index');
+Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
+
+// page liste
+Route::get('/message', [LesMessageController::class, 'index'])->name('message.index');
+// conversation (GET)
+Route::get('/message/{id}', [LesMessageController::class, 'show'])->name('message.show');
+// envoyer message (POST) <- ajouté
+Route::post('/message/{id}', [LesMessageController::class, 'store'])->name('message.send');
