@@ -321,10 +321,36 @@
 @endsection
 
 <script>
+let currentDeleteData = {};
+
 window.supprimerDuPanier = function(paiementId, depart, destination) {
     console.log('supprimerDuPanier appelée:', paiementId, depart, destination);
     
-    if (!confirm(`Voulez-vous vraiment supprimer ce trajet du panier ?\n\n${depart} → ${destination}\n\nLes places seront remises disponibles.`)) {
+    // Sauvegarder les données pour la suppression
+    currentDeleteData = {
+        paiementId: paiementId,
+        depart: depart,
+        destination: destination
+    };
+    
+    // Mettre à jour le texte du modal
+    document.getElementById('deleteTrajetInfo').textContent = `${depart} → ${destination}`;
+    
+    // Ouvrir le modal
+    const modal = document.getElementById('deleteConfirmationModal');
+    if (modal) {
+        const bootstrapModal = new bootstrap.Modal(modal, {
+            backdrop: true,
+            keyboard: true,
+            focus: true
+        });
+        bootstrapModal.show();
+    }
+};
+
+function confirmerSuppression() {
+    if (!currentDeleteData.paiementId) {
+        console.error('Aucune donnée de suppression disponible');
         return;
     }
     
@@ -342,16 +368,30 @@ window.supprimerDuPanier = function(paiementId, depart, destination) {
     const paiementInput = document.createElement('input');
     paiementInput.type = 'hidden';
     paiementInput.name = 'paiement_id';
-    paiementInput.value = paiementId;
+    paiementInput.value = currentDeleteData.paiementId;
     form.appendChild(paiementInput);
+    
+    // Fermer le modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
+    if (modal) {
+        modal.hide();
+    }
     
     document.body.appendChild(form);
     console.log('Soumission du formulaire de suppression...');
     form.submit();
-};
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     let currentPaymentData = {};
+    
+    // Event listener pour le bouton de confirmation de suppression
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            confirmerSuppression();
+        });
+    }
     
     const payButtons = document.querySelectorAll('.btn-pay');
     payButtons.forEach(button => {
