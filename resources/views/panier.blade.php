@@ -19,6 +19,7 @@
 @endpush
 <script src="https://www.paypal.com/sdk/js?client-id=AWQqeyvmMlkT1LYUxQ-WRRLHao1rtwanQXVP9LTSYtoyCmJ1JKcKimTRLI5oVZ3kEBbRXQ2n0JqSXt9v&currency=CAD&enable-funding=paypal&disable-funding=card,credit&components=buttons"></script>
 @section('content')
+
 <div class="panier-page">
     <div class="panier-container">
         <div class="panier-header">

@@ -12,7 +12,7 @@ class LesMessageController extends Controller
     {
         $userId = session('utilisateur_id');
         if (!$userId) {
-            return redirect('/connexion');
+            return redirect('/connexion')->with('error', 'Veuillez vous connecter pour consulter vos messages.');
         }
 
         $otherId = (int) $id;
