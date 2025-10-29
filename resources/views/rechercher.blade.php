@@ -14,7 +14,6 @@
 @section('content')
     <div class="rechercher-page">
         <div class="container" style="padding-top: 100px;">
-            <!-- En-tête de la page -->
             <div class="page-header">
                 <h1 class="page-title">
                     <i class="fa fa-search"></i> Rechercher des trajets

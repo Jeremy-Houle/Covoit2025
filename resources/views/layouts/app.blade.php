@@ -41,19 +41,23 @@
                         <a href="/" class="nav-link">Accueil</a>
                         
                         @if($userId)
-                            <a href="/rechercher" class="nav-link">Rechercher</a>
-                            
+                            @if($role === 'Passager')
+                                <a href="/rechercher" class="nav-link">Rechercher</a>
+                            @endif
                             @if($role === 'Conducteur')
                                 <a href="/publier" class="nav-link">Publier</a>
                             @endif
                             
                             <a href="/mes-reservations" class="nav-link">Mes Réservations</a>
                         @endif
+                        @if(!$userId)
+                            <a href="/about" class="nav-link">À propos</a>
+                            <a href="/faq" class="nav-link">FAQ</a>
+                            <a href="/contact" class="nav-link">Contact</a>
+                        @endif
                         
                         <a href="/tarifs" class="nav-link">Tarifs</a>
-                        <a href="/about" class="nav-link">À propos</a>
-                        <a href="/faq" class="nav-link">FAQ</a>
-                        <a href="/contact" class="nav-link">Contact</a>
+       
                         
                         @if($userId)
                             <a href="/cart" class="nav-link"><i class="fa fa-shopping-cart"></i> <span class="nav-text">Panier</span></a>
@@ -62,11 +66,10 @@
                     </div>
                     <div class="navbar-right">
                         @if(session('utilisateur_id'))
-                            <span class="user-greeting">
-                                <i class="fa fa-user-circle"></i> <span class="greeting-text">{{ session('utilisateur_prenom') }}</span>
+                            <a href="/profil" class=" nav-link profile-link">
+                                <i class="fa fa-user"></i> <span class="greeting-text">{{ session('utilisateur_prenom') }}</span>
                                 <small class="user-role">({{ session('utilisateur_role') }})</small>
-                            </span>
-                            <a href="/profil" class="nav-link profile-link"><i class="fa fa-user"></i> <span class="nav-text">Mon Profil</span></a>
+                            </a>
                             <a href="/deconnexion" class="btn-logout"><i class="fa fa-sign-out-alt"></i> <span class="nav-text">Déconnexion</span></a>
                         @else
                             <a href="/connexion" class="nav-link"><i class="fa fa-sign-in-alt"></i> <span class="nav-text">Connexion</span></a>
