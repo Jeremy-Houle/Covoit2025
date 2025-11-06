@@ -1280,3 +1280,22 @@ header {
     height: 300px;
   }
 }
+
+.star-selected {
+  color: #fbbf24;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
+  animation: slideUp 0.3s ease-out;
+}
+
+
+@keyframes slideUp {
+  from {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}

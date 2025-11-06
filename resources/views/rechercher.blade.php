@@ -70,6 +70,52 @@
                                     <div>Départ: {{ $t->Depart }} — Destination: {{ $t->Destination }}</div>
                                     <div>Date: {{ $t->DateTrajet }} — Heure: {{ $t->HeureTrajet }}</div>
                                     <div>Places: <span class="places-dispo">{{ $t->PlacesDisponibles }}</span> — Prix: {{ number_format($t->Prix, 2) }}$</div>
+                                    @if (session('utilisateur_id'))
+                                        <div style="display:flex" class="rating">           
+                                            @php
+                                                $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
+                                                $wholeStars = floor($averageNote);
+                                                $hasHalfStar = ($averageNote - $wholeStars) > 0;
+                                                $placedStars = 0;
+                                            @endphp
+                                            @for ($placedStars = 1; $placedStars <= $wholeStars; $placedStars++)
+                                                <i class='fa-solid fa-star star' style="color: #fbbf24;' data-star='{{ $placedStars }}'
+                                                data-trajet='{{ $t->IdTrajet }}' ></i> 
+                                            @endfor
+                                            @if ($hasHalfStar)
+                                                @php
+                                                    $placedStars++;
+                                                @endphp
+                                                <i class="fa-regular fa-star-half-stroke star" style="color: #fbbf24;" data-star="{{ $placedStars }}"
+                                                data-trajet="{{ $t->IdTrajet }}"></i>
+                                            @endif
+                                            @if($placedStars <= 5)
+                                                @for (; $placedStars <= 5; $placedStars++)
+                                                    <i class="fa-regular fa-star star" data-star="{{ $placedStars }}"
+                                                    data-trajet="{{ $t->IdTrajet }}"></i>
+                                                @endfor
+                                            @endif
+                                        </div>
+                                    @endif
+                                    @if(!session('utilisateur_id'))
+                                        <div style="display:flex">           
+                                            @php
+                                                $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
+                                                $placedStars = 0;
+                                            @endphp
+                                            @for ($placedStars = 1; $placedStars <= round($averageNote); $placedStars++)
+                                                <i class="fa-solid fa-star" style="color: yellow;"></i>
+                                            @endfor
+                                            @if (is_float($averageNote))
+                                                <i class="fa-regular fa-star-half" style="color: red;"></i> 
+                                            @endif
+                                            @if($placedStars<= 5)
+                                                @for (; $placedStars <= 5; $placedStars++)
+                                                    <i class="fa-light fa-star star"></i> 
+                                                @endfor
+                                            @endif
+                                        </div>
+                                    @endif
 
                                     @if(session('utilisateur_id'))
                                         @if(!$isConducteur || strtolower($userRole) === 'passager')
@@ -625,7 +671,53 @@
                     }
                 });
             }
+            
         }
+
+    document.querySelectorAll('.rating').forEach(rating => {
+        const stars = Array.from(rating.querySelectorAll('.star'));
+
+        stars.forEach(s => {
+            s.dataset.originalClass = s.className || '';
+        });
+
+        function renderHover(value) {
+            stars.forEach(s => {
+                const starValue = parseInt(s.dataset.star) || 0;
+                if (starValue <= value) {
+                    s.classList.remove('fa-star-half-stroke', 'fa-star-half', 'fa-regular', 'fa-light');
+                    s.classList.add('fa-star', 'fa-solid', 'star-selected');
+                    s.classList.remove('fa-regular');
+                } else {
+                    s.classList.remove('fa-solid', 'star-selected');
+                    s.classList.add('fa-regular');
+                }
+            });
+        }
+
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const value = parseInt(star.dataset.star) || 0;
+                renderHover(value);
+            });
+            star.addEventListener('focus', () => {
+                renderHover(parseInt(star.dataset.star) || 0);
+            });
+        });
+
+        rating.addEventListener('mouseleave', () => {
+            stars.forEach(s => {
+                if (s.dataset.originalClass !== undefined) {
+                    s.className = s.dataset.originalClass;
+                } else {
+                    s.classList.remove('fa-solid', 'star-selected');
+                    s.classList.add('fa-regular');
+                }
+            });
+        });
+    });
+
+        
         
     </script>
 

@@ -65,7 +65,12 @@ class TrajetController extends Controller
     public function index()
     {
         $trajets = Trajet::all();
-        return view('rechercher', compact('trajets'));
+        $reviews = DB::table('evaluation')
+            ->select('IdTrajet', DB::raw('AVG(Note) as average_note'), DB::raw('COUNT(*) as review_count'))
+            ->groupBy('IdTrajet')
+            ->get()
+            ->keyBy('IdTrajet');
+        return view('rechercher', compact('trajets', 'reviews'));
     }
 
     public function search(Request $request)
