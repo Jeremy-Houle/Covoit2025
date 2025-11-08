@@ -327,17 +327,17 @@ let currentDeleteData = {};
 window.supprimerDuPanier = function(paiementId, depart, destination) {
     console.log('supprimerDuPanier appelée:', paiementId, depart, destination);
     
-    // Sauvegarder les données pour la suppression
+   
     currentDeleteData = {
         paiementId: paiementId,
         depart: depart,
         destination: destination
     };
     
-    // Mettre à jour le texte du modal
+   
     document.getElementById('deleteTrajetInfo').textContent = `${depart} → ${destination}`;
     
-    // Ouvrir le modal
+  
     const modal = document.getElementById('deleteConfirmationModal');
     if (modal) {
         const bootstrapModal = new bootstrap.Modal(modal, {
@@ -386,7 +386,7 @@ function confirmerSuppression() {
 document.addEventListener('DOMContentLoaded', function() {
     let currentPaymentData = {};
     
-    // Event listener pour le bouton de confirmation de suppression
+    
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', function() {
@@ -595,12 +595,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="confirmation-content">
                         <h6 class="confirmation-title">Supprimer ce trajet du panier ?</h6>
-                        <p class="confirmation-text" id="deleteTrajetInfo">
+                        <!-- <p class="confirmation-text" id="deleteTrajetInfo"> -->
                         </p>
-                        <div class="warning-note">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Les places seront remises disponibles dans le trajet</span>
-                        </div>
                     </div>
                 </div>
             </div>

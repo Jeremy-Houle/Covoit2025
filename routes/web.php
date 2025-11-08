@@ -9,6 +9,7 @@ use App\Http\Controllers\TrajetController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\LesMessageController;
 use App\Http\Controllers\MotDePasseController;
+use App\Http\Controllers\FavoriController;
 
 
 Route::get('/', function () {
@@ -71,6 +72,7 @@ Route::post('/reset-password', [MotDePasseController::class, 'resetPassword'])->
 Route::post('/payer-panier/{conducteurId}/{idUtilisateur}/{paiementId}', [CartController::class, 'payerPanier'])->name('payer.panier');
 Route::post('/update-places', [CartController::class, 'updatePlaces'])->name('update.places');
 Route::post('/remove-from-cart', [CartController::class, 'removeFromCart'])->name('remove.from.cart');
+Route::get('/historique-transactions', [CartController::class, 'historique'])->name('historique.transactions');
 Route::get('/profil', [ProfilController::class, 'index']);
 Route::get('/edit-profil', [ProfilController::class, 'edit'])->name('profil.edit');
 Route::post('/edit-profil', [ProfilController::class, 'update'])->name('profil.update');
@@ -95,6 +97,11 @@ Route::get('/trajets/{id}/availability', function($id) {
 });
 
 Route::get('/api/reservations', [ReservationController::class, 'myReservations'])->middleware('auth');
+
+// Routes pour les favoris
+Route::get('/api/favoris', [FavoriController::class, 'index'])->name('favoris.index');
+Route::post('/api/favoris/toggle', [FavoriController::class, 'toggle'])->name('favoris.toggle');
+Route::get('/api/favoris/check/{idTrajet}', [FavoriController::class, 'check'])->name('favoris.check');
 
 Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
 Route::post('/messages', [LesMessageController::class, 'store'])->name('messages.store');

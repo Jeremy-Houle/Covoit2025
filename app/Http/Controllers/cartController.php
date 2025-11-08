@@ -84,6 +84,36 @@ class CartController extends Controller
             $paymentType
         ]);
 
+        // Insérer dans l'historique des transactions
+        try {
+            $conducteur = DB::table('Utilisateurs')
+                ->where('IdUtilisateur', $p_conducteurId)
+                ->first();
+            
+            DB::table('HistoriqueTransactions')->insert([
+                'IdUtilisateur' => $p_idUtilisateur,
+                'IdTrajet' => $trajet->IdTrajet,
+                'IdConducteur' => $p_conducteurId,
+                'IdPaiement' => $p_Idpaiement,
+                'IdReservation' => null, // Sera mis à jour si une réservation est créée
+                'NombrePlaces' => $paiement->NombrePlaces,
+                'Montant' => $montantAttendu,
+                'Statut' => 'Payé',
+                'MethodePaiement' => $paymentType === 'paypal' ? 'PayPal' : 'Solde',
+                'Depart' => $trajet->Depart,
+                'Destination' => $trajet->Destination,
+                'DateTrajet' => $trajet->DateTrajet,
+                'HeureTrajet' => $trajet->HeureTrajet,
+                'PrixUnitaire' => $trajet->Prix,
+                'NomConducteur' => $conducteur->Nom ?? '',
+                'PrenomConducteur' => $conducteur->Prenom ?? '',
+                'DateTransaction' => now(),
+                'CreatedAt' => now()
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'insertion dans l\'historique: ' . $e->getMessage());
+        }
+
         Log::info('Paiement effectué avec succès', [
             'conducteur_id' => $p_conducteurId,
             'utilisateur_id' => $p_idUtilisateur,
@@ -235,16 +265,6 @@ class CartController extends Controller
                 return response()->json(['success' => false, 'message' => 'Paiement introuvable']);
             }
 
-            $trajet = DB::table('Trajets')
-                ->where('IdTrajet', $paiement->IdTrajet)
-                ->first();
-
-            if ($trajet) {
-                DB::table('Trajets')
-                    ->where('IdTrajet', $paiement->IdTrajet)
-                    ->increment('PlacesDisponibles', $paiement->NombrePlaces);
-            }
-
             DB::table('Paiements')
                 ->where('IdPaiement', $paiementId)
                 ->where('IdUtilisateur', $userId)
@@ -252,8 +272,7 @@ class CartController extends Controller
 
             Log::info('Paiement supprimé du panier', [
                 'paiement_id' => $paiementId,
-                'utilisateur_id' => $userId,
-                'places_remises' => $paiement->NombrePlaces
+                'utilisateur_id' => $userId
             ]);
 
             return redirect()->route('cart')->with('success', 'Trajet supprimé du panier');
@@ -266,5 +285,21 @@ class CartController extends Controller
 
             return redirect()->route('cart')->with('error', 'Erreur lors de la suppression');
         }
+    }
+
+    public function historique()
+    {
+        $userId = session('utilisateur_id');
+        if (!$userId) {
+            return redirect('/connexion')->with('error', 'Veuillez vous connecter pour consulter votre historique de transactions.');
+        }
+
+        // Récupérer uniquement l'historique depuis la table HistoriqueTransactions
+        $transactions = DB::table('HistoriqueTransactions')
+            ->where('IdUtilisateur', $userId)
+            ->orderBy('DateTransaction', 'desc')
+            ->get();
+
+        return view('historique-transactions', ['transactions' => $transactions]);
     }
 }
