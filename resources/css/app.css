@@ -1246,6 +1246,12 @@ header {
   box-shadow: var(--shadow-lg);
 }
 
+.star-golden {
+  color: #fbbf24;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
+}
+
 @media (max-width: 1024px) {
   .rechercher-layout {
     flex-direction: column;
@@ -1283,3 +1289,4 @@ header {
     height: 300px;
   }
 }
+
