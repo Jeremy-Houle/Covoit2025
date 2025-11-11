@@ -20,7 +20,7 @@ window.FavoritesManager = {
         
         this._loading = true;
         try {
-            const res = await fetch('/api/favoris', {
+            const res = await fetch('/api/favoris?type=Rechercher', {
                 credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
@@ -67,7 +67,10 @@ window.FavoritesManager = {
                     'X-CSRF-TOKEN': window.csrfToken || '',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({ IdTrajet: Number(idTrajet) })
+                body: JSON.stringify({ 
+                    IdTrajet: Number(idTrajet),
+                    TypeFavori: 'Rechercher'
+                })
             });
             
             if (res.ok) {

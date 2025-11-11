@@ -7,6 +7,13 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 @endpush
 
+@push('scripts')
+<script>
+    window.csrfToken = '{{ csrf_token() }}';
+</script>
+@vite(['resources/js/reservations.js'])
+@endpush
+
 @section('content')
 <div class="reservations-page">
     <div class="reservations-container">
@@ -48,7 +55,7 @@
             $isConducteur = session('utilisateur_role') === 'Conducteur';
         @endphp
 
-        <div class="reservation-card">
+        <div class="reservation-card" data-trajet-id="{{ $resa->IdTrajet }}" data-date-trajet="{{ $resa->DateTrajet }}">
 
             <div class="reservation-header">
                 @if($isConducteur)
@@ -63,8 +70,17 @@
                         <span class="conducteur-nom">{{ $resa->PrenomConducteur }} {{ $resa->NomConducteur }}</span>
                     </div>
                 @endif
-                 <div class="reservation-status">
+                 <div class="reservation-status" style="display: flex; align-items: center; gap: 10px;">
                      <span class="badge badge-reservation">Réservé</span>
+                     @if(!$isConducteur)
+                     <button type="button" 
+                         class="btn-favorite btn btn-sm" 
+                         data-trajet-id="{{ $resa->IdTrajet }}"
+                         title="Ajouter aux favoris"
+                         style="color:#666;border:none;background:transparent;padding:4px 8px;cursor:pointer;">
+                         <i class="fa-regular fa-star"></i>
+                     </button>
+                     @endif
                  </div>
              </div>
 
