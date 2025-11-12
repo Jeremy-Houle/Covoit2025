@@ -1,14 +1,227 @@
-console.log("rechercher.js chargé");
+window.FavoritesManager = {
+    _favoritesCache: null,
+    _loading: false,
+    
+    getFavorites: async function() {
+        if (this._favoritesCache !== null && !this._loading) {
+            return this._favoritesCache;
+        }
+        
+        if (this._loading) {
+            return new Promise((resolve) => {
+                const checkInterval = setInterval(() => {
+                    if (!this._loading) {
+                        clearInterval(checkInterval);
+                        resolve(this._favoritesCache || []);
+                    }
+                }, 100);
+            });
+        }
+        
+        this._loading = true;
+        try {
+            const res = await fetch('/api/favoris', {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                this._favoritesCache = Array.isArray(data) ? data : [];
+                this._loading = false;
+                return this._favoritesCache;
+            } else if (res.status === 401) {
+                this._favoritesCache = [];
+                this._loading = false;
+                return [];
+            } else {
+                this._favoritesCache = [];
+                this._loading = false;
+                return [];
+            }
+        } catch (e) {
+            this._favoritesCache = [];
+            this._loading = false;
+            return [];
+        }
+    },
+    
+    isFavorite: async function(idTrajet) {
+        const favorites = await this.getFavorites();
+        return favorites.includes(String(idTrajet));
+    },
+    
+    toggleFavorite: async function(idTrajet) {
+        if (this._toggling) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            return this.toggleFavorite(idTrajet);
+        }
+        
+        this._toggling = true;
+        try {
+            const res = await fetch('/api/favoris/toggle', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': window.csrfToken || '',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ IdTrajet: Number(idTrajet) })
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                this._favoritesCache = null;
+                await this.getFavorites();
+                const isFavorite = data.isFavorite !== undefined ? data.isFavorite : (data.success === true);
+                return isFavorite;
+            } else if (res.status === 401) {
+                alert('Veuillez vous connecter pour ajouter des trajets aux favoris.');
+                return false;
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(errorData.message || 'Erreur lors de l\'ajout aux favoris');
+                return false;
+            }
+        } catch (e) {
+            alert('Erreur réseau lors de l\'ajout aux favoris');
+            return false;
+        } finally {
+            this._toggling = false;
+        }
+    },
+    
+    invalidateCache: function() {
+        this._favoritesCache = null;
+    }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.debug("DOM ready - attach search listener");
     const form = document.getElementById('searchForm');
     const resultsEl = document.getElementById('results');
     const myResEl = document.getElementById('myReservations');
+    const filterFavoris = document.getElementById('filterFavoris');
     if (!form || !resultsEl) {
-        console.error('searchForm ou results introuvable');
         return;
     }
+    
+    async function updateFavoritesUI() {
+        const trajets = document.querySelectorAll('#results .trajet');
+        for (const trajet of trajets) {
+            const id = trajet.dataset.id;
+            const starBtn = trajet.querySelector('.btn-favorite');
+            if (starBtn && id) {
+                const isFav = await FavoritesManager.isFavorite(id);
+                starBtn.classList.toggle('active', isFav);
+                starBtn.innerHTML = isFav ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+                starBtn.style.color = isFav ? '#ffc107' : '#666';
+                starBtn.title = isFav ? 'Retirer des favoris' : 'Ajouter aux favoris';
+                
+                if (!starBtn.hasAttribute('data-listener-attached')) {
+                    starBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleFavoriteClick(starBtn);
+                    });
+                    starBtn.setAttribute('data-listener-attached', 'true');
+                }
+            }
+        }
+    }
+    
+    async function filterByFavorites(showOnlyFavorites) {
+        const trajets = document.querySelectorAll('#results .trajet');
+        let visibleCount = 0;
+        
+        const existingMsg = resultsEl.querySelector('.no-favorites-message');
+        if (existingMsg) {
+            existingMsg.remove();
+        }
+        
+        if (!showOnlyFavorites) {
+            trajets.forEach(trajet => {
+                trajet.style.display = '';
+                visibleCount++;
+            });
+            return;
+        }
+        
+        const favorites = await FavoritesManager.getFavorites();
+        
+        trajets.forEach(trajet => {
+            const id = trajet.dataset.id;
+            if (!id) {
+                trajet.style.display = 'none';
+                return;
+            }
+            
+            const isFav = favorites.includes(String(id));
+            
+            if (isFav) {
+                trajet.style.display = '';
+                visibleCount++;
+            } else {
+                trajet.style.display = 'none';
+            }
+        });
+        
+        if (showOnlyFavorites && visibleCount === 0) {
+            const noResultsMsg = document.createElement('p');
+            noResultsMsg.className = 'no-favorites-message';
+            noResultsMsg.style.cssText = 'text-align:center;padding:20px;color:#666;font-style:italic;margin-top:20px;';
+            noResultsMsg.textContent = 'Aucun trajet en favoris pour le moment. Cliquez sur l\'étoile d\'un trajet pour l\'ajouter aux favoris.';
+            resultsEl.appendChild(noResultsMsg);
+        }
+    }
+    
+    if (filterFavoris) {
+        filterFavoris.addEventListener('change', async (e) => {
+            await filterByFavorites(e.target.checked);
+        });
+    }
+    
+    async function handleFavoriteClick(starBtn) {
+        const card = starBtn.closest('.trajet');
+        if (!card) {
+            return;
+        }
+        
+        const idTrajet = card.dataset.id;
+        if (!idTrajet) {
+            return;
+        }
+        
+        starBtn.disabled = true;
+        const originalHTML = starBtn.innerHTML;
+        starBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+        
+        const isNowFavorite = await FavoritesManager.toggleFavorite(idTrajet);
+        
+        starBtn.disabled = false;
+        starBtn.classList.toggle('active', isNowFavorite);
+        starBtn.innerHTML = isNowFavorite 
+            ? '<i class="fa-solid fa-star"></i>' 
+            : '<i class="fa-regular fa-star"></i>';
+        starBtn.style.color = isNowFavorite ? '#ffc107' : '#666';
+        starBtn.title = isNowFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris';
+        
+        if (filterFavoris && filterFavoris.checked && !isNowFavorite) {
+            card.style.display = 'none';
+            const remainingFavs = document.querySelectorAll('#results .trajet:not([style*="display: none"])');
+            if (remainingFavs.length === 0) {
+                const noResultsMsg = document.createElement('p');
+                noResultsMsg.className = 'no-favorites-message';
+                noResultsMsg.style.cssText = 'text-align:center;padding:20px;color:#666;font-style:italic;margin-top:20px;';
+                noResultsMsg.textContent = 'Aucun trajet en favoris pour le moment. Cliquez sur l\'étoile d\'un trajet pour l\'ajouter aux favoris.';
+                if (!resultsEl.querySelector('.no-favorites-message')) {
+                    resultsEl.appendChild(noResultsMsg);
+                }
+            }
+        }
+    }
+    
+    updateFavoritesUI();
 
     async function loadMyReservations() {
         if (!myResEl) return;
@@ -27,8 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (res.status === 401 || res.status === 403) {
-                myResEl.innerHTML = '<p>Vous devez être connecté pour voir vos réservations.</p>';
-                console.warn('Accès refusé:', res.status);
+                myResEl.innerHTML = '';
                 return;
             }
 
@@ -59,43 +271,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 myResEl.innerHTML = text || '<p>Aucune réservation pour le moment.</p>';
             }
         } catch (err) {
-            console.error('Erreur chargement réservations :', err);
             myResEl.innerHTML = '<p>Impossible de charger vos réservations (erreur réseau).</p>';
         }
     }
 
     loadMyReservations();
+    
+
+  
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        console.debug("submit intercepté");
 
         const paramsObj = Object.fromEntries(new FormData(form));
         const url = (form.action && form.action !== "") ? form.action : '/api/trajets/search';
-
-        console.debug('Requête de recherche - URL:', url, 'Params:', paramsObj);
 
         resultsEl.innerHTML = '<p>Recherche…</p>';
 
         try {
             const fullUrl = url + '?' + new URLSearchParams(paramsObj).toString();
-            console.debug('Fetch ->', fullUrl);
 
             const res = await fetch(fullUrl, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
 
-            console.debug('Réponse reçue - status:', res.status, 'headers:', [...res.headers.entries()]);
-
             const contentType = res.headers.get('content-type') || '';
             if (contentType.includes('application/json')) {
                 const data = await res.json();
-                console.log('Trajets complets reçus :', data);
 
                 if (!Array.isArray(data) || data.length === 0) {
                     resultsEl.innerHTML = '<p>Aucun trajet trouvé.</p>';
                 } else {
+                    const favorites = await FavoritesManager.getFavorites();
+                    
                     resultsEl.innerHTML = data.map(t => {
+                        const isFav = favorites.includes(String(t.IdTrajet));
                         const maxPlaces = Math.max(0, Number(t.PlacesDisponibles) || 0);
                         const optCount = Math.max(1, maxPlaces);
                         const options = Array.from({length: optCount}, (_, i) => {
@@ -120,6 +330,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="d-flex justify-content-between align-items-start">
                                 <div><strong>${t.NomConducteur || 'Conducteur'}</strong></div>
                                 <div style="display:flex;gap:6px;">
+                                    <button type="button" class="btn-favorite btn btn-sm ${isFav ? 'active' : ''}" data-id="${t.IdTrajet}" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}" style="color:${isFav ? '#ffc107' : '#666'};border:none;background:transparent;padding:4px 8px;cursor:pointer;">
+                                        <i class="${isFav ? 'fa-solid fa-star' : 'fa-regular fa-star'}"></i>
+                                    </button>
                                     <button type="button" class="btn-details btn btn-sm btn-outline-secondary" data-id="${t.IdTrajet}">Détails</button>
                                 </div>
                             </div>
@@ -139,16 +352,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         `;
                     }).join('');
+                    
+                    await updateFavoritesUI();
+                    if (filterFavoris && filterFavoris.checked) {
+                        await filterByFavorites(true);
+                    }
                 }
 
                 loadMyReservations();
             } else {
                 const text = await res.text();
-                console.debug('Payload texte reçu (début):', text.slice(0,300));
                 resultsEl.innerHTML = text;
             }
         } catch (err) {
-            console.error('Erreur lors de la requête de recherche :', err);
             resultsEl.innerHTML = '<p>Erreur lors de la recherche.</p>';
         }
     });
@@ -191,7 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.appendChild(detailsPanel);
                 detailsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
-                console.warn('Impossible charger détails trajet', id, res.status);
                 detailsPanel = document.createElement('div');
                 detailsPanel.className = 'trajet-details';
                 detailsPanel.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;color:#a00;';
@@ -199,7 +414,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.appendChild(detailsPanel);
             }
         } catch (err) {
-            console.error('Erreur fetch détails trajet', err);
             const fallback = document.createElement('div');
             fallback.className = 'trajet-details';
             fallback.style = 'margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;display:block;color:#a00;';
@@ -209,7 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleReserveClick(btn) {
-        console.log('Bouton réserver cliqué !', btn);
         const idTrajet = btn.dataset.id;
 
         const card = btn.closest('.trajet');
@@ -255,13 +468,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.href = '/cart';
                 }, 500);
             } else {
-                console.error('Erreur ajout réserve', payload);
                 alert(payload.error || payload.message || 'Erreur lors de l\'ajout');
                 btn.textContent = origText;
                 btn.disabled = false;
             }
         } catch (err) {
-            console.error('Erreur:', err);
             alert('Erreur réseau lors de l\'ajout');
             btn.textContent = origText;
             btn.disabled = false;
@@ -269,6 +480,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleTrajetClick(ev) {
+        const favoriteBtn = ev.target.closest('.btn-favorite');
+        if (favoriteBtn) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            handleFavoriteClick(favoriteBtn);
+            return;
+        }
+        
+        if (ev.target.classList.contains('fa-star') || ev.target.classList.contains('fa-regular') || ev.target.classList.contains('fa-solid')) {
+            const btn = ev.target.closest('.btn-favorite');
+            if (btn) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                handleFavoriteClick(btn);
+                return;
+            }
+        }
+        
         const detailsBtn = ev.target.closest('.btn-details');
         if (detailsBtn) {
             handleDetailsClick(detailsBtn);

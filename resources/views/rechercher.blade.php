@@ -60,6 +60,13 @@
                                         <div><strong>{{ $t->NomConducteur ?? "Trajet #{$t->IdTrajet}" }}</strong></div>
                                         <div style="display:flex;gap:6px;">
                                             <button type="button" 
+                                                class="btn-favorite btn btn-sm" 
+                                                data-id="{{ $t->IdTrajet }}"
+                                                title="Ajouter aux favoris"
+                                                style="color:#666;border:none;background:transparent;padding:4px 8px;cursor:pointer;">
+                                                <i class="fa-regular fa-star"></i>
+                                            </button>
+                                            <button type="button" 
                                                 class="btn-details-{{ $t->IdTrajet }} btn btn-sm btn-outline-secondary" 
                                                 onclick="toggleDetails({{ $t->IdTrajet }})">
                                                 Détails
@@ -180,6 +187,13 @@
                         <h4 class="sidebar-title">
                             <i class="fa fa-filter"></i> Filtres & Options
                         </h4>
+
+                        <div class="filter-group" style="margin-bottom:16px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--gray-700);">
+                                <input type="checkbox" id="filterFavoris" name="filterFavoris" style="width:18px;height:18px;cursor:pointer;">
+                                <i class="fa fa-star" style="color:#ffc107;"></i> Afficher uniquement les favoris
+                            </label>
+                        </div>
 
                         <div class="filter-group" style="margin-bottom:16px;">
                             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
@@ -338,6 +352,127 @@
                 if (btn) btn.textContent = 'Détails';
             }
         };
+
+        // Gestion des favoris dans le HTML initial - attendre que FavoritesManager soit disponible
+        async function initFavoritesForStaticTrajets() {
+            if (typeof window.FavoritesManager === 'undefined') {
+                // Attendre un peu que le script soit chargé
+                setTimeout(initFavoritesForStaticTrajets, 100);
+                return;
+            }
+            
+            const trajets = document.querySelectorAll('#results .trajet');
+            const resultsEl = document.getElementById('results');
+            const filterFavoris = document.getElementById('filterFavoris');
+            
+            // Récupérer tous les favoris une seule fois
+            const favorites = await window.FavoritesManager.getFavorites();
+            
+            // Initialiser les favoris au chargement
+            trajets.forEach(trajet => {
+                const id = trajet.dataset.id;
+                const starBtn = trajet.querySelector('.btn-favorite');
+                if (starBtn && id) {
+                    const isFav = favorites.includes(String(id));
+                    starBtn.classList.toggle('active', isFav);
+                    starBtn.innerHTML = isFav ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+                    starBtn.style.color = isFav ? '#ffc107' : '#666';
+                    starBtn.title = isFav ? 'Retirer des favoris' : 'Ajouter aux favoris';
+                    
+                    // Ajouter le gestionnaire de clic
+                    starBtn.addEventListener('click', async function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        starBtn.disabled = true;
+                        const originalHTML = starBtn.innerHTML;
+                        starBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                        
+                        const isNowFavorite = await window.FavoritesManager.toggleFavorite(id);
+                        
+                        starBtn.disabled = false;
+                        starBtn.classList.toggle('active', isNowFavorite);
+                        starBtn.innerHTML = isNowFavorite ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+                        starBtn.style.color = isNowFavorite ? '#ffc107' : '#666';
+                        starBtn.title = isNowFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris';
+                        
+                        // Si le filtre favoris est actif, masquer le trajet retiré des favoris
+                        if (filterFavoris && filterFavoris.checked && !isNowFavorite) {
+                            trajet.style.display = 'none';
+                            // Vérifier s'il reste des favoris
+                            const remainingFavs = document.querySelectorAll('#results .trajet:not([style*="display: none"])');
+                            if (remainingFavs.length === 0 && resultsEl) {
+                                const noResultsMsg = document.createElement('p');
+                                noResultsMsg.className = 'no-favorites-message';
+                                noResultsMsg.style.cssText = 'text-align:center;padding:20px;color:#666;font-style:italic;margin-top:20px;';
+                                noResultsMsg.textContent = 'Aucun trajet en favoris pour le moment. Cliquez sur l\'étoile d\'un trajet pour l\'ajouter aux favoris.';
+                                if (!resultsEl.querySelector('.no-favorites-message')) {
+                                    resultsEl.appendChild(noResultsMsg);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Gestion du filtre favoris pour le HTML initial
+            if (filterFavoris) {
+                filterFavoris.addEventListener('change', async function() {
+                    const showOnlyFavorites = this.checked;
+                    let visibleCount = 0;
+                    
+                    // Supprimer le message précédent
+                    if (resultsEl) {
+                        const existingMsg = resultsEl.querySelector('.no-favorites-message');
+                        if (existingMsg) {
+                            existingMsg.remove();
+                        }
+                    }
+                    
+                    if (!showOnlyFavorites) {
+                        // Afficher tous les trajets
+                        trajets.forEach(trajet => {
+                            trajet.style.display = '';
+                            visibleCount++;
+                        });
+                        return;
+                    }
+                    
+                    // Récupérer les favoris depuis l'API
+                    const favoritesList = await window.FavoritesManager.getFavorites();
+                    
+                    trajets.forEach(trajet => {
+                        const id = trajet.dataset.id;
+                        if (!id) {
+                            trajet.style.display = 'none';
+                            return;
+                        }
+                        
+                        const isFav = favoritesList.includes(String(id));
+                        
+                        if (isFav) {
+                            trajet.style.display = '';
+                            visibleCount++;
+                        } else {
+                            trajet.style.display = 'none';
+                        }
+                    });
+                    
+                    // Afficher un message si aucun favori n'est trouvé
+                    if (showOnlyFavorites && visibleCount === 0 && resultsEl) {
+                        const noResultsMsg = document.createElement('p');
+                        noResultsMsg.className = 'no-favorites-message';
+                        noResultsMsg.style.cssText = 'text-align:center;padding:20px;color:#666;font-style:italic;margin-top:20px;';
+                        noResultsMsg.textContent = 'Aucun trajet en favoris pour le moment. Cliquez sur l\'étoile d\'un trajet pour l\'ajouter aux favoris.';
+                        resultsEl.appendChild(noResultsMsg);
+                    }
+                });
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initFavoritesForStaticTrajets();
+        });
 
         window.reserverTrajet = async function(idTrajet, placesMax) {
             console.log('Fonction reserverTrajet appelée - IdTrajet:', idTrajet);
