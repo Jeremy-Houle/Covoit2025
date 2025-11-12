@@ -78,49 +78,54 @@
                                     <div>Date: {{ $t->DateTrajet }} — Heure: {{ $t->HeureTrajet }}</div>
                                     <div>Places: <span class="places-dispo">{{ $t->PlacesDisponibles }}</span> — Prix: {{ number_format($t->Prix, 2) }}$</div>
                                     @if (session('utilisateur_id'))
-                                        <div style="display:flex" class="rating">           
+                                        @php
+                                            $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
+                                            $wholeStars = floor($averageNote);
+                                            $hasHalfStar = ($averageNote - $wholeStars) > 0;
+                                            $placedStars = 0;
+                                        @endphp
+                                        <div style="display:flex" class="rating" data-average="{{ $averageNote }}">          
                                             @php
-                                                $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
-                                                $wholeStars = floor($averageNote);
-                                                $hasHalfStar = ($averageNote - $wholeStars) > 0;
-                                                $placedStars = 0;
+                                                // Render stars deterministically to avoid off-by-one errors
+                                                $full = (int) floor($averageNote);
+                                                $hasHalf = ($averageNote - $full) > 0;
                                             @endphp
-                                            @for ($placedStars = 1; $placedStars <= $wholeStars; $placedStars++)
-                                                <i class='fa-solid fa-star star' style="color: #fbbf24;' data-star='{{ $placedStars }}'
-                                                data-trajet='{{ $t->IdTrajet }}' ></i> 
+                                            @for ($i = 1; $i <= $full; $i++)
+                                                <i class="fa-solid fa-star star" style="color: #fbbf24;" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
                                             @endfor
-                                            @if ($hasHalfStar)
-                                                @php
-                                                    $placedStars++;
-                                                @endphp
-                                                <i class="fa-regular fa-star-half-stroke star" style="color: #fbbf24;" data-star="{{ $placedStars }}"
-                                                data-trajet="{{ $t->IdTrajet }}"></i>
+                                            @if ($hasHalf)
+                                                @php $halfPos = $full + 1; @endphp
+                                                <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;" data-star="{{ $halfPos }}" data-trajet="{{ $t->IdTrajet }}"></i>
                                             @endif
-                                            @if($placedStars <= 5)
-                                                @for (; $placedStars <= 5; $placedStars++)
-                                                    <i class="fa-regular fa-star star" data-star="{{ $placedStars }}"
-                                                    data-trajet="{{ $t->IdTrajet }}"></i>
-                                                @endfor
-                                            @endif
+                                            @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
+                                            @for ($i = $start; $i <= 5; $i++)
+                                                <i class="fa-regular fa-star star" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                            @endfor
                                         </div>
                                     @endif
                                     @if(!session('utilisateur_id'))
-                                        <div style="display:flex">           
+                                        @php
+                                            $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
+                                            $wholeStars = floor($averageNote);
+                                            $hasHalfStar = ($averageNote - $wholeStars) > 0;
+                                            $placedStars = 0;
+                                        @endphp
+                                        <div style="display:flex" class="rating" data-average="{{ $averageNote }}">          
                                             @php
-                                                $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
-                                                $placedStars = 0;
+                                                $full = (int) floor($averageNote);
+                                                $hasHalf = ($averageNote - $full) > 0;
                                             @endphp
-                                            @for ($placedStars = 1; $placedStars <= round($averageNote); $placedStars++)
-                                                <i class="fa-solid fa-star" style="color: yellow;"></i>
+                                            @for ($i = 1; $i <= $full; $i++)
+                                                <i class="fa-solid fa-star star" style="color: #fbbf24;" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
                                             @endfor
-                                            @if (is_float($averageNote))
-                                                <i class="fa-regular fa-star-half" style="color: red;"></i> 
+                                            @if ($hasHalf)
+                                                @php $halfPos = $full + 1; @endphp
+                                                <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;" data-star="{{ $halfPos }}" data-trajet="{{ $t->IdTrajet }}"></i>
                                             @endif
-                                            @if($placedStars<= 5)
-                                                @for (; $placedStars <= 5; $placedStars++)
-                                                    <i class="fa-light fa-star star"></i> 
-                                                @endfor
-                                            @endif
+                                            @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
+                                            @for ($i = $start; $i <= 5; $i++)
+                                                <i class="fa-regular fa-star star" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                            @endfor
                                         </div>
                                     @endif
 
@@ -812,9 +817,48 @@
     document.querySelectorAll('.rating').forEach(rating => {
         const stars = Array.from(rating.querySelectorAll('.star'));
 
-        stars.forEach(s => {
-            s.dataset.originalClass = s.className || '';
-        });
+        function renderFromData() {
+            const avgStr = rating.dataset.average || '';
+            const userStr = rating.dataset.userNote || '';
+
+            const userVal = parseInt(userStr);
+            if (!isNaN(userVal) && userStr !== '') {
+                stars.forEach(s => {
+                    const val = parseInt(s.dataset.star) || 0;
+                    s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
+                    if (val <= userVal) {
+                        s.classList.add('fa-solid', 'fa-star', 'star-selected');
+                    } else {
+                        s.classList.add('fa-regular', 'fa-star');
+                    }
+                });
+                return;
+            }
+
+            const avg = parseFloat(avgStr) || 0;
+            const whole = Math.floor(avg);
+            const hasHalf = (avg - whole) > 0;
+            // Debug: log rating state to help diagnose half-star logic
+            try {
+                const starVals = stars.map(s => parseInt(s.dataset.star) || 0);
+                console.log('renderFromData: avg=', avg, 'whole=', whole, 'hasHalf=', hasHalf, 'starsCount=', stars.length, 'starVals=', starVals);
+            } catch (err) {
+                console.log('renderFromData: debug failed', err);
+            }
+            stars.forEach(s => {
+                const val = parseInt(s.dataset.star) || 0;
+                console.log('  star val=', val, 'compared to whole+1=', whole + 1);
+                s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
+                if (val <= whole) {
+                    s.classList.add('fa-solid', 'fa-star', 'star-selected');
+                } else if (val === whole + 1 && hasHalf) {
+                    s.classList.add('fa-solid', 'fa-star-half-stroke');
+                    console.log('Adding half star for value', val);
+                } else {
+                    s.classList.add('fa-regular', 'fa-star');
+                }
+            });
+        }
 
         function renderHover(value) {
             stars.forEach(s => {
@@ -841,15 +885,94 @@
         });
 
         rating.addEventListener('mouseleave', () => {
-            stars.forEach(s => {
-                if (s.dataset.originalClass !== undefined) {
-                    s.className = s.dataset.originalClass;
-                } else {
-                    s.classList.remove('fa-solid', 'star-selected');
-                    s.classList.add('fa-regular');
-                }
-            });
+            renderFromData();
         });
-    });    
+
+        renderFromData();
+    });
+    document.querySelectorAll('.rating').forEach(rating => {
+    const stars = rating.querySelectorAll('.star');
+    stars.forEach(star => {
+        star.addEventListener('click', async () => {
+            const idTrajet = star.dataset.trajet;
+            const note = star.dataset.star;
+
+            try {
+                const response = await fetch("{{ route('reviews.store') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        idTrajet: idTrajet,
+                        note: note
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log('Review saved:', data.review, 'action=', data.action);
+                    try {
+                        const ratingEl = star.closest('.rating');
+                        if (!ratingEl) return;
+
+                        ratingEl.dataset.average = (typeof data.average_note === 'number') ? data.average_note : (ratingEl.dataset.average || 0);
+
+                        if (data.user_note !== null && data.user_note !== undefined) {
+                            ratingEl.dataset.userNote = String(data.user_note);
+                        } else {
+                            delete ratingEl.dataset.userNote;
+                        }
+
+                        const sList = Array.from(ratingEl.querySelectorAll('.star'));
+
+                        if (data.user_note !== null && data.user_note !== undefined) {
+                            const userVal = parseInt(data.user_note) || 0;
+                            sList.forEach(s => {
+                                const val = parseInt(s.dataset.star) || 0;
+                                s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
+                                if (val <= userVal) {
+                                    s.classList.add('fa-solid', 'fa-star', 'star-selected');
+                                } else {
+                                    s.classList.add('fa-regular', 'fa-star');
+                                }
+                            });
+                            ratingEl.classList.add('rated');
+                            ratingEl.dispatchEvent(new Event('mouseleave'));
+                        } else {
+                            const avg = parseFloat(ratingEl.dataset.average) || 0;
+                            const whole = Math.floor(avg);
+                            const hasHalf = (avg - whole) > 0;
+                            sList.forEach(s => {
+                                const val = parseInt(s.dataset.star) || 0;
+                                s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
+                                if (val <= whole) {
+                                    s.classList.add('fa-solid', 'fa-star', 'star-selected');
+                                } else if (val === whole + 1 && hasHalf) {
+                                    s.classList.add('fa-solid', 'fa-star-half-stroke', 'star-selected');
+                                } else {
+                                    s.classList.add('fa-regular', 'fa-star');
+                                }
+                            });
+                            ratingEl.classList.remove('rated');
+                            ratingEl.dispatchEvent(new Event('mouseleave'));
+                        }
+
+                    } catch (e) {
+                        console.error('Failed to update stars UI:', e);
+                    }
+                } else {
+                    console.error('Failed to save review');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+});
+        
+        
     </script>
 @endsection
