@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Trajet;
 use App\Mail\TrajetConfirmeMail;
 use App\Mail\TrajetAnnuleMail;
@@ -15,29 +16,111 @@ class TrajetController extends Controller
     private function normalizeString($string)
     {
         $string = strtolower(trim($string));
-        
+
         $string = str_replace(
-            ['é', 'è', 'ê', 'ë', 'à', 'â', 'ä', 'ô', 'ö', 'û', 'ü', 'ù', 'î', 'ï', 'ç',
-             'É', 'È', 'Ê', 'Ë', 'À', 'Â', 'Ä', 'Ô', 'Ö', 'Û', 'Ü', 'Ù', 'Î', 'Ï', 'Ç'],
-            ['e', 'e', 'e', 'e', 'a', 'a', 'a', 'o', 'o', 'u', 'u', 'u', 'i', 'i', 'c',
-             'e', 'e', 'e', 'e', 'a', 'a', 'a', 'o', 'o', 'u', 'u', 'u', 'i', 'i', 'c'],
+            [
+                'é',
+                'è',
+                'ê',
+                'ë',
+                'à',
+                'â',
+                'ä',
+                'ô',
+                'ö',
+                'û',
+                'ü',
+                'ù',
+                'î',
+                'ï',
+                'ç',
+                'É',
+                'È',
+                'Ê',
+                'Ë',
+                'À',
+                'Â',
+                'Ä',
+                'Ô',
+                'Ö',
+                'Û',
+                'Ü',
+                'Ù',
+                'Î',
+                'Ï',
+                'Ç'
+            ],
+            [
+                'e',
+                'e',
+                'e',
+                'e',
+                'a',
+                'a',
+                'a',
+                'o',
+                'o',
+                'u',
+                'u',
+                'u',
+                'i',
+                'i',
+                'c',
+                'e',
+                'e',
+                'e',
+                'e',
+                'a',
+                'a',
+                'a',
+                'o',
+                'o',
+                'u',
+                'u',
+                'u',
+                'i',
+                'i',
+                'c'
+            ],
             $string
         );
-        
+
         $string = preg_replace('/[^a-z0-9]/', '', $string);
-        
+
         return $string;
     }
+    /*
+        public function create()
+        {
+            $userId = session('utilisateur_id');
+            if (!$userId) {
+                return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
+            }
 
-    public function create()
-    {
-        $userId = session('utilisateur_id');
-        if (!$userId) {
-            return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
+            return view('publier');
         }
+            */
 
-        return view('publier');
+public function create()
+{
+    $userId = session('utilisateur_id');
+    if (!$userId) {
+        return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
     }
+
+    // Récupère tous les trajets du conducteur connecté **sans réservation**
+    $mesTrajets = DB::table('Trajets')
+        ->leftJoin('Reservations', 'Trajets.IdTrajet', '=', 'Reservations.IdTrajet')
+        ->where('Trajets.IdConducteur', $userId)
+        ->whereNull('Reservations.IdReservation') // aucun passager réservé
+        ->orderBy('Trajets.DateTrajet', 'asc')
+        ->select('Trajets.*') // on récupère juste les colonnes de Trajets
+        ->get();
+
+    return view('publier', compact('mesTrajets'));
+}
+
+
 
     public function store(Request $request)
     {
@@ -79,12 +162,12 @@ class TrajetController extends Controller
 
         if ($depart = $request->input('Depart')) {
             $departNormalized = $this->normalizeString($depart);
-                $query->whereRaw('LOWER(Depart) LIKE ?', ['%' . strtolower($depart) . '%']);
+            $query->whereRaw('LOWER(Depart) LIKE ?', ['%' . strtolower($depart) . '%']);
         }
 
         if ($destination = $request->input('Destination')) {
             $destinationNormalized = $this->normalizeString($destination);
-                $query->whereRaw('LOWER(Destination) LIKE ?', ['%' . strtolower($destination) . '%']);
+            $query->whereRaw('LOWER(Destination) LIKE ?', ['%' . strtolower($destination) . '%']);
         }
 
         if ($date = $request->input('DateTrajet')) {
@@ -184,7 +267,7 @@ class TrajetController extends Controller
                     $trajetInfo = DB::table('Trajets')->where('IdTrajet', $idTrajet)->first();
 
                     if ($passager && $trajetInfo) {
-                        $reservation = (object)[
+                        $reservation = (object) [
                             'IdReservation' => $idReservation,
                             'PlacesReservees' => $places
                         ];
@@ -257,45 +340,93 @@ class TrajetController extends Controller
 
         return redirect('/mes-reservations')->with('success', 'Trajet modifié et passagers notifiés.');
     }
-
-    public function cancelTrajet($id)
-    {
-        $userId = session('utilisateur_id');
-        if (!$userId) {
-            return redirect('/connexion');
-        }
-
-        $trajet = DB::table('Trajets')->where('IdTrajet', $id)->first();
-
-        if (!$trajet || $trajet->IdConducteur != $userId) {
-            return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
-        }
-
-        $conducteur = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
-
-        $reservations = DB::table('Reservations')
-            ->join('Utilisateurs', 'Reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
-            ->where('Reservations.IdTrajet', $id)
-            ->select('Utilisateurs.*', 'Reservations.*')
-            ->get();
-
-        foreach ($reservations as $resa) {
-            try {
-                Mail::to($resa->Courriel)->send(
-                    new TrajetAnnuleMail($trajet, $resa, $conducteur, 'cancelled')
-                );
-            } catch (\Exception $e) {
-                Log::error("Erreur lors de l'envoi de l'email d'annulation au passager {$resa->IdPassager} : {$e->getMessage()}");
+    /*
+        public function cancelTrajet($id)
+        {
+            $userId = session('utilisateur_id');
+            if (!$userId) {
+                return redirect('/connexion');
             }
+
+            $trajet = DB::table('Trajets')->where('IdTrajet', $id)->first();
+
+            if (!$trajet || $trajet->IdConducteur != $userId) {
+                return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
+            }
+
+            $conducteur = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+
+            $reservations = DB::table('Reservations')
+                ->join('Utilisateurs', 'Reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
+                ->where('Reservations.IdTrajet', $id)
+                ->select('Utilisateurs.*', 'Reservations.*')
+                ->get();
+
+            foreach ($reservations as $resa) {
+                try {
+                    Mail::to($resa->Courriel)->send(
+                        new TrajetAnnuleMail($trajet, $resa, $conducteur, 'cancelled')
+                    );
+                } catch (\Exception $e) {
+                    Log::error("Erreur lors de l'envoi de l'email d'annulation au passager {$resa->IdPassager} : {$e->getMessage()}");
+                }
+            }
+
+            DB::table('Paiements')
+                ->where('IdTrajet', $id)
+                ->update(['Statut' => 'Annulé']);
+
+            DB::table('Reservations')->where('IdTrajet', $id)->delete();
+            DB::table('Trajets')->where('IdTrajet', $id)->delete();
+
+            return redirect('/mes-reservations')->with('success', 'Trajet annulé et passagers notifiés. Les remboursements seront traités automatiquement.');
         }
+            */
 
-        DB::table('Paiements')
-            ->where('IdTrajet', $id)
-            ->update(['Statut' => 'Annulé']);
 
-        DB::table('Reservations')->where('IdTrajet', $id)->delete();
-        DB::table('Trajets')->where('IdTrajet', $id)->delete();
-
-        return redirect('/mes-reservations')->with('success', 'Trajet annulé et passagers notifiés. Les remboursements seront traités automatiquement.');
+public function cancelTrajet($id) 
+{
+    $userId = session('utilisateur_id');
+    if (!$userId) {
+        return redirect('/connexion');
     }
+
+    $trajet = DB::table('Trajets')->where('IdTrajet', $id)->first();
+    if (!$trajet || $trajet->IdConducteur != $userId) {
+        return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
+    }
+
+    // Vérifier s'il existe des paiements actifs (statut différent de 'En attente' ou 'Annulé')
+    $activePaymentsCount = DB::table('Paiements')
+        ->where('IdTrajet', $id)
+        ->whereNotIn('Statut', ['En attente', 'Annulé'])
+        ->count();
+
+    if ($activePaymentsCount > 0) {
+        return redirect('/publier')
+            ->with('error', 'Impossible de supprimer ce trajet : certains paiements sont déjà effectués.');
+    }
+
+    // Supprimer les dépendances
+    DB::table('Commentaires')->where('IdTrajet', $id)->delete();
+    DB::table('Evaluation')->where('IdTrajet', $id)->delete();
+    DB::table('RecurrenceTrajet')->where('IdTrajet', $id)->delete();
+
+    if (Schema::hasTable('favoris')) {
+        DB::table('favoris')->where('IdTrajet', $id)->delete();
+    }
+
+    // Supprimer les paiements en attente ou annulés
+    DB::table('Paiements')
+        ->where('IdTrajet', $id)
+        ->whereIn('Statut', ['En attente', 'Annulé'])
+        ->delete();
+
+    // Supprimer le trajet
+    DB::table('Trajets')->where('IdTrajet', $id)->delete();
+
+    return redirect('/publier')->with('success', 'Trajet supprimé avec succès.');
+}
+
+
 }

@@ -4,6 +4,36 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/publier.css') }}?v={{ time() }}">
+    <style>
+        /* Style pour le tableau de mes trajets */
+        .mes-trajets {
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .mes-trajets table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .mes-trajets thead {
+            background-color: #f5f5f5;
+        }
+        .mes-trajets tbody tr:hover {
+            background-color: #f0f8ff;
+        }
+        .trash-button {
+            background: transparent;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        .mes-trajets h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -23,18 +53,68 @@
                 </div>
             @endif
 
-            <div class="publier-layout">
-                <div class="map-section">
-                    <div class="map-container-publier">
-                        <div id="map"></div>
+            <div class="publier-layout" style="display: flex; gap: 30px;">
+                <!-- Section Carte + Mes trajets -->
+                <div style="flex: 1;">
+                    <div class="map-section">
+                        <div class="map-container-publier" style="height: 400px;">
+                            <div id="map"></div>
+                        </div>
+                        <div class="map-info">
+                            <i class="fa fa-info-circle"></i>
+                            <span>Utilisez les champs de recherche pour définir votre itinéraire sur la carte</span>
+                        </div>
                     </div>
-                    <div class="map-info">
-                        <i class="fa fa-info-circle"></i>
-                        <span>Utilisez les champs de recherche pour définir votre itinéraire sur la carte</span>
+
+                    <!-- Mes trajets publiés -->
+                    <div class="mes-trajets">
+                        @if($mesTrajets->isEmpty()) 
+                            <p style="margin-top: 30px; color: #555;">Vous n'avez aucun trajet publié.</p>
+                        @else
+                            <h2>Mes trajets publiés</h2>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Départ</th>
+                                            <th>Destination</th>
+                                            <th>Date</th>
+                                            <th>Heure</th>
+                                            <th>Places</th>
+                                            <th>Prix</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($mesTrajets as $trajet)
+                                            <tr>
+                                                <td>{{ $trajet->Depart }}</td>
+                                                <td>{{ $trajet->Destination }}</td>
+                                                <td>{{ $trajet->DateTrajet }}</td>
+                                                <td>{{ $trajet->HeureTrajet }}</td>
+                                                <td>{{ $trajet->PlacesDisponibles }}</td>
+                                                <td>{{ $trajet->Prix }} $</td>
+                                                <td>
+                                                    <form action="{{ route('trajets.cancel', $trajet->IdTrajet) }}" method="POST"
+                                                        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce trajet ?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="trash-button" title="Supprimer">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
-                <div class="form-section">
+                <!-- Section Formulaire -->
+                <div class="form-section" style="flex: 1;">
                     <form action="{{ route('trajets.store') }}" method="POST" id="trajetForm" class="modern-form">
                         @csrf
                         <input type="hidden" name="IdConducteur" value="{{ session('utilisateur_id') }}">
@@ -44,31 +124,25 @@
                         <div class="form-group-title">
                             <i class="fa fa-route"></i> Itinéraire
                         </div>
-
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="Depart"><i class="fa fa-map-marker-alt"></i> Ville de départ</label>
-                                <input type="text" name="Depart" id="Depart" placeholder="Ex: Montréal, QC" maxlength="150"
-                                    required>
+                                <input type="text" name="Depart" id="Depart" placeholder="Ex: Montréal, QC" maxlength="150" required>
                             </div>
-
                             <div class="form-group">
                                 <label for="Destination"><i class="fa fa-flag-checkered"></i> Ville d'arrivée</label>
-                                <input type="text" name="Destination" id="Destination" placeholder="Ex: Québec, QC"
-                                    maxlength="150" required>
+                                <input type="text" name="Destination" id="Destination" placeholder="Ex: Québec, QC" maxlength="150" required>
                             </div>
                         </div>
 
                         <div class="form-group-title">
                             <i class="fa fa-calendar"></i> Date et heure
                         </div>
-
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="DateTrajet"><i class="fa fa-calendar-day"></i> Date du trajet</label>
                                 <input type="date" name="DateTrajet" id="DateTrajet" required>
                             </div>
-
                             <div class="form-group">
                                 <label for="HeureTrajet"><i class="fa fa-clock"></i> Heure de départ</label>
                                 <input type="time" name="HeureTrajet" id="HeureTrajet" required>
@@ -78,14 +152,11 @@
                         <div class="form-group-title">
                             <i class="fa fa-users"></i> Places et tarif
                         </div>
-
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="PlacesDisponibles"><i class="fa fa-chair"></i> Places disponibles</label>
-                                <input type="number" name="PlacesDisponibles" id="PlacesDisponibles" min="1" max="6"
-                                    placeholder="1-6" required>
+                                <input type="number" name="PlacesDisponibles" id="PlacesDisponibles" min="1" max="6" placeholder="1-6" required>
                             </div>
-
                             <div class="form-group">
                                 <label for="Prix"><i class="fa fa-dollar-sign"></i> Prix par place</label>
                                 <input type="number" step="0.01" name="Prix" id="Prix" placeholder="0.00" required>
@@ -95,7 +166,6 @@
                         <div class="form-group-title">
                             <i class="fa fa-cog"></i> Préférences
                         </div>
-
                         <div class="form-group">
                             <label for="TypeConversation"><i class="fa fa-comments"></i> Type de conversation</label>
                             <select name="TypeConversation" id="TypeConversation" class="form-select" required>
