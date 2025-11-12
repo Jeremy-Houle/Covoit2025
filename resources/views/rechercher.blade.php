@@ -86,7 +86,6 @@
                                         @endphp
                                         <div style="display:flex" class="rating" data-average="{{ $averageNote }}">          
                                             @php
-                                                // Render stars deterministically to avoid off-by-one errors
                                                 $full = (int) floor($averageNote);
                                                 $hasHalf = ($averageNote - $full) > 0;
                                             @endphp
@@ -110,17 +109,17 @@
                                             $hasHalfStar = ($averageNote - $wholeStars) > 0;
                                             $placedStars = 0;
                                         @endphp
-                                        <div style="display:flex" class="rating" data-average="{{ $averageNote }}">          
+                                        <div style="display:flex" class="rating rating-static" data-average="{{ $averageNote }}">          
                                             @php
                                                 $full = (int) floor($averageNote);
                                                 $hasHalf = ($averageNote - $full) > 0;
                                             @endphp
                                             @for ($i = 1; $i <= $full; $i++)
-                                                <i class="fa-solid fa-star star" style="color: #fbbf24;" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                                <i class="fa-solid fa-star star" style="color: #fbbf24;"  data-trajet="{{ $t->IdTrajet }}"></i>
                                             @endfor
                                             @if ($hasHalf)
                                                 @php $halfPos = $full + 1; @endphp
-                                                <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;" data-star="{{ $halfPos }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                                <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;"  data-trajet="{{ $t->IdTrajet }}"></i>
                                             @endif
                                             @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
                                             @for ($i = $start; $i <= 5; $i++)
@@ -170,6 +169,29 @@
                                         <div><i class="fa fa-comments"></i> Type conversation : {{ $t->TypeConversation ?? '—' }}</div>
                                         <div><i class="fa fa-music"></i> Musique : {{ $t->Musique ? 'Oui' : 'Non' }}</div>
                                         <div><i class="fa fa-smoking"></i> Fumeur : {{ $t->Fumeur ? 'Oui' : 'Non' }}</div>
+                                        @php
+                                            $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
+                                            $wholeStars = floor($averageNote);
+                                            $hasHalfStar = ($averageNote - $wholeStars) > 0;
+                                            $placedStars = 0;
+                                        @endphp
+                                        <div style="display:flex" class="rating rating-static" data-average="{{ $averageNote }}">          
+                                            @php
+                                                $full = (int) floor($averageNote);
+                                                $hasHalf = ($averageNote - $full) > 0;
+                                            @endphp
+                                            @for ($i = 1; $i <= $full; $i++)
+                                                <i class="fa-solid fa-star star" style="color: #fbbf24;" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                            @endfor
+                                            @if ($hasHalf)
+                                                @php $halfPos = $full + 1; @endphp
+                                                <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;" data-star="{{ $halfPos }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                            @endif
+                                            @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
+                                            @for ($i = $start; $i <= 5; $i++)
+                                                <i class="fa-regular fa-star star" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                            @endfor
+                                        </div>
                                         @if(isset($t->Description))
                                             <div style="margin-top:6px;"><i class="fa fa-info-circle"></i> Description : {{ $t->Description }}</div>
                                         @endif
@@ -265,6 +287,11 @@
             </form>
         </div>
     </div>
+    <style>
+        /* For disconnected users make stars static and non-interactive */
+        .rating-static .star { pointer-events: none; cursor: default; }
+    </style>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('searchForm');
@@ -816,6 +843,7 @@
 
     document.querySelectorAll('.rating').forEach(rating => {
         const stars = Array.from(rating.querySelectorAll('.star'));
+        const isStatic = rating.classList.contains('rating-static') || rating.dataset.static === '1';
 
         function renderFromData() {
             const avgStr = rating.dataset.average || '';
@@ -838,16 +866,12 @@
             const avg = parseFloat(avgStr) || 0;
             const whole = Math.floor(avg);
             const hasHalf = (avg - whole) > 0;
-            // Debug: log rating state to help diagnose half-star logic
             try {
                 const starVals = stars.map(s => parseInt(s.dataset.star) || 0);
-                console.log('renderFromData: avg=', avg, 'whole=', whole, 'hasHalf=', hasHalf, 'starsCount=', stars.length, 'starVals=', starVals);
             } catch (err) {
-                console.log('renderFromData: debug failed', err);
             }
             stars.forEach(s => {
                 const val = parseInt(s.dataset.star) || 0;
-                console.log('  star val=', val, 'compared to whole+1=', whole + 1);
                 s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
                 if (val <= whole) {
                     s.classList.add('fa-solid', 'fa-star', 'star-selected');
@@ -874,15 +898,17 @@
             });
         }
 
-        stars.forEach(star => {
-            star.addEventListener('mouseover', () => {
-                const value = parseInt(star.dataset.star) || 0;
-                renderHover(value);
+        if (!isStatic) {
+            stars.forEach(star => {
+                star.addEventListener('mouseover', () => {
+                    const value = parseInt(star.dataset.star) || 0;
+                    renderHover(value);
+                });
+                star.addEventListener('focus', () => {
+                    renderHover(parseInt(star.dataset.star) || 0);
+                });
             });
-            star.addEventListener('focus', () => {
-                renderHover(parseInt(star.dataset.star) || 0);
-            });
-        });
+        }
 
         rating.addEventListener('mouseleave', () => {
             renderFromData();
@@ -891,6 +917,7 @@
         renderFromData();
     });
     document.querySelectorAll('.rating').forEach(rating => {
+    if (rating.classList.contains('rating-static') || rating.dataset.static === '1') return;
     const stars = rating.querySelectorAll('.star');
     stars.forEach(star => {
         star.addEventListener('click', async () => {
