@@ -10,7 +10,6 @@
     </script>
 @endpush
 
-
 @section('content')
     <div class="rechercher-page">
         <div class="container" style="padding-top: 100px;">
@@ -35,7 +34,6 @@
                             </button>
                         </div>
 
-                    
                         <div class="map-container">
                             <div id="map"></div>
                         </div>
@@ -76,7 +74,8 @@
 
                                     <div>Départ: {{ $t->Depart }} — Destination: {{ $t->Destination }}</div>
                                     <div>Date: {{ $t->DateTrajet }} — Heure: {{ $t->HeureTrajet }}</div>
-                                    <div>Places: <span class="places-dispo">{{ $t->PlacesDisponibles }}</span> — Prix: {{ number_format($t->Prix, 2) }}$</div>
+                                    <div>Places: <span class="places-dispo">{{ $t->PlacesDisponibles }}</span> — Prix: {{ number_format($t->Prix, 2) }}$ — Distance: {{ $t->Distance ?? '—' }}</div>
+                                    
                                     @if (session('utilisateur_id'))
                                         @php
                                             $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
@@ -154,9 +153,7 @@
                                         </div>
                                     @endif
 
-                                    <div class="trajet-details-{{ $t->IdTrajet }}" id="details-{{ $t->IdTrajet }}" style="display:none;margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:0.95rem;background:var(--gray-50);padding:12px;border-radius:8px;    box-shadow:
-                                        inset 2px 2px 5px rgba(0, 0, 0, 0.2),
-                                        inset -2px -2px 5px rgba(255, 255, 255, 0.8);">
+                                    <div class="trajet-details-{{ $t->IdTrajet }}" id="details-{{ $t->IdTrajet }}" style="display:none;margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:0.95rem;background:var(--gray-50);padding:12px;border-radius:8px;box-shadow:inset 2px 2px 5px rgba(0, 0, 0, 0.2),inset -2px -2px 5px rgba(255, 255, 255, 0.8);">
                                         <div><strong style="color:var(--primary-blue);font-size:1.1rem;">Détails complets</strong></div>
                                         <div style="margin-top:8px;"><i class="fa fa-user"></i> Conducteur : {{ $t->NomConducteur }} </div>
                                         <div><i class="fa fa-road"></i> Distance : {{ $t->Distance ?? '—' }}</div>
@@ -210,6 +207,7 @@
                             <i class="fa fa-filter"></i> Filtres & Options
                         </h4>
 
+                        <!-- Filtre Favoris -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--gray-700);">
                                 <input type="checkbox" id="filterFavoris" name="filterFavoris" style="width:18px;height:18px;cursor:pointer;">
@@ -217,6 +215,7 @@
                             </label>
                         </div>
 
+                        <!-- Filtre Prix Maximum -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
                                 <label style="margin:0;font-weight:600;color:var(--gray-700);">💰 Prix max :</label>
@@ -225,6 +224,21 @@
                             <input type="range" id="PrixMax" name="PrixMaxSlider" min="0" max="2000" step="0.5" value="{{ request('PrixMax', 2000) }}" style="width:100%;">
                         </div>
 
+                        <!-- NOUVEAU FILTRE: Trier par distance -->
+                        <div class="filter-group" style="margin-bottom:16px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--gray-700);">
+                                <input type="checkbox" id="filterShortestPath" name="ShortestPath" value="1" 
+                                       {{ request('ShortestPath') ? 'checked' : '' }}
+                                       style="width:18px;height:18px;cursor:pointer;">
+                                <i class="fa fa-route" style="color:#2563eb;"></i>
+                                Trier par distance
+                            </label>
+                            <small style="display:block;margin-left:26px;color:var(--gray-600);font-size:0.85rem;margin-top:4px;">
+                                Affiche les trajets du plus court au plus long
+                            </small>
+                        </div>
+
+                        <!-- Filtre Places Disponibles -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--gray-700);">
                                 👥 Places disponibles minimum
@@ -239,6 +253,7 @@
                             </select>
                         </div>
 
+                        <!-- Filtre Type de Conversation -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <div style="font-weight:600;margin-bottom:8px;color:var(--gray-700);">💬 Type de conversation</div>
                             <fieldset style="border:0;padding:0;margin:0;">
@@ -257,6 +272,7 @@
                             </fieldset>
                         </div>
 
+                        <!-- Filtre Préférences -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <div style="font-weight:600;margin-bottom:8px;color:var(--gray-700);">⚙️ Préférences</div>
                             <div style="display:flex;flex-direction:column;gap:8px;">
@@ -272,6 +288,7 @@
                             </div>
                         </div>
 
+                        <!-- Boutons d'action -->
                         <div class="filter-buttons">
                             <button type="button" onclick="reinitialiserFiltres()" class="btn-reset">
                                 <i class="fa fa-redo"></i>
@@ -287,6 +304,7 @@
             </form>
         </div>
     </div>
+    
     <style>
         /* For disconnected users make stars static and non-interactive */
         .rating-static .star { pointer-events: none; cursor: default; }
@@ -300,6 +318,7 @@
                 const destination = document.getElementById('Destination').value.trim();
                 console.log('Soumission du formulaire - Départ:', depart, 'Destination:', destination);
             });
+            
             const slider = document.getElementById('PrixMax');
             const numberInput = document.getElementById('PrixMaxNumber');
             
@@ -341,6 +360,14 @@
                     });
                 }
             });
+            
+            // NOUVEAU: Gestionnaire pour le filtre chemin le plus court
+            const shortestPathCheckbox = document.getElementById('filterShortestPath');
+            if (shortestPathCheckbox) {
+                shortestPathCheckbox.addEventListener('change', function() {
+                    form.submit();
+                });
+            }
         });
         
         document.getElementById('showAllBtn')?.addEventListener('click', function() {
@@ -352,6 +379,13 @@
             document.getElementById('PrixMax').value = 2000;
             document.getElementById('PrixMaxNumber').value = 2000;
             document.getElementById('PlacesMin').value = '';
+            
+            // NOUVEAU: Réinitialiser le filtre chemin le plus court
+            const shortestPathCheckbox = document.getElementById('filterShortestPath');
+            if (shortestPathCheckbox) {
+                shortestPathCheckbox.checked = false;
+            }
+            
             document.querySelectorAll('input[name="TypeConversation"]').forEach(radio => {
                 radio.checked = (radio.value === '');
             });
@@ -383,7 +417,6 @@
         // Gestion des favoris dans le HTML initial - attendre que FavoritesManager soit disponible
         async function initFavoritesForStaticTrajets() {
             if (typeof window.FavoritesManager === 'undefined') {
-                // Attendre un peu que le script soit chargé
                 setTimeout(initFavoritesForStaticTrajets, 100);
                 return;
             }
@@ -392,10 +425,8 @@
             const resultsEl = document.getElementById('results');
             const filterFavoris = document.getElementById('filterFavoris');
             
-            // Récupérer tous les favoris une seule fois
             const favorites = await window.FavoritesManager.getFavorites();
             
-            // Initialiser les favoris au chargement
             trajets.forEach(trajet => {
                 const id = trajet.dataset.id;
                 const starBtn = trajet.querySelector('.btn-favorite');
@@ -406,7 +437,6 @@
                     starBtn.style.color = isFav ? '#ffc107' : '#666';
                     starBtn.title = isFav ? 'Retirer des favoris' : 'Ajouter aux favoris';
                     
-                    // Ajouter le gestionnaire de clic
                     starBtn.addEventListener('click', async function(e) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -423,10 +453,8 @@
                         starBtn.style.color = isNowFavorite ? '#ffc107' : '#666';
                         starBtn.title = isNowFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris';
                         
-                        // Si le filtre favoris est actif, masquer le trajet retiré des favoris
                         if (filterFavoris && filterFavoris.checked && !isNowFavorite) {
                             trajet.style.display = 'none';
-                            // Vérifier s'il reste des favoris
                             const remainingFavs = document.querySelectorAll('#results .trajet:not([style*="display: none"])');
                             if (remainingFavs.length === 0 && resultsEl) {
                                 const noResultsMsg = document.createElement('p');
@@ -442,13 +470,11 @@
                 }
             });
             
-            // Gestion du filtre favoris pour le HTML initial
             if (filterFavoris) {
                 filterFavoris.addEventListener('change', async function() {
                     const showOnlyFavorites = this.checked;
                     let visibleCount = 0;
                     
-                    // Supprimer le message précédent
                     if (resultsEl) {
                         const existingMsg = resultsEl.querySelector('.no-favorites-message');
                         if (existingMsg) {
@@ -457,7 +483,6 @@
                     }
                     
                     if (!showOnlyFavorites) {
-                        // Afficher tous les trajets
                         trajets.forEach(trajet => {
                             trajet.style.display = '';
                             visibleCount++;
@@ -465,7 +490,6 @@
                         return;
                     }
                     
-                    // Récupérer les favoris depuis l'API
                     const favoritesList = await window.FavoritesManager.getFavorites();
                     
                     trajets.forEach(trajet => {
@@ -485,7 +509,6 @@
                         }
                     });
                     
-                    // Afficher un message si aucun favori n'est trouvé
                     if (showOnlyFavorites && visibleCount === 0 && resultsEl) {
                         const noResultsMsg = document.createElement('p');
                         noResultsMsg.className = 'no-favorites-message';
@@ -605,7 +628,6 @@
         let destinationMarker;
         let directionsService;
         let directionsRenderer;
-        
 
         window.initMap = function () {
             map = new google.maps.Map(document.getElementById("map"), {
@@ -617,21 +639,19 @@
             directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: false, preserveViewport: false });
             directionsRenderer.setMap(map);
 
-
             const departInput = document.getElementById("Depart");
             const destinationInput = document.getElementById("Destination");
             const form = document.getElementById("searchForm");
             const swapBtn = document.getElementById("swapBtn");
 
             departAutocomplete = new google.maps.places.Autocomplete(
-                    document.getElementById("Depart"),
-                    { componentRestrictions: { country: "ca" }, fields: ["geometry", "name"] }
+                document.getElementById("Depart"),
+                { componentRestrictions: { country: "ca" }, fields: ["geometry", "name"] }
             );
             destinationAutocomplete = new google.maps.places.Autocomplete(
-                    document.getElementById("Destination"),
-                    { componentRestrictions: { country: "ca" }, fields: ["geometry", "name"] }
-            );            
-            
+                document.getElementById("Destination"),
+                { componentRestrictions: { country: "ca" }, fields: ["geometry", "name"] }
+            );
 
             function drawRoute() {
                 if (!departMarker || !destinationMarker) {
@@ -696,6 +716,7 @@
                 }
                 clearRoute();
             }
+            
             function removeDestinationMarker() {
                 if (destinationMarker) {
                     destinationMarker.setMap(null);
@@ -744,6 +765,7 @@
                     removeDepartMarker();
                 }
             });
+            
             destinationInput.addEventListener('input', () => {
                 if (!destinationInput.value || destinationInput.value.trim() === '') {
                     removeDestinationMarker();
@@ -760,6 +782,7 @@
                     });
                 }
             });
+            
             destinationInput.addEventListener('blur', () => {
                 if (!destinationMarker && departInput.value && destinationInput.value) {
                     const geocoder = new google.maps.Geocoder();
@@ -838,168 +861,160 @@
                     }
                 });
             }
-            
         }
 
-    document.querySelectorAll('.rating').forEach(rating => {
-        const stars = Array.from(rating.querySelectorAll('.star'));
-        const isStatic = rating.classList.contains('rating-static') || rating.dataset.static === '1';
+        document.querySelectorAll('.rating').forEach(rating => {
+            const stars = Array.from(rating.querySelectorAll('.star'));
+            const isStatic = rating.classList.contains('rating-static') || rating.dataset.static === '1';
 
-        function renderFromData() {
-            const avgStr = rating.dataset.average || '';
-            const userStr = rating.dataset.userNote || '';
+            function renderFromData() {
+                const avgStr = rating.dataset.average || '';
+                const userStr = rating.dataset.userNote || '';
 
-            const userVal = parseInt(userStr);
-            if (!isNaN(userVal) && userStr !== '') {
+                const userVal = parseInt(userStr);
+                if (!isNaN(userVal) && userStr !== '') {
+                    stars.forEach(s => {
+                        const val = parseInt(s.dataset.star) || 0;
+                        s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
+                        if (val <= userVal) {
+                            s.classList.add('fa-solid', 'fa-star', 'star-selected');
+                        } else {
+                            s.classList.add('fa-regular', 'fa-star');
+                        }
+                    });
+                    return;
+                }
+
+                const avg = parseFloat(avgStr) || 0;
+                const whole = Math.floor(avg);
+                const hasHalf = (avg - whole) > 0;
+                
                 stars.forEach(s => {
                     const val = parseInt(s.dataset.star) || 0;
                     s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
-                    if (val <= userVal) {
+                    if (val <= whole) {
                         s.classList.add('fa-solid', 'fa-star', 'star-selected');
+                    } else if (val === whole + 1 && hasHalf) {
+                        s.classList.add('fa-solid', 'fa-star-half-stroke');
                     } else {
                         s.classList.add('fa-regular', 'fa-star');
                     }
                 });
-                return;
             }
 
-            const avg = parseFloat(avgStr) || 0;
-            const whole = Math.floor(avg);
-            const hasHalf = (avg - whole) > 0;
-            try {
-                const starVals = stars.map(s => parseInt(s.dataset.star) || 0);
-            } catch (err) {
+            function renderHover(value) {
+                stars.forEach(s => {
+                    const starValue = parseInt(s.dataset.star) || 0;
+                    if (starValue <= value) {
+                        s.classList.remove('fa-star-half-stroke', 'fa-star-half', 'fa-regular', 'fa-light');
+                        s.classList.add('fa-star', 'fa-solid', 'star-selected');
+                    } else {
+                        s.classList.remove('fa-solid', 'star-selected');
+                        s.classList.add('fa-regular');
+                    }
+                });
             }
-            stars.forEach(s => {
-                const val = parseInt(s.dataset.star) || 0;
-                s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
-                if (val <= whole) {
-                    s.classList.add('fa-solid', 'fa-star', 'star-selected');
-                } else if (val === whole + 1 && hasHalf) {
-                    s.classList.add('fa-solid', 'fa-star-half-stroke');
-                    console.log('Adding half star for value', val);
-                } else {
-                    s.classList.add('fa-regular', 'fa-star');
-                }
-            });
-        }
 
-        function renderHover(value) {
-            stars.forEach(s => {
-                const starValue = parseInt(s.dataset.star) || 0;
-                if (starValue <= value) {
-                    s.classList.remove('fa-star-half-stroke', 'fa-star-half', 'fa-regular', 'fa-light');
-                    s.classList.add('fa-star', 'fa-solid', 'star-selected');
-                    s.classList.remove('fa-regular');
-                } else {
-                    s.classList.remove('fa-solid', 'star-selected');
-                    s.classList.add('fa-regular');
-                }
-            });
-        }
-
-        if (!isStatic) {
-            stars.forEach(star => {
-                star.addEventListener('mouseover', () => {
-                    const value = parseInt(star.dataset.star) || 0;
-                    renderHover(value);
+            if (!isStatic) {
+                stars.forEach(star => {
+                    star.addEventListener('mouseover', () => {
+                        const value = parseInt(star.dataset.star) || 0;
+                        renderHover(value);
+                    });
+                    star.addEventListener('focus', () => {
+                        renderHover(parseInt(star.dataset.star) || 0);
+                    });
                 });
-                star.addEventListener('focus', () => {
-                    renderHover(parseInt(star.dataset.star) || 0);
-                });
-            });
-        }
+            }
 
-        rating.addEventListener('mouseleave', () => {
+            rating.addEventListener('mouseleave', () => {
+                renderFromData();
+            });
+
             renderFromData();
         });
 
-        renderFromData();
-    });
-    document.querySelectorAll('.rating').forEach(rating => {
-    if (rating.classList.contains('rating-static') || rating.dataset.static === '1') return;
-    const stars = rating.querySelectorAll('.star');
-    stars.forEach(star => {
-        star.addEventListener('click', async () => {
-            const idTrajet = star.dataset.trajet;
-            const note = star.dataset.star;
+        document.querySelectorAll('.rating').forEach(rating => {
+            if (rating.classList.contains('rating-static') || rating.dataset.static === '1') return;
+            const stars = rating.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.addEventListener('click', async () => {
+                    const idTrajet = star.dataset.trajet;
+                    const note = star.dataset.star;
 
-            try {
-                const response = await fetch("{{ route('reviews.store') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        idTrajet: idTrajet,
-                        note: note
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    console.log('Review saved:', data.review, 'action=', data.action);
                     try {
-                        const ratingEl = star.closest('.rating');
-                        if (!ratingEl) return;
+                        const response = await fetch("{{ route('reviews.store') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                idTrajet: idTrajet,
+                                note: note
+                            })
+                        });
 
-                        ratingEl.dataset.average = (typeof data.average_note === 'number') ? data.average_note : (ratingEl.dataset.average || 0);
+                        const data = await response.json();
 
-                        if (data.user_note !== null && data.user_note !== undefined) {
-                            ratingEl.dataset.userNote = String(data.user_note);
-                        } else {
-                            delete ratingEl.dataset.userNote;
-                        }
+                        if (data.success) {
+                            console.log('Review saved:', data.review, 'action=', data.action);
+                            try {
+                                const ratingEl = star.closest('.rating');
+                                if (!ratingEl) return;
 
-                        const sList = Array.from(ratingEl.querySelectorAll('.star'));
+                                ratingEl.dataset.average = (typeof data.average_note === 'number') ? data.average_note : (ratingEl.dataset.average || 0);
 
-                        if (data.user_note !== null && data.user_note !== undefined) {
-                            const userVal = parseInt(data.user_note) || 0;
-                            sList.forEach(s => {
-                                const val = parseInt(s.dataset.star) || 0;
-                                s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
-                                if (val <= userVal) {
-                                    s.classList.add('fa-solid', 'fa-star', 'star-selected');
+                                if (data.user_note !== null && data.user_note !== undefined) {
+                                    ratingEl.dataset.userNote = String(data.user_note);
                                 } else {
-                                    s.classList.add('fa-regular', 'fa-star');
+                                    delete ratingEl.dataset.userNote;
                                 }
-                            });
-                            ratingEl.classList.add('rated');
-                            ratingEl.dispatchEvent(new Event('mouseleave'));
-                        } else {
-                            const avg = parseFloat(ratingEl.dataset.average) || 0;
-                            const whole = Math.floor(avg);
-                            const hasHalf = (avg - whole) > 0;
-                            sList.forEach(s => {
-                                const val = parseInt(s.dataset.star) || 0;
-                                s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
-                                if (val <= whole) {
-                                    s.classList.add('fa-solid', 'fa-star', 'star-selected');
-                                } else if (val === whole + 1 && hasHalf) {
-                                    s.classList.add('fa-solid', 'fa-star-half-stroke', 'star-selected');
-                                } else {
-                                    s.classList.add('fa-regular', 'fa-star');
-                                }
-                            });
-                            ratingEl.classList.remove('rated');
-                            ratingEl.dispatchEvent(new Event('mouseleave'));
-                        }
 
-                    } catch (e) {
-                        console.error('Failed to update stars UI:', e);
+                                const sList = Array.from(ratingEl.querySelectorAll('.star'));
+
+                                if (data.user_note !== null && data.user_note !== undefined) {
+                                    const userVal = parseInt(data.user_note) || 0;
+                                    sList.forEach(s => {
+                                        const val = parseInt(s.dataset.star) || 0;
+                                        s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
+                                        if (val <= userVal) {
+                                            s.classList.add('fa-solid', 'fa-star', 'star-selected');
+                                        } else {
+                                            s.classList.add('fa-regular', 'fa-star');
+                                        }
+                                    });
+                                    ratingEl.classList.add('rated');
+                                    ratingEl.dispatchEvent(new Event('mouseleave'));
+                                } else {
+                                    const avg = parseFloat(ratingEl.dataset.average) || 0;
+                                    const whole = Math.floor(avg);
+                                    const hasHalf = (avg - whole) > 0;
+                                    sList.forEach(s => {
+                                        const val = parseInt(s.dataset.star) || 0;
+                                        s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
+                                        if (val <= whole) {
+                                            s.classList.add('fa-solid', 'fa-star', 'star-selected');
+                                        } else if (val === whole + 1 && hasHalf) {
+                                            s.classList.add('fa-solid', 'fa-star-half-stroke', 'star-selected');
+                                        } else {
+                                            s.classList.add('fa-regular', 'fa-star');
+                                        }
+                                    });
+                                    ratingEl.classList.remove('rated');
+                                    ratingEl.dispatchEvent(new Event('mouseleave'));
+                                }
+                            } catch (e) {
+                                console.error('Failed to update stars UI:', e);
+                            }
+                        } else {
+                            console.error('Failed to save review');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
                     }
-                } else {
-                    console.error('Failed to save review');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
+                });
+            });
         });
-    });
-});
-        
-        
     </script>
 @endsection

@@ -101,24 +101,24 @@ class TrajetController extends Controller
         }
             */
 
-public function create()
-{
-    $userId = session('utilisateur_id');
-    if (!$userId) {
-        return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
+    public function create()
+    {
+        $userId = session('utilisateur_id');
+        if (!$userId) {
+            return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
+        }
+
+        // Récupère tous les trajets du conducteur connecté **sans réservation**
+        $mesTrajets = DB::table('Trajets')
+            ->leftJoin('Reservations', 'Trajets.IdTrajet', '=', 'Reservations.IdTrajet')
+            ->where('Trajets.IdConducteur', $userId)
+            ->whereNull('Reservations.IdReservation') // aucun passager réservé
+            ->orderBy('Trajets.DateTrajet', 'asc')
+            ->select('Trajets.*') // on récupère juste les colonnes de Trajets
+            ->get();
+
+        return view('publier', compact('mesTrajets'));
     }
-
-    // Récupère tous les trajets du conducteur connecté **sans réservation**
-    $mesTrajets = DB::table('Trajets')
-        ->leftJoin('Reservations', 'Trajets.IdTrajet', '=', 'Reservations.IdTrajet')
-        ->where('Trajets.IdConducteur', $userId)
-        ->whereNull('Reservations.IdReservation') // aucun passager réservé
-        ->orderBy('Trajets.DateTrajet', 'asc')
-        ->select('Trajets.*') // on récupère juste les colonnes de Trajets
-        ->get();
-
-    return view('publier', compact('mesTrajets'));
-}
 
 
 
@@ -144,7 +144,7 @@ public function create()
 
         return redirect()->route('trajets.index')->with('success', 'Trajet ajouté avec succès!');
     }
-
+    /*
     public function index()
     {
         $trajets = Trajet::all();
@@ -222,6 +222,102 @@ public function create()
 
         return view('rechercher', compact('trajets'));
     }
+
+    */
+    public function search(Request $request)
+    {
+        $query = DB::table('Trajets')->select('*');
+
+        if ($depart = $request->input('Depart')) {
+            $departNormalized = $this->normalizeString($depart);
+            $query->whereRaw('LOWER(Depart) LIKE ?', ['%' . strtolower($depart) . '%']);
+        }
+
+        if ($destination = $request->input('Destination')) {
+            $destinationNormalized = $this->normalizeString($destination);
+            $query->whereRaw('LOWER(Destination) LIKE ?', ['%' . strtolower($destination) . '%']);
+        }
+
+        if ($date = $request->input('DateTrajet')) {
+            $query->whereDate('DateTrajet', $date);
+        }
+
+        if (($prixMax = $request->input('PrixMax')) !== null && $prixMax !== '') {
+            if (is_numeric($prixMax)) {
+                $query->where('Prix', '<=', floatval($prixMax));
+            }
+        }
+
+        if (($placesMin = $request->input('PlacesMin')) !== null && $placesMin !== '') {
+            if (is_numeric($placesMin)) {
+                $query->where('PlacesDisponibles', '>=', intval($placesMin));
+            }
+        }
+
+        if ($type = $request->input('TypeConversation')) {
+            $allowed = ['Silencieux', 'Normal', 'Bavard'];
+            if (in_array($type, $allowed)) {
+                $query->where('TypeConversation', $type);
+            }
+        }
+
+        $animaux = $request->input('AnimauxAcceptes');
+        if ($animaux !== null && $animaux !== '') {
+            if (in_array($animaux, ['0', '1', 0, 1], true)) {
+                $query->where('AnimauxAcceptes', intval($animaux));
+            }
+        }
+
+        $musique = $request->input('Musique');
+        if ($musique !== null && $musique !== '') {
+            if (in_array($musique, ['0', '1', 0, 1], true)) {
+                $query->where('Musique', intval($musique));
+            }
+        }
+
+        $fumeur = $request->input('Fumeur');
+        if ($fumeur !== null && $fumeur !== '') {
+            if (in_array($fumeur, ['0', '1', 0, 1], true)) {
+                $query->where('Fumeur', intval($fumeur));
+            }
+        }
+
+        // NOUVEAU FILTRE: Chemin le plus court
+        if ($request->input('ShortestPath') == '1') {
+            // Trier par distance croissante (du plus court au plus long)
+            $query->orderByRaw('CAST(Distance AS DECIMAL(10,2)) ASC');
+        } else {
+            // Ordre par défaut : par date croissante
+            $query->orderBy('DateTrajet', 'asc');
+        }
+
+        $trajets = $query->limit(100)->get();
+
+        // Récupérer les reviews pour chaque trajet
+        $reviews = DB::table('evaluation')
+            ->select('IdTrajet', DB::raw('AVG(Note) as average_note'), DB::raw('COUNT(*) as review_count'))
+            ->groupBy('IdTrajet')
+            ->get()
+            ->keyBy('IdTrajet');
+
+        if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json($trajets);
+        }
+
+        return view('rechercher', compact('trajets', 'reviews'));
+    }
+
+    public function index()
+    {
+        $trajets = Trajet::all();
+        $reviews = DB::table('evaluation')
+            ->select('IdTrajet', DB::raw('AVG(Note) as average_note'), DB::raw('COUNT(*) as review_count'))
+            ->groupBy('IdTrajet')
+            ->get()
+            ->keyBy('IdTrajet');
+        return view('rechercher', compact('trajets', 'reviews'));
+    }
+
 
     public function reserve(Request $request)
     {
@@ -384,49 +480,49 @@ public function create()
             */
 
 
-public function cancelTrajet($id) 
-{
-    $userId = session('utilisateur_id');
-    if (!$userId) {
-        return redirect('/connexion');
+    public function cancelTrajet($id)
+    {
+        $userId = session('utilisateur_id');
+        if (!$userId) {
+            return redirect('/connexion');
+        }
+
+        $trajet = DB::table('Trajets')->where('IdTrajet', $id)->first();
+        if (!$trajet || $trajet->IdConducteur != $userId) {
+            return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
+        }
+
+        // Vérifier s'il existe des paiements actifs (statut différent de 'En attente' ou 'Annulé')
+        $activePaymentsCount = DB::table('Paiements')
+            ->where('IdTrajet', $id)
+            ->whereNotIn('Statut', ['En attente', 'Annulé'])
+            ->count();
+
+        if ($activePaymentsCount > 0) {
+            return redirect('/publier')
+                ->with('error', 'Impossible de supprimer ce trajet : certains paiements sont déjà effectués.');
+        }
+
+        // Supprimer les dépendances
+        DB::table('Commentaires')->where('IdTrajet', $id)->delete();
+        DB::table('Evaluation')->where('IdTrajet', $id)->delete();
+        DB::table('RecurrenceTrajet')->where('IdTrajet', $id)->delete();
+
+        if (Schema::hasTable('favoris')) {
+            DB::table('favoris')->where('IdTrajet', $id)->delete();
+        }
+
+        // Supprimer les paiements en attente ou annulés
+        DB::table('Paiements')
+            ->where('IdTrajet', $id)
+            ->whereIn('Statut', ['En attente', 'Annulé'])
+            ->delete();
+
+        // Supprimer le trajet
+        DB::table('Trajets')->where('IdTrajet', $id)->delete();
+
+        return redirect('/publier')->with('success', 'Trajet supprimé avec succès.');
     }
-
-    $trajet = DB::table('Trajets')->where('IdTrajet', $id)->first();
-    if (!$trajet || $trajet->IdConducteur != $userId) {
-        return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
-    }
-
-    // Vérifier s'il existe des paiements actifs (statut différent de 'En attente' ou 'Annulé')
-    $activePaymentsCount = DB::table('Paiements')
-        ->where('IdTrajet', $id)
-        ->whereNotIn('Statut', ['En attente', 'Annulé'])
-        ->count();
-
-    if ($activePaymentsCount > 0) {
-        return redirect('/publier')
-            ->with('error', 'Impossible de supprimer ce trajet : certains paiements sont déjà effectués.');
-    }
-
-    // Supprimer les dépendances
-    DB::table('Commentaires')->where('IdTrajet', $id)->delete();
-    DB::table('Evaluation')->where('IdTrajet', $id)->delete();
-    DB::table('RecurrenceTrajet')->where('IdTrajet', $id)->delete();
-
-    if (Schema::hasTable('favoris')) {
-        DB::table('favoris')->where('IdTrajet', $id)->delete();
-    }
-
-    // Supprimer les paiements en attente ou annulés
-    DB::table('Paiements')
-        ->where('IdTrajet', $id)
-        ->whereIn('Statut', ['En attente', 'Annulé'])
-        ->delete();
-
-    // Supprimer le trajet
-    DB::table('Trajets')->where('IdTrajet', $id)->delete();
-
-    return redirect('/publier')->with('success', 'Trajet supprimé avec succès.');
-}
 
 
 }
