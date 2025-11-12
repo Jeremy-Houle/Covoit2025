@@ -9,6 +9,7 @@ use App\Http\Controllers\TrajetController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\LesMessageController;
 use App\Http\Controllers\MotDePasseController;
+use App\Http\Controllers\ReviewController;
 
 
 Route::get('/', function () {
@@ -104,3 +105,4 @@ Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messa
 Route::get('/message', [LesMessageController::class, 'index'])->name('message.index');
 Route::get('/message/{id}', [LesMessageController::class, 'show'])->name('message.show');
 Route::post('/message/{id}', [LesMessageController::class, 'store'])->name('message.send');
+Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
