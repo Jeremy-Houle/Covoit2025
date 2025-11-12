@@ -1283,9 +1283,16 @@ header {
 
 .star-selected {
   color: #fbbf24;
-  transform: translateY(-3px);
   box-shadow: var(--shadow-sm);
-  animation: slideUp 0.3s ease-out;
+}
+.star-selected:hover {  
+  animation: slideUp 0.3s ease-out; 
+  transform: translateY(-3px);
+
+
+}
+.star{
+  
 }
 
 
