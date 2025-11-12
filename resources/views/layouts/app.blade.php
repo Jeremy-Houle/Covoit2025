@@ -54,15 +54,17 @@
                         @if(!$userId)
                             <a href="/rechercher" class="nav-link">Rechercher</a>
                             <a href="/about" class="nav-link">À propos</a>
-                            <a href="/faq" class="nav-link">FAQ</a>
                             <a href="/contact" class="nav-link">Contact</a>
                         @endif
                         
                         <a href="/tarifs" class="nav-link">Tarifs</a>
+                        <a href="/faq" class="nav-link">FAQ</a>
        
                         
                         @if($userId)
-                            <a href="/cart" class="nav-link"><i class="fa fa-shopping-cart"></i> <span class="nav-text">Panier</span></a>
+                            @if($role === 'Passager')
+                                <a href="/cart" class="nav-link"><i class="fa fa-shopping-cart"></i> <span class="nav-text">Panier</span></a>
+                            @endif
                             <a href="{{ route('messages.index') }}" class="nav-link"><i class="fa fa-comments"></i> <span class="nav-text">Messages</span></a>
                         @endif
                     </div>
