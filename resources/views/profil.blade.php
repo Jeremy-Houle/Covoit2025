@@ -83,17 +83,17 @@
                   <p>Gérer mon panier</p>
                 </div>
               </a>
-              
-              <a href="/historique-transactions" class="action-card">
-                <div class="action-icon">
-                  <i class="fas fa-history"></i>
-                </div>
-                <div class="action-content">
-                  <h3>Historique</h3>
-                  <p>Voir l'historique de mes transactions</p>
-                </div>
-              </a>
             @endif
+            
+            <a href="/historique-transactions" class="action-card">
+              <div class="action-icon">
+                <i class="fas fa-history"></i>
+              </div>
+              <div class="action-content">
+                <h3>Historique</h3>
+                <p>Voir l'historique de mes transactions</p>
+              </div>
+            </a>
           </div>
         </section>
 

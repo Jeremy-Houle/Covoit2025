@@ -109,6 +109,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const sendButton = this.querySelector('.chat-send-button');
         sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     });
+    
+    async function updateBadge() {
+        try {
+            const response = await fetch('/api/messages/unread-count', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const badge = document.getElementById('messageBadge');
+                if (badge) {
+                    if (data.count > 0) {
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour du badge:', error);
+        }
+    }
+    
+    setTimeout(updateBadge, 500);
 });
 </script>
 @endsection

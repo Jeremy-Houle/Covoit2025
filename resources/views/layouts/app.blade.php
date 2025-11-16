@@ -65,7 +65,12 @@
                             @if($role === 'Passager')
                                 <a href="/cart" class="nav-link"><i class="fa fa-shopping-cart"></i> <span class="nav-text">Panier</span></a>
                             @endif
-                            <a href="{{ route('messages.index') }}" class="nav-link"><i class="fa fa-comments"></i> <span class="nav-text">Messages</span></a>
+                            <a href="{{ route('messages.index') }}" class="nav-link messages-link">
+                                <i class="fa fa-comments messages-icon">
+                                    <span class="message-badge" id="messageBadge" style="display: none;"></span>
+                                </i>
+                                <span class="nav-text">Messages</span>
+                            </a>
                         @endif
                     </div>
                     <div class="navbar-right">
@@ -140,6 +145,36 @@
                     icon.classList.add('fa-bars');
                 }
             });
+
+            async function loadUnreadMessages() {
+                try {
+                    const response = await fetch('/api/messages/unread-count', {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        const badge = document.getElementById('messageBadge');
+                        if (badge && data.count > 0) {
+                            badge.textContent = data.count > 99 ? '99+' : data.count;
+                            badge.style.display = 'flex';
+                        } else if (badge) {
+                            badge.style.display = 'none';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Erreur lors du chargement des messages non lus:', error);
+                }
+            }
+
+            @if($userId)
+            loadUnreadMessages();
+            setInterval(loadUnreadMessages, 30000);
+            @endif
         });
     </script>
 </body>

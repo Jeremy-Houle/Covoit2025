@@ -323,7 +323,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const paiementId = element.dataset.paiementId;
             const currentPlaces = parseInt(element.textContent);
             
-            // Récupérer les places disponibles pour ce trajet
             const trajetId = element.dataset.trajetId;
             if (trajetId) {
                 fetch(`/trajets/${trajetId}/availability`)

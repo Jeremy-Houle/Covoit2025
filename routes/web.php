@@ -99,7 +99,6 @@ Route::get('/trajets/{id}/availability', function($id) {
 
 Route::get('/api/reservations', [ReservationController::class, 'myReservations'])->middleware('auth');
 
-// Routes pour les favoris
 Route::get('/api/favoris', [FavoriController::class, 'index'])->name('favoris.index');
 Route::post('/api/favoris/toggle', [FavoriController::class, 'toggle'])->name('favoris.toggle');
 Route::get('/api/favoris/check/{idTrajet}', [FavoriController::class, 'check'])->name('favoris.check');
@@ -107,7 +106,7 @@ Route::get('/api/favoris/check/{idTrajet}', [FavoriController::class, 'check'])-
 Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
 Route::post('/messages', [LesMessageController::class, 'store'])->name('messages.store');
 Route::get('/messages', [LesMessageController::class, 'index'])->name('messages.index');
-Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
+Route::get('/api/messages/unread-count', [LesMessageController::class, 'unreadCount'])->name('messages.unread-count');
 
 Route::get('/message', [LesMessageController::class, 'index'])->name('message.index');
 Route::get('/message/{id}', [LesMessageController::class, 'show'])->name('message.show');

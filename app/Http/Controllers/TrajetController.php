@@ -108,13 +108,13 @@ class TrajetController extends Controller
             return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
         }
 
-        // Récupère tous les trajets du conducteur connecté **sans réservation**
+        
         $mesTrajets = DB::table('Trajets')
             ->leftJoin('Reservations', 'Trajets.IdTrajet', '=', 'Reservations.IdTrajet')
             ->where('Trajets.IdConducteur', $userId)
-            ->whereNull('Reservations.IdReservation') // aucun passager réservé
+            ->whereNull('Reservations.IdReservation') 
             ->orderBy('Trajets.DateTrajet', 'asc')
-            ->select('Trajets.*') // on récupère juste les colonnes de Trajets
+            ->select('Trajets.*') 
             ->get();
 
         return view('publier', compact('mesTrajets'));
@@ -282,18 +282,18 @@ class TrajetController extends Controller
             }
         }
 
-        // NOUVEAU FILTRE: Chemin le plus court
+       
         if ($request->input('ShortestPath') == '1') {
-            // Trier par distance croissante (du plus court au plus long)
+           
             $query->orderByRaw('CAST(Distance AS DECIMAL(10,2)) ASC');
         } else {
-            // Ordre par défaut : par date croissante
+           
             $query->orderBy('DateTrajet', 'asc');
         }
 
         $trajets = $query->limit(100)->get();
 
-        // Récupérer les reviews pour chaque trajet
+       
         $reviews = DB::table('evaluation')
             ->select('IdTrajet', DB::raw('AVG(Note) as average_note'), DB::raw('COUNT(*) as review_count'))
             ->groupBy('IdTrajet')
@@ -492,7 +492,6 @@ class TrajetController extends Controller
             return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
         }
 
-        // Vérifier s'il existe des paiements actifs (statut différent de 'En attente' ou 'Annulé')
         $activePaymentsCount = DB::table('Paiements')
             ->where('IdTrajet', $id)
             ->whereNotIn('Statut', ['En attente', 'Annulé'])
@@ -503,7 +502,6 @@ class TrajetController extends Controller
                 ->with('error', 'Impossible de supprimer ce trajet : certains paiements sont déjà effectués.');
         }
 
-        // Supprimer les dépendances
         DB::table('Commentaires')->where('IdTrajet', $id)->delete();
         DB::table('Evaluation')->where('IdTrajet', $id)->delete();
         DB::table('RecurrenceTrajet')->where('IdTrajet', $id)->delete();
@@ -512,13 +510,11 @@ class TrajetController extends Controller
             DB::table('favoris')->where('IdTrajet', $id)->delete();
         }
 
-        // Supprimer les paiements en attente ou annulés
         DB::table('Paiements')
             ->where('IdTrajet', $id)
             ->whereIn('Statut', ['En attente', 'Annulé'])
             ->delete();
 
-        // Supprimer le trajet
         DB::table('Trajets')->where('IdTrajet', $id)->delete();
 
         return redirect('/publier')->with('success', 'Trajet supprimé avec succès.');

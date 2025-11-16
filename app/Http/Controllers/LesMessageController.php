@@ -37,6 +37,11 @@ class LesMessageController extends Controller
             ? trim(($currentUser->Prenom ?? '') . ' ' . ($currentUser->Nom ?? ''))
             : "Vous";
 
+        DB::table('LesMessages')
+            ->where('IdDestinataire', $userId)
+            ->where('IdExpediteur', $otherId)
+            ->update(['MessageLu' => 1]);
+
         return view('messages.show', compact('messages', 'otherId', 'otherName', 'currentUserName', 'userId'));
     }
 
@@ -58,6 +63,7 @@ class LesMessageController extends Controller
             'IdDestinataire' => $otherId,
             'LeMessage'      => $text,
             'DateEnvoi'      => Carbon::now('UTC')->format('Y-m-d H:i:s'),
+            'MessageLu'      => 0,
         ]);
 
         return redirect()->route('message.show', $otherId);
@@ -91,13 +97,31 @@ class LesMessageController extends Controller
             if (!isset($threads[$other])) {
                 $userOther = $users->get($other);
                 $m->otherName = trim(($userOther->Prenom ?? '') . ' ' . ($userOther->Nom ?? ''));
-                // format simple date+heure - convertir de UTC vers timezone local
-                $m->sentAt = \Carbon\Carbon::parse($m->DateEnvoi, 'UTC')->setTimezone(config('app.timezone', 'America/Toronto'))->locale('fr')->diffForHumans();
+                $m->sentAt = Carbon::parse($m->DateEnvoi, 'UTC')->setTimezone(config('app.timezone', 'America/Toronto'))->locale('fr')->diffForHumans();
                 $threads[$other] = $m;
             }
         }
 
+        DB::table('LesMessages')
+            ->where('IdDestinataire', $userId)
+            ->update(['MessageLu' => 1]);
+
         return view('messages.index', compact('threads', 'messages'));
+    }
+
+    public function unreadCount()
+    {
+        $userId = session('utilisateur_id');
+        if (!$userId) {
+            return response()->json(['count' => 0]);
+        }
+
+        $count = DB::table('LesMessages')
+            ->where('IdDestinataire', $userId)
+            ->where('MessageLu', 0)
+            ->count();
+
+        return response()->json(['count' => $count]);
     }
 }
 
