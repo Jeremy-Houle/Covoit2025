@@ -113,3 +113,4 @@ Route::get('/message/{id}', [LesMessageController::class, 'show'])->name('messag
 Route::post('/message/{id}', [LesMessageController::class, 'store'])->name('message.send');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 Route::post('/trajets/favoris', [TrajetController::class, 'addToFavorites'])->name('trajets.favoris');
+Route::delete('/favoris/{id}', [TrajetController::class, 'deleteFavorite'])->name('favoris.delete');

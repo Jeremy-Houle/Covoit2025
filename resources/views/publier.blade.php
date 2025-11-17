@@ -175,7 +175,7 @@
                                                 <form action="{{ route('trajets.favoris') }}" method="POST">
                                                     @csrf
                                                     <input type="hidden" name="IdTrajet" value="{{ $trajet->IdTrajet }}">
-                                                    <button type="submit" class="btn btn-sm btn-primary" title="Ajouter aux favoris">
+                                                    <button type="submit" class="btn btn-sm btn-primary" title="Sauvegarder ce trajet>
                                                         <i class="fas fa-heart"></i>
                                                     </button>
                                                 </form>
@@ -191,9 +191,9 @@
                 <!-- Mes trajets favoris -->
                 <div class="mes-favoris" style="margin-top: 40px;">
                     @if($mesFavoris->isEmpty())
-                        <p style="color: #555;">Vous n'avez aucun trajet dans vos favoris.</p>
+                        <p style="color: #555;">Vous n'avez aucun trajet dans vos sauvegardés.</p>
                     @else
-                        <h2>Mes trajets favoris</h2>
+                        <h2>Mes trajets sauvegardés</h2>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -221,6 +221,13 @@
                                                     data-prix="{{ $favori->Prix }}">
                                                     Réajouter
                                                 </button>
+                                                <form action="{{ route('favoris.delete', $favori->IdFavori) }}" method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach

@@ -561,4 +561,22 @@ class TrajetController extends Controller
 
         return redirect()->back()->with('success', 'Trajet ajouté à vos favoris.');
     }
+
+    public function deleteFavorite($id)
+    {
+        $userId = session('utilisateur_id'); // Vérifiez si l'utilisateur est connecté
+        if (!$userId) {
+            return redirect()->back()->with('error', 'Vous devez être connecté pour effectuer cette action.');
+        }
+
+        $favori = DB::table('trajet_favoris')->where('IdFavori', $id)->where('IdUtilisateur', $userId)->first();
+
+        if (!$favori) {
+            return redirect()->back()->with('error', 'Trajet sauvegardé introuvable.');
+        }
+
+        DB::table('trajet_favoris')->where('IdFavori', $id)->delete();
+
+        return redirect()->back()->with('success', 'Trajet sauvegardé supprimé avec succès.');
+    }
 }
