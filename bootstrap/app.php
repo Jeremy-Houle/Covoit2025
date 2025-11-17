@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         //
     })
+    ->withSchedule(function ($schedule) {
+        $schedule->command('trajets:envoyer-rappels')->everyFifteenMinutes();
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

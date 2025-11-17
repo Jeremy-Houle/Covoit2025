@@ -15,7 +15,25 @@ use App\Http\Controllers\ContactController;
 
 
 Route::get('/', function () {
-    return view('front-page');
+    $trajetsPopulaires = DB::table('trajets as t')
+        ->join('utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
+        ->select(
+            't.IdTrajet',
+            't.Depart',
+            't.Destination',
+            't.DateTrajet',
+            't.HeureTrajet',
+            't.Prix',
+            't.PlacesDisponibles',
+            'u.Nom as ConducteurNom',
+            'u.Prenom as ConducteurPrenom'
+        )
+        ->where('t.DateTrajet', '>=', DB::raw('CURDATE()')) 
+        ->orderBy('t.IdTrajet', 'desc') 
+        ->limit(6)
+        ->get();
+    
+    return view('front-page', compact('trajetsPopulaires'));
 });
 
 Route::get('/about', function () {

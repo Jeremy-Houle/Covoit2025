@@ -33,8 +33,6 @@
                     <li><a href="/about">À propos</a></li>
                     <li><a href="/faq">FAQ</a></li>
                     <li><a href="/contact">Contact</a></li>
-                    <li><a href="/privacy">Confidentialité</a></li>
-                    <li><a href="/terms">Conditions d'utilisation</a></li>
                 </ul>
             </div>
 
@@ -46,11 +44,11 @@
                 </div>
                 <div class="contact-item">
                     <i class="fas fa-phone"></i>
-                    <span>+1 (555) 123-4567</span>
+                    <span>(450) 430-3120</span>
                 </div>
                 <div class="contact-item">
                     <i class="fas fa-map-marker-alt"></i>
-                    <span>Montréal, QC, Canada</span>
+                    <span>100 Rue Duquet<br>Sainte-Thérèse, QC J7E 3G6</span>
                 </div>
             </div>
         </div>

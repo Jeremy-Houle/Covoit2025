@@ -122,7 +122,6 @@
        
 
         <div class="publier-layout" style="display: flex; gap: 30px;">
-            <!-- Section Carte + Mes trajets -->
             <div style="flex: 1;">
                 <div class="map-section">
                     <div class="map-container-publier" style="height: 400px;">
@@ -134,7 +133,6 @@
                     </div>
                 </div>
 
-                <!-- Mes trajets publiés -->
                 <div class="mes-trajets">
                     @if($mesTrajets->isEmpty()) 
                         <p style="margin-top: 30px; color: #555;">Vous n'avez aucun trajet publié.</p>
@@ -188,7 +186,6 @@
                     @endif
                 </div>
 
-                <!-- Mes trajets favoris -->
                 <div class="mes-favoris" style="margin-top: 40px;">
                     @if($mesFavoris->isEmpty())
                         <p style="color: #555;">Vous n'avez aucun trajet dans vos sauvegardés.</p>
@@ -238,7 +235,6 @@
                 </div>
             </div>
 
-            <!-- Section Formulaire -->
             <div class="form-section" style="flex: 1;">
                 <form action="{{ route('trajets.store') }}" method="POST" id="trajetForm" class="modern-form">
                     @csrf
@@ -326,6 +322,19 @@
                         </label>
                     </div>
 
+                    <div class="notification-consent">
+                        <label class="consent-checkbox">
+                            <input type="checkbox" name="RappelEmail" id="RappelEmail" value="1">
+                            <span class="consent-content">
+                                <i class="fas fa-bell"></i>
+                                <div class="consent-text">
+                                    <strong>Recevoir un rappel par email</strong>
+                                    <small>Je souhaite recevoir un email de rappel 2 heures avant le départ de mon trajet</small>
+                                </div>
+                            </span>
+                        </label>
+                    </div>
+
                     <button type="submit" id="submitTrajet" class="btn-submit">
                         <i class="fa fa-paper-plane"></i>
                         <span>Publier le trajet</span>
@@ -336,7 +345,6 @@
     </div>
 </div>
 
-<!-- Modal de confirmation -->
 <div id="deleteModal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
         <h3><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> Supprimer ce trajet ?</h3>
@@ -381,7 +389,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
-<!-- Google Maps intact -->
 <script>
 let map, directionsService, directionsRenderer;
 let departAutocomplete, destinationAutocomplete;
@@ -534,20 +541,16 @@ window.initMap = initMap;
                 const places = this.getAttribute("data-places");
                 const prix = this.getAttribute("data-prix");
 
-                // Remplir les champs du formulaire
                 document.getElementById("Depart").value = depart;
                 document.getElementById("Destination").value = destination;
                 document.getElementById("PlacesDisponibles").value = places;
                 document.getElementById("Prix").value = prix;
 
-                // Effacer les champs de date et heure
                 document.getElementById("DateTrajet").value = "";
                 document.getElementById("HeureTrajet").value = "";
 
-                // Appeler afficherTrajet() pour mettre à jour la carte
                 afficherTrajet();
 
-                // Scroller jusqu'au formulaire
                 document.getElementById("trajetForm").scrollIntoView({ behavior: "smooth" });
             });
         });
