@@ -112,3 +112,4 @@ Route::get('/message', [LesMessageController::class, 'index'])->name('message.in
 Route::get('/message/{id}', [LesMessageController::class, 'show'])->name('message.show');
 Route::post('/message/{id}', [LesMessageController::class, 'store'])->name('message.send');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+Route::post('/trajets/favoris', [TrajetController::class, 'addToFavorites'])->name('trajets.favoris');

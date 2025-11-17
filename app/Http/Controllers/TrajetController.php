@@ -103,21 +103,19 @@ class TrajetController extends Controller
 
     public function create()
     {
-        $userId = session('utilisateur_id');
+        $userId = session('utilisateur_id'); // Retrieve the logged-in user's ID
         if (!$userId) {
-            return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
+            return redirect('/connexion')->with('error', 'Veuillez vous connecter pour accéder à cette page.');
         }
 
-        
-        $mesTrajets = DB::table('Trajets')
-            ->leftJoin('Reservations', 'Trajets.IdTrajet', '=', 'Reservations.IdTrajet')
-            ->where('Trajets.IdConducteur', $userId)
-            ->whereNull('Reservations.IdReservation') 
-            ->orderBy('Trajets.DateTrajet', 'asc')
-            ->select('Trajets.*') 
-            ->get();
+        // Retrieve the user's published trips
+        $mesTrajets = DB::table('Trajets')->where('IdConducteur', $userId)->get();
 
-        return view('publier', compact('mesTrajets'));
+        // Retrieve the user's favorite trips
+        $mesFavoris = DB::table('trajet_favoris')->where('IdUtilisateur', $userId)->get();
+
+        // Pass both variables to the view
+        return view('publier', compact('mesTrajets', 'mesFavoris'));
     }
 
 
@@ -520,5 +518,47 @@ class TrajetController extends Controller
         return redirect('/publier')->with('success', 'Trajet supprimé avec succès.');
     }
 
+    public function addToFavorites(Request $request)
+    {
+        $userId = session('utilisateur_id'); // Récupérer l'utilisateur connecté
+        if (!$userId) {
+            return redirect()->back()->with('error', 'Vous devez être connecté pour ajouter un trajet à vos favoris.');
+        }
 
+        $validated = $request->validate([
+            'IdTrajet' => 'required|exists:Trajets,IdTrajet',
+        ]);
+
+        $trajet = Trajet::find($validated['IdTrajet']);
+
+        // Vérifier si le trajet est déjà dans les favoris
+        $favoriExiste = DB::table('trajet_favoris')
+            ->where('IdUtilisateur', $userId)
+            ->where('Depart', $trajet->Depart)
+            ->where('Destination', $trajet->Destination)
+            ->exists();
+
+        if ($favoriExiste) {
+            return redirect()->back()->with('error', 'Ce trajet est déjà dans vos favoris.');
+        }
+
+        // Ajouter le trajet aux favoris
+        DB::table('trajet_favoris')->insert([
+            'IdUtilisateur' => $userId,
+            'Depart' => $trajet->Depart,
+            'Destination' => $trajet->Destination,
+            'DateDernierePublication' => $trajet->DateTrajet,
+            'HeureTrajet' => $trajet->HeureTrajet,
+            'PlacesDisponibles' => $trajet->PlacesDisponibles,
+            'Prix' => $trajet->Prix,
+            'AnimauxAcceptes' => $trajet->AnimauxAcceptes,
+            'TypeConversation' => $trajet->TypeConversation,
+            'Musique' => $trajet->Musique,
+            'Fumeur' => $trajet->Fumeur,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Trajet ajouté à vos favoris.');
+    }
 }

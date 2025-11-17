@@ -107,12 +107,19 @@
             <p class="page-subtitle">Partagez votre trajet et trouvez des covoitureurs</p>
         </div>
 
+        
         @if(session('success'))
             <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                {{ session('success') }}
+                <i class="fas fa-check-circle"></i> {{ session('success') }}
             </div>
         @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+            </div>
+        @endif
+       
 
         <div class="publier-layout" style="display: flex; gap: 30px;">
             <!-- Section Carte + Mes trajets -->
@@ -163,6 +170,57 @@
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </form>
+                                            </td>
+                                            <td>
+                                                <form action="{{ route('trajets.favoris') }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="IdTrajet" value="{{ $trajet->IdTrajet }}">
+                                                    <button type="submit" class="btn btn-sm btn-primary" title="Ajouter aux favoris">
+                                                        <i class="fas fa-heart"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Mes trajets favoris -->
+                <div class="mes-favoris" style="margin-top: 40px;">
+                    @if($mesFavoris->isEmpty())
+                        <p style="color: #555;">Vous n'avez aucun trajet dans vos favoris.</p>
+                    @else
+                        <h2>Mes trajets favoris</h2>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Départ</th>
+                                        <th>Destination</th>
+                                        <th>Places</th>
+                                        <th>Prix</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($mesFavoris as $favori)
+                                        <tr>
+                                            <td>{{ $favori->Depart }}</td>
+                                            <td>{{ $favori->Destination }}</td>
+                                            <td>{{ $favori->PlacesDisponibles }}</td>
+                                            <td>{{ $favori->Prix }} $</td>
+                                            <td>
+                                                <button 
+                                                    class="btn btn-sm btn-success btn-reajouter" 
+                                                    data-depart="{{ $favori->Depart }}" 
+                                                    data-destination="{{ $favori->Destination }}" 
+                                                    data-places="{{ $favori->PlacesDisponibles }}" 
+                                                    data-prix="{{ $favori->Prix }}">
+                                                    Réajouter
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -456,5 +514,36 @@ function setupEnterSelect(inputId, type, autocompleteService, placesService) {
 }
 
 window.initMap = initMap;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const buttons = document.querySelectorAll(".btn-reajouter");
+
+        buttons.forEach(button => {
+            button.addEventListener("click", function () {
+                const depart = this.getAttribute("data-depart");
+                const destination = this.getAttribute("data-destination");
+                const places = this.getAttribute("data-places");
+                const prix = this.getAttribute("data-prix");
+
+                // Remplir les champs du formulaire
+                document.getElementById("Depart").value = depart;
+                document.getElementById("Destination").value = destination;
+                document.getElementById("PlacesDisponibles").value = places;
+                document.getElementById("Prix").value = prix;
+
+                // Effacer les champs de date et heure
+                document.getElementById("DateTrajet").value = "";
+                document.getElementById("HeureTrajet").value = "";
+
+                // Appeler afficherTrajet() pour mettre à jour la carte
+                afficherTrajet();
+
+                // Scroller jusqu'au formulaire
+                document.getElementById("trajetForm").scrollIntoView({ behavior: "smooth" });
+            });
+        });
+    });
 </script>
 @endsection
