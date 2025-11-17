@@ -24,7 +24,6 @@
                     <li><a href="/rechercher">Rechercher un trajet</a></li>
                     <li><a href="/publier">Publier un trajet</a></li>
                     <li><a href="/mes-reservations">Mes réservations</a></li>
-                    <li><a href="/tarifs">Tarifs</a></li>
                 </ul>
             </div>
 
@@ -43,7 +42,7 @@
                 <h4>Contact</h4>
                 <div class="contact-item">
                     <i class="fas fa-envelope"></i>
-                    <span>contact@covoit2025.com</span>
+                    <span>covoit.2025@gmail.com</span>
                 </div>
                 <div class="contact-item">
                     <i class="fas fa-phone"></i>

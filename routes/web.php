@@ -11,6 +11,7 @@ use App\Http\Controllers\LesMessageController;
 use App\Http\Controllers\MotDePasseController;
 use App\Http\Controllers\FavoriController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ContactController;
 
 
 Route::get('/', function () {
@@ -29,17 +30,12 @@ Route::get('/mes-reservations', function () {
     return view('mes-reservations');
 });
 
-Route::get('/tarifs', function () {
-    return view('tarifs');
-});
-
 Route::get('/faq', function () {
     return view('faq');
 });
 
-Route::get('/contact', function () {
-    return view('contact');
-});
+Route::get('/contact', [ContactController::class, 'show']);
+Route::post('/contact', [ContactController::class, 'submit']);
 
 Route::get('/cart', function () {
     $userId = session('utilisateur_id');
