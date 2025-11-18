@@ -136,7 +136,8 @@
                             </button>
 
                             @if(!$resa->IdConducteur != session('utilisateur_id'))
-                            <a href="{{ route('comments.create', ['trajet' => $resa->IdTrajet]) }}" class="btn-update">
+                            <a href="{{ route('comments.create', ['trajet' => $resa->IdTrajet]) }}" class="btn-update" style="  text-decoration: none;
+">
                                 <i class="fas fa-comment"></i> Ajouter un commentaire
                             </a>
                             @endif
