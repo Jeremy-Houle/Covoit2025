@@ -220,36 +220,47 @@
                                                 @endif
                                             </div>
                                             <i class="fa-regular fa-comment comments" data-trajet="{{ $t->IdTrajet }}"></i>
-                                            @php
-                                                $comments = $commentsByTrajet[$t->IdTrajet] ?? collect();
-                                            @endphp
-                                            @foreach ($comments as $c)
-                                            <div class="commentsContainer" id="CommentsContainer{{ $t->IdTrajet }}" hidden>
-                                                <div class="comment-header">
-                                                    <span class="comment-user">
-                                                        {{ $t->NomConducteur }}
-                                                    </span>
-                                                    <span class="comment-date">
-                                                        {{ $c->DateCommentaire }}
-                                                    </span>
-                                                </div>
 
-                                                <div class="comment-body">
-                                                    {{ $c->Commentaire }}
-                                                </div>
-                                            </div>      
-                                            @endforeach
-                                            @if(!$comments->count())
-                                            <div class="commentsContainer" id="CommentsContainer{{ $t->IdTrajet }}" hidden>
-                                                <p>Aucun commentaire pour ce trajet.</p>
-                                            </div>
-                                            @endif
+                <div class="commentsWrapper" id="CommentsContainer{{ $t->IdTrajet }}" hidden>
+                    @php
+                        $comments = $commentsByTrajet[$t->IdTrajet] ?? collect();
+                        $review = $reviewAll[$t->IdTrajet] ?? null;
+                    @endphp
 
-                                        </div>
+                    @foreach ($comments as $c)
+                        <div class="commentsContainer">
+                            <div class="comment-header">
+                                <span class="comment-user">{{ $c->user_prenom }} {{ $c->user_nom }}</span>
+                                <span class="comment-date">{{ $c->DateCommentaire }}</span>
+                            </div>
+
+                            <div class="comment-body">{{ $c->Commentaire }}</div>
+
+                            @isset($review)
+                                @for($i = 1; $i < 5; $i++)
+                                    @if($i <= $review->Note)
+                                        <i class="fa-solid fa-star" style="color: #fbbf24;"></i>
+                                    @endif
+                                @endfor
+                            @endisset
+                        </div>
+                    @endforeach
+
+                    @if(!$comments->count())
+                        <div class="commentsContainer">
+                            <p>Aucun commentaire pour ce trajet.</p>
+                        </div>
+                    @endif
+                </div>
+
+            </div> 
+
+                                        
                                     @empty
                                         <p>Aucun trajet trouvé.</p>
-                                    @endforelse
+                                    @endforelse</div>
                                 @endisset
+                                </div>
                             </div>
                         </div>
                     </div>

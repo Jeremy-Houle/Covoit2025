@@ -103,7 +103,7 @@ class TrajetController extends Controller
 
     public function create()
     {
-        $userId = session('utilisateur_id'); 
+        $userId = session('utilisateur_id');
         if (!$userId) {
             return redirect('/connexion')->with('error', 'Veuillez vous connecter pour accéder à cette page.');
         }
@@ -138,21 +138,21 @@ class TrajetController extends Controller
 
         $data = $request->all();
         $data['RappelEmail'] = $request->has('RappelEmail') ? 1 : 0;
-        $data['RappelEnvoye'] = 0; 
-        
+        $data['RappelEnvoye'] = 0;
+
         $trajet = Trajet::create($data);
 
         if ($request->has('RappelEmail')) {
             $dateTimeTrajet = \Carbon\Carbon::parse($request->DateTrajet . ' ' . $request->HeureTrajet);
             $now = \Carbon\Carbon::now();
             $diffEnHeures = $now->diffInHours($dateTimeTrajet, false);
-            
+
             if ($diffEnHeures >= 0 && $diffEnHeures <= 2) {
                 try {
                     $conducteur = DB::table('utilisateurs')
                         ->where('IdUtilisateur', $request->IdConducteur)
                         ->first();
-                    
+
                     if ($conducteur) {
                         $emailData = [
                             'conducteurNom' => $conducteur->Prenom . ' ' . $conducteur->Nom,
@@ -162,14 +162,14 @@ class TrajetController extends Controller
                             'heureTrajet' => \Carbon\Carbon::parse($request->HeureTrajet)->format('H:i'),
                             'placesDisponibles' => $request->PlacesDisponibles,
                         ];
-                        
+
                         $heuresRestantes = round(\Carbon\Carbon::now()->diffInHours(\Carbon\Carbon::parse(request()->DateTrajet . ' ' . request()->HeureTrajet)));
-                        
-                        \Mail::send('emails.rappel-trajet', $emailData, function($message) use ($conducteur, $heuresRestantes) {
+
+                        \Mail::send('emails.rappel-trajet', $emailData, function ($message) use ($conducteur, $heuresRestantes) {
                             $message->to($conducteur->Courriel)
-                                    ->subject('🚗 Rappel : Votre trajet dans ' . $heuresRestantes . 'h - Covoit2025');
+                                ->subject('🚗 Rappel : Votre trajet dans ' . $heuresRestantes . 'h - Covoit2025');
                         });
-                        
+
                         DB::table('trajets')
                             ->where('IdTrajet', $trajet->IdTrajet)
                             ->update(['RappelEnvoye' => true]);
@@ -320,32 +320,38 @@ class TrajetController extends Controller
             }
         }
 
-       
+
         if ($request->input('ShortestPath') == '1') {
-           
+
             $query->orderByRaw('CAST(Distance AS DECIMAL(10,2)) ASC');
         } else {
-           
+
             $query->orderBy('DateTrajet', 'asc');
         }
 
         $trajets = $query->limit(100)->get();
 
-       
+
         $reviews = DB::table('evaluation')
             ->select('IdTrajet', DB::raw('AVG(Note) as average_note'), DB::raw('COUNT(*) as review_count'))
             ->groupBy('IdTrajet')
             ->get()
             ->keyBy('IdTrajet');
-        
+
         $commentsByTrajet = DB::table('Commentaires')
+            ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
+            ->select(
+                'Commentaires.*',
+                'Utilisateurs.Prenom as user_prenom',
+                'Utilisateurs.Nom as user_nom'
+            )
             ->orderBy('DateCommentaire', 'desc')
             ->get()
             ->groupBy('IdTrajet');
-
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json($trajets);
         }
+
 
         return view('rechercher', compact('trajets', 'reviews', 'commentsByTrajet'));
     }
@@ -353,16 +359,28 @@ class TrajetController extends Controller
     public function index()
     {
         $trajets = Trajet::all();
+
         $reviews = DB::table('evaluation')
             ->select('IdTrajet', DB::raw('AVG(Note) as average_note'), DB::raw('COUNT(*) as review_count'))
             ->groupBy('IdTrajet')
             ->get()
             ->keyBy('IdTrajet');
+            
+
         $commentsByTrajet = DB::table('Commentaires')
+            ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
+            ->select(
+                'Commentaires.*',
+                'Utilisateurs.Prenom as user_prenom',
+                'Utilisateurs.Nom as user_nom'
+            )
             ->orderBy('DateCommentaire', 'desc')
             ->get()
             ->groupBy('IdTrajet');
-        return view('rechercher', compact('trajets', 'reviews', 'commentsByTrajet'));
+
+        $reviewAll = DB::table('evaluation')->get();
+
+        return view('rechercher', compact('trajets', 'reviews', 'commentsByTrajet', 'reviewAll'));
     }
 
 
@@ -569,7 +587,7 @@ class TrajetController extends Controller
 
     public function addToFavorites(Request $request)
     {
-        $userId = session('utilisateur_id'); 
+        $userId = session('utilisateur_id');
         if (!$userId) {
             return redirect()->back()->with('error', 'Vous devez être connecté pour ajouter un trajet à vos favoris.');
         }
@@ -611,7 +629,7 @@ class TrajetController extends Controller
 
     public function deleteFavorite($id)
     {
-        $userId = session('utilisateur_id'); 
+        $userId = session('utilisateur_id');
         if (!$userId) {
             return redirect()->back()->with('error', 'Vous devez être connecté pour effectuer cette action.');
         }

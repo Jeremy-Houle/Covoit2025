@@ -1344,12 +1344,17 @@ header {
   }
 }
 .commentsContainer {
-    background: #f7f7f7;
+    background: var(--gray-50);
     padding: 12px 15px;
     margin-bottom: 12px;
-    border-radius: 8px;
-    border-left: 4px solid #3b82f6; 
+    border-radius: 12px;
     font-family: Arial, sans-serif;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.4);
+    border-right: 3px solid var(--primary-blue-light); 
+    border-left: 3px solid var(--primary-blue-light); 
+
+
+
 }
 
 .comment-header {
@@ -1362,7 +1367,7 @@ header {
 
 .comment-user {
     font-weight: bold;
-    color: #333;
+  color: var(--primary-blue-light);
 }
 
 .comment-date {
@@ -1374,7 +1379,6 @@ header {
     font-size: 1rem;
     line-height: 1.4;
     color: #222;
-    white-space: pre-wrap; 
 }
 .comment-page {
     display: flex;
@@ -1470,4 +1474,9 @@ header {
 .alert.error {
     background-color: #f2dede;
     color: #a94442;
+}
+.comments{
+  color: var(--primary-blue-light);
+  margin:1%;
+  font-size: var(--font-size-lg);
 }
