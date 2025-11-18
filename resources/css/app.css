@@ -1289,4 +1289,37 @@ header {
     height: 300px;
   }
 }
+.commentsContainer {
+    background: #f7f7f7;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6; 
+    font-family: Arial, sans-serif;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.comment-user {
+    font-weight: bold;
+    color: #333;
+}
+
+.comment-date {
+    font-style: italic;
+    color: #777;
+}
+
+.comment-body {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #222;
+    white-space: pre-wrap; 
+}
 

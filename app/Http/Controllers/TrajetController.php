@@ -299,12 +299,17 @@ class TrajetController extends Controller
             ->groupBy('IdTrajet')
             ->get()
             ->keyBy('IdTrajet');
+        
+        $commentsByTrajet = DB::table('Commentaires')
+            ->orderBy('DateCommentaire', 'desc')
+            ->get()
+            ->groupBy('IdTrajet');
 
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json($trajets);
         }
 
-        return view('rechercher', compact('trajets', 'reviews'));
+        return view('rechercher', compact('trajets', 'reviews', 'commentsByTrajet'));
     }
 
     public function index()
@@ -315,7 +320,11 @@ class TrajetController extends Controller
             ->groupBy('IdTrajet')
             ->get()
             ->keyBy('IdTrajet');
-        return view('rechercher', compact('trajets', 'reviews'));
+        $commentsByTrajet = DB::table('Commentaires')
+            ->orderBy('DateCommentaire', 'desc')
+            ->get()
+            ->groupBy('IdTrajet');
+        return view('rechercher', compact('trajets', 'reviews', 'commentsByTrajet'));
     }
 
 

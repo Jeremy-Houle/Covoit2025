@@ -11,6 +11,8 @@ use App\Http\Controllers\LesMessageController;
 use App\Http\Controllers\MotDePasseController;
 use App\Http\Controllers\FavoriController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CommentsController;
+
 
 
 Route::get('/', function () {
@@ -113,3 +115,7 @@ Route::get('/message', [LesMessageController::class, 'index'])->name('message.in
 Route::get('/message/{id}', [LesMessageController::class, 'show'])->name('message.show');
 Route::post('/message/{id}', [LesMessageController::class, 'store'])->name('message.send');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+Route::get('/trajet/{trajet}/commenter', [CommentsController::class, 'create'])
+    ->name('comments.create');
+Route::post('/comments/store', [CommentsController::class, 'store'])->name('comments.store');
+

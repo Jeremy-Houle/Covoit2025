@@ -26,7 +26,8 @@
                         <div class="search-inputs-wrapper">
                             <input type="text" name="Depart" id="Depart" placeholder="Ville de départ" class="form-control">
                             <button type="button" id="swapBtn" class="btn" title="Intervertir départ/destination">⇄</button>
-                            <input type="text" name="Destination" id="Destination" placeholder="Ville d'arrivée" class="form-control">
+                            <input type="text" name="Destination" id="Destination" placeholder="Ville d'arrivée"
+                                class="form-control">
                             <input type="date" name="DateTrajet" class="form-control" style="max-width:170px;">
                             <button type="submit" class="btn-search-main">
                                 <i class="fa fa-search"></i>
@@ -46,158 +47,209 @@
                                 <i class="fa fa-car"></i> Derniers trajets publiés
                             </h3>
                             <div id="results">
-                        @isset($trajets)
-                            @forelse($trajets as $t)
-                                @php
-                                    $maxPlaces = max(0, (int)($t->PlacesDisponibles ?? 0));
-                                    $userRole = session('utilisateur_role', '');
-                                    $isConducteur = (strtolower($userRole) === 'conducteur');
-                                @endphp
-                                <div class="trajet card mb-2 p-2" data-id="{{ $t->IdTrajet }}">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div><strong>{{ $t->NomConducteur ?? "Trajet #{$t->IdTrajet}" }}</strong></div>
-                                        <div style="display:flex;gap:6px;">
-                                            <button type="button" 
-                                                class="btn-favorite btn btn-sm" 
-                                                data-id="{{ $t->IdTrajet }}"
-                                                title="Ajouter aux favoris"
-                                                style="color:#666;border:none;background:transparent;padding:4px 8px;cursor:pointer;">
-                                                <i class="fa-regular fa-star"></i>
-                                            </button>
-                                            <button type="button" 
-                                                class="btn-details-{{ $t->IdTrajet }} btn btn-sm btn-outline-secondary" 
-                                                onclick="toggleDetails({{ $t->IdTrajet }})">
-                                                Détails
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div>Départ: {{ $t->Depart }} — Destination: {{ $t->Destination }}</div>
-                                    <div>Date: {{ $t->DateTrajet }} — Heure: {{ $t->HeureTrajet }}</div>
-                                    <div>Places: <span class="places-dispo">{{ $t->PlacesDisponibles }}</span> — Prix: {{ number_format($t->Prix, 2) }}$ — Distance: {{ $t->Distance ?? '—' }}</div>
-                                    
-                                    @if (session('utilisateur_id'))
+                                @isset($trajets)
+                                    @forelse($trajets as $t)
+                                        @if($t->IdConducteur == session('utilisateur_id'))
+                                            @continue
+                                        @endif
                                         @php
-                                            $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
-                                            $wholeStars = floor($averageNote);
-                                            $hasHalfStar = ($averageNote - $wholeStars) > 0;
-                                            $placedStars = 0;
+                                            $maxPlaces = max(0, (int) ($t->PlacesDisponibles ?? 0));
+                                            $userRole = session('utilisateur_role', '');
+                                            $isConducteur = (strtolower($userRole) === 'conducteur');
                                         @endphp
-                                        <div style="display:flex" class="rating" data-average="{{ $averageNote }}">          
-                                            @php
-                                                $full = (int) floor($averageNote);
-                                                $hasHalf = ($averageNote - $full) > 0;
-                                            @endphp
-                                            @for ($i = 1; $i <= $full; $i++)
-                                                <i class="fa-solid fa-star star" style="color: #fbbf24;" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
-                                            @endfor
-                                            @if ($hasHalf)
-                                                @php $halfPos = $full + 1; @endphp
-                                                <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;" data-star="{{ $halfPos }}" data-trajet="{{ $t->IdTrajet }}"></i>
-                                            @endif
-                                            @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
-                                            @for ($i = $start; $i <= 5; $i++)
-                                                <i class="fa-regular fa-star star" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
-                                            @endfor
-                                        </div>
-                                    @endif
-                                    @if(!session('utilisateur_id'))
-                                        @php
-                                            $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
-                                            $wholeStars = floor($averageNote);
-                                            $hasHalfStar = ($averageNote - $wholeStars) > 0;
-                                            $placedStars = 0;
-                                        @endphp
-                                        <div style="display:flex" class="rating rating-static" data-average="{{ $averageNote }}">          
-                                            @php
-                                                $full = (int) floor($averageNote);
-                                                $hasHalf = ($averageNote - $full) > 0;
-                                            @endphp
-                                            @for ($i = 1; $i <= $full; $i++)
-                                                <i class="fa-solid fa-star star" style="color: #fbbf24;"  data-trajet="{{ $t->IdTrajet }}"></i>
-                                            @endfor
-                                            @if ($hasHalf)
-                                                @php $halfPos = $full + 1; @endphp
-                                                <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;"  data-trajet="{{ $t->IdTrajet }}"></i>
-                                            @endif
-                                            @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
-                                            @for ($i = $start; $i <= 5; $i++)
-                                                <i class="fa-regular fa-star star" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
-                                            @endfor
-                                        </div>
-                                    @endif
-
-                                    @if(session('utilisateur_id'))
-                                        @if(!$isConducteur || strtolower($userRole) === 'passager')
-                                            <div class="reserve-controls" style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:6px;">
-                                                <select class="places-select-{{ $t->IdTrajet }} form-select form-select-sm" id="places-{{ $t->IdTrajet }}" 
-                                                    style="width:48px;max-width:48px;padding:.12rem .25rem;font-size:.82rem;height:30px;" 
-                                                    {{ $maxPlaces === 0 ? 'disabled' : '' }}>
-                                                    @for($i = 1; $i <= max(1, $maxPlaces); $i++)
-                                                        <option value="{{ $i }}" {{ $i > $maxPlaces ? 'disabled' : '' }}>{{ $i }}</option>
-                                                    @endfor
-                                                </select>
-                                                <button type="button" 
-                                                    onclick="reserverTrajet({{ $t->IdTrajet }}, {{ $t->PlacesDisponibles }})" 
-                                                    class="btn-reserve-{{ $t->IdTrajet }} btn btn-sm btn-primary" 
-                                                    {{ $maxPlaces === 0 ? 'disabled' : '' }}>
-                                                    Réserver ce trajet
-                                                </button>
+                                        <div class="trajet card mb-2 p-2" data-id="{{ $t->IdTrajet }}">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div><strong>{{ $t->NomConducteur ?? "Trajet #{$t->IdTrajet}" }}</strong></div>
+                                                <div style="display:flex;gap:6px;">
+                                                    <button type="button" class="btn-favorite btn btn-sm"
+                                                        data-id="{{ $t->IdTrajet }}" title="Ajouter aux favoris"
+                                                        style="color:#666;border:none;background:transparent;padding:4px 8px;cursor:pointer;">
+                                                        <i class="fa-regular fa-star"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn-details-{{ $t->IdTrajet }} btn btn-sm btn-outline-secondary"
+                                                        onclick="toggleDetails({{ $t->IdTrajet }})">
+                                                        Détails
+                                                    </button>
+                                                </div>
                                             </div>
-                                        @endif
-                                    @else
-                                        <div style="text-align:center;margin-top:10px;padding:10px;background:rgba(37,99,235,0.1);border-radius:8px;">
-                                            <a href="/connexion" style="color:var(--primary-blue);font-weight:600;">
-                                                <i class="fa fa-sign-in-alt"></i> Connectez-vous pour réserver ce trajet
-                                            </a>
-                                        </div>
-                                    @endif
 
-                                    <div class="trajet-details-{{ $t->IdTrajet }}" id="details-{{ $t->IdTrajet }}" style="display:none;margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:0.95rem;background:var(--gray-50);padding:12px;border-radius:8px;box-shadow:inset 2px 2px 5px rgba(0, 0, 0, 0.2),inset -2px -2px 5px rgba(255, 255, 255, 0.8);">
-                                        <div><strong style="color:var(--primary-blue);font-size:1.1rem;">Détails complets</strong></div>
-                                        <div style="margin-top:8px;"><i class="fa fa-user"></i> Conducteur : {{ $t->NomConducteur }} </div>
-                                        <div><i class="fa fa-road"></i> Distance : {{ $t->Distance ?? '—' }}</div>
-                                        <div><i class="fa fa-map-marker-alt"></i> Départ : {{ $t->Depart }}</div>
-                                        <div><i class="fa fa-flag-checkered"></i> Destination : {{ $t->Destination }}</div>
-                                        <div><i class="fa fa-calendar"></i> Date / Heure : {{ $t->DateTrajet }} {{ $t->HeureTrajet }}</div>
-                                        <div><i class="fa fa-chair"></i> Places disponibles : {{ $t->PlacesDisponibles }}</div>
-                                        <div><i class="fa fa-dollar-sign"></i> Prix par place : {{ number_format($t->Prix,2) }}$</div>
-                                        <div><i class="fa fa-paw"></i> Animaux acceptés : {{ $t->AnimauxAcceptes ? 'Oui' : 'Non' }}</div>
-                                        <div><i class="fa fa-comments"></i> Type conversation : {{ $t->TypeConversation ?? '—' }}</div>
-                                        <div><i class="fa fa-music"></i> Musique : {{ $t->Musique ? 'Oui' : 'Non' }}</div>
-                                        <div><i class="fa fa-smoking"></i> Fumeur : {{ $t->Fumeur ? 'Oui' : 'Non' }}</div>
-                                        @php
-                                            $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
-                                            $wholeStars = floor($averageNote);
-                                            $hasHalfStar = ($averageNote - $wholeStars) > 0;
-                                            $placedStars = 0;
-                                        @endphp
-                                        <div style="display:flex" class="rating rating-static" data-average="{{ $averageNote }}">          
-                                            @php
-                                                $full = (int) floor($averageNote);
-                                                $hasHalf = ($averageNote - $full) > 0;
-                                            @endphp
-                                            @for ($i = 1; $i <= $full; $i++)
-                                                <i class="fa-solid fa-star star" style="color: #fbbf24;" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
-                                            @endfor
-                                            @if ($hasHalf)
-                                                @php $halfPos = $full + 1; @endphp
-                                                <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;" data-star="{{ $halfPos }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                            <div>Départ: {{ $t->Depart }} — Destination: {{ $t->Destination }}</div>
+                                            <div>Date: {{ $t->DateTrajet }} — Heure: {{ $t->HeureTrajet }}</div>
+                                            <div>Places: <span class="places-dispo">{{ $t->PlacesDisponibles }}</span> — Prix:
+                                                {{ number_format($t->Prix, 2) }}$ — Distance: {{ $t->Distance ?? '—' }}</div>
+
+                                            @if (session('utilisateur_id'))
+                                                @php
+                                                    $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
+                                                    $wholeStars = floor($averageNote);
+                                                    $hasHalfStar = ($averageNote - $wholeStars) > 0;
+                                                    $placedStars = 0;
+                                                @endphp
+                                                <div style="display:flex" class="rating" data-average="{{ $averageNote }}">
+                                                    @php
+                                                        $full = (int) floor($averageNote);
+                                                        $hasHalf = ($averageNote - $full) > 0;
+                                                    @endphp
+                                                    @for ($i = 1; $i <= $full; $i++)
+                                                        <i class="fa-solid fa-star star" style="color: #fbbf24;" data-star="{{ $i }}"
+                                                            data-trajet="{{ $t->IdTrajet }}"></i>
+                                                    @endfor
+                                                    @if ($hasHalf)
+                                                        @php $halfPos = $full + 1; @endphp
+                                                        <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;"
+                                                            data-star="{{ $halfPos }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                                    @endif
+                                                    @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
+                                                    @for ($i = $start; $i <= 5; $i++)
+                                                        <i class="fa-regular fa-star star" data-star="{{ $i }}"
+                                                            data-trajet="{{ $t->IdTrajet }}"></i>
+                                                    @endfor
+                                                </div>
                                             @endif
-                                            @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
-                                            @for ($i = $start; $i <= 5; $i++)
-                                                <i class="fa-regular fa-star star" data-star="{{ $i }}" data-trajet="{{ $t->IdTrajet }}"></i>
-                                            @endfor
+                                            @if(!session('utilisateur_id'))
+                                                @php
+                                                    $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
+                                                    $wholeStars = floor($averageNote);
+                                                    $hasHalfStar = ($averageNote - $wholeStars) > 0;
+                                                    $placedStars = 0;
+                                                @endphp
+                                                <div style="display:flex" class="rating rating-static"
+                                                    data-average="{{ $averageNote }}">
+                                                    @php
+                                                        $full = (int) floor($averageNote);
+                                                        $hasHalf = ($averageNote - $full) > 0;
+                                                    @endphp
+                                                    @for ($i = 1; $i <= $full; $i++)
+                                                        <i class="fa-solid fa-star star" style="color: #fbbf24;"
+                                                            data-trajet="{{ $t->IdTrajet }}"></i>
+                                                    @endfor
+                                                    @if ($hasHalf)
+                                                        @php $halfPos = $full + 1; @endphp
+                                                        <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;"
+                                                            data-trajet="{{ $t->IdTrajet }}"></i>
+                                                    @endif
+                                                    @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
+                                                    @for ($i = $start; $i <= 5; $i++)
+                                                        <i class="fa-regular fa-star star" data-star="{{ $i }}"
+                                                            data-trajet="{{ $t->IdTrajet }}"></i>
+                                                    @endfor
+                                                </div>
+                                            @endif
+
+                                            @if(session('utilisateur_id'))
+                                                @if(!$isConducteur || strtolower($userRole) === 'passager')
+                                                    <div class="reserve-controls"
+                                                        style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:6px;">
+                                                        <select class="places-select-{{ $t->IdTrajet }} form-select form-select-sm"
+                                                            id="places-{{ $t->IdTrajet }}"
+                                                            style="width:48px;max-width:48px;padding:.12rem .25rem;font-size:.82rem;height:30px;"
+                                                            {{ $maxPlaces === 0 ? 'disabled' : '' }}>
+                                                            @for($i = 1; $i <= max(1, $maxPlaces); $i++)
+                                                                <option value="{{ $i }}" {{ $i > $maxPlaces ? 'disabled' : '' }}>{{ $i }}
+                                                                </option>
+                                                            @endfor
+                                                        </select>
+                                                        <button type="button"
+                                                            onclick="reserverTrajet({{ $t->IdTrajet }}, {{ $t->PlacesDisponibles }})"
+                                                            class="btn-reserve-{{ $t->IdTrajet }} btn btn-sm btn-primary" {{ $maxPlaces === 0 ? 'disabled' : '' }}>
+                                                            Réserver ce trajet
+                                                        </button>
+                                                    </div>
+                                                @endif
+                                            @else
+                                                <div
+                                                    style="text-align:center;margin-top:10px;padding:10px;background:rgba(37,99,235,0.1);border-radius:8px;">
+                                                    <a href="/connexion" style="color:var(--primary-blue);font-weight:600;">
+                                                        <i class="fa fa-sign-in-alt"></i> Connectez-vous pour réserver ce trajet
+                                                    </a>
+                                                </div>
+                                            @endif
+
+                                            <div class="trajet-details-{{ $t->IdTrajet }}" id="details-{{ $t->IdTrajet }}"
+                                                style="display:none;margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:0.95rem;background:var(--gray-50);padding:12px;border-radius:8px;box-shadow:inset 2px 2px 5px rgba(0, 0, 0, 0.2),inset -2px -2px 5px rgba(255, 255, 255, 0.8);">
+                                                <div><strong style="color:var(--primary-blue);font-size:1.1rem;">Détails
+                                                        complets</strong></div>
+                                                <div style="margin-top:8px;"><i class="fa fa-user"></i> Conducteur :
+                                                    {{ $t->NomConducteur }} </div>
+                                                <div><i class="fa fa-road"></i> Distance : {{ $t->Distance ?? '—' }}</div>
+                                                <div><i class="fa fa-map-marker-alt"></i> Départ : {{ $t->Depart }}</div>
+                                                <div><i class="fa fa-flag-checkered"></i> Destination : {{ $t->Destination }}</div>
+                                                <div><i class="fa fa-calendar"></i> Date / Heure : {{ $t->DateTrajet }}
+                                                    {{ $t->HeureTrajet }}</div>
+                                                <div><i class="fa fa-chair"></i> Places disponibles : {{ $t->PlacesDisponibles }}
+                                                </div>
+                                                <div><i class="fa fa-dollar-sign"></i> Prix par place :
+                                                    {{ number_format($t->Prix, 2) }}$</div>
+                                                <div><i class="fa fa-paw"></i> Animaux acceptés :
+                                                    {{ $t->AnimauxAcceptes ? 'Oui' : 'Non' }}</div>
+                                                <div><i class="fa fa-comments"></i> Type conversation :
+                                                    {{ $t->TypeConversation ?? '—' }}</div>
+                                                <div><i class="fa fa-music"></i> Musique : {{ $t->Musique ? 'Oui' : 'Non' }}</div>
+                                                <div><i class="fa fa-smoking"></i> Fumeur : {{ $t->Fumeur ? 'Oui' : 'Non' }}</div>
+                                                @php
+                                                    $averageNote = $reviews[$t->IdTrajet]->average_note ?? 0;
+                                                    $wholeStars = floor($averageNote);
+                                                    $hasHalfStar = ($averageNote - $wholeStars) > 0;
+                                                    $placedStars = 0;
+                                                @endphp
+                                                <div style="display:flex" class="rating rating-static"
+                                                    data-average="{{ $averageNote }}">
+                                                    @php
+                                                        $full = (int) floor($averageNote);
+                                                        $hasHalf = ($averageNote - $full) > 0;
+                                                    @endphp
+                                                    @for ($i = 1; $i <= $full; $i++)
+                                                        <i class="fa-solid fa-star star" style="color: #fbbf24;" data-star="{{ $i }}"
+                                                            data-trajet="{{ $t->IdTrajet }}"></i>
+                                                    @endfor
+                                                    @if ($hasHalf)
+                                                        @php $halfPos = $full + 1; @endphp
+                                                        <i class="fa-solid fa-star-half-stroke star" style="color: #fbbf24;"
+                                                            data-star="{{ $halfPos }}" data-trajet="{{ $t->IdTrajet }}"></i>
+                                                    @endif
+                                                    @php $start = ($hasHalf ? $halfPos + 1 : $full + 1); @endphp
+                                                    @for ($i = $start; $i <= 5; $i++)
+                                                        <i class="fa-regular fa-star star" data-star="{{ $i }}"
+                                                            data-trajet="{{ $t->IdTrajet }}"></i>
+                                                    @endfor
+                                                </div>
+                                                @if(isset($t->Description))
+                                                    <div style="margin-top:6px;"><i class="fa fa-info-circle"></i> Description :
+                                                        {{ $t->Description }}</div>
+                                                @endif
+                                            </div>
+                                            <i class="fa-regular fa-comment comments" data-trajet="{{ $t->IdTrajet }}"></i>
+                                            @php
+                                                $comments = $commentsByTrajet[$t->IdTrajet] ?? collect();
+                                            @endphp
+                                            @foreach ($comments as $c)
+                                            <div class="commentsContainer" id="CommentsContainer{{ $t->IdTrajet }}" hidden>
+                                                <div class="comment-header">
+                                                    <span class="comment-user">
+                                                        {{ $t->NomConducteur }}
+                                                    </span>
+                                                    <span class="comment-date">
+                                                        {{ $c->DateCommentaire }}
+                                                    </span>
+                                                </div>
+
+                                                <div class="comment-body">
+                                                    {{ $c->Commentaire }}
+                                                </div>
+                                            </div>      
+                                            @endforeach
+                                            @if(!$comments->count())
+                                            <div class="commentsContainer" id="CommentsContainer{{ $t->IdTrajet }}" hidden>
+                                                <p>Aucun commentaire pour ce trajet.</p>
+                                            </div>
+                                            @endif
+
                                         </div>
-                                        @if(isset($t->Description))
-                                            <div style="margin-top:6px;"><i class="fa fa-info-circle"></i> Description : {{ $t->Description }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                            @empty
-                                <p>Aucun trajet trouvé.</p>
-                            @endforelse
-                        @endisset
+                                    @empty
+                                        <p>Aucun trajet trouvé.</p>
+                                    @endforelse
+                                @endisset
                             </div>
                         </div>
                     </div>
@@ -209,8 +261,10 @@
 
                         <!-- Filtre Favoris -->
                         <div class="filter-group" style="margin-bottom:16px;">
-                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--gray-700);">
-                                <input type="checkbox" id="filterFavoris" name="filterFavoris" style="width:18px;height:18px;cursor:pointer;">
+                            <label
+                                style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--gray-700);">
+                                <input type="checkbox" id="filterFavoris" name="filterFavoris"
+                                    style="width:18px;height:18px;cursor:pointer;">
                                 <i class="fa fa-star" style="color:#ffc107;"></i> Afficher uniquement les favoris
                             </label>
                         </div>
@@ -219,21 +273,24 @@
                         <div class="filter-group" style="margin-bottom:16px;">
                             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
                                 <label style="margin:0;font-weight:600;color:var(--gray-700);">💰 Prix max :</label>
-                                <input type="number" id="PrixMaxNumber" name="PrixMax" min="0" max="2000" step="0.5" value="{{ request('PrixMax', 2000) }}" class="form-control" style="width:96px;">
+                                <input type="number" id="PrixMaxNumber" name="PrixMax" min="0" max="2000" step="0.5"
+                                    value="{{ request('PrixMax', 2000) }}" class="form-control" style="width:96px;">
                             </div>
-                            <input type="range" id="PrixMax" name="PrixMaxSlider" min="0" max="2000" step="0.5" value="{{ request('PrixMax', 2000) }}" style="width:100%;">
+                            <input type="range" id="PrixMax" name="PrixMaxSlider" min="0" max="2000" step="0.5"
+                                value="{{ request('PrixMax', 2000) }}" style="width:100%;">
                         </div>
 
                         <!-- NOUVEAU FILTRE: Trier par distance -->
                         <div class="filter-group" style="margin-bottom:16px;">
-                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--gray-700);">
-                                <input type="checkbox" id="filterShortestPath" name="ShortestPath" value="1" 
-                                       {{ request('ShortestPath') ? 'checked' : '' }}
-                                       style="width:18px;height:18px;cursor:pointer;">
+                            <label
+                                style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--gray-700);">
+                                <input type="checkbox" id="filterShortestPath" name="ShortestPath" value="1" {{ request('ShortestPath') ? 'checked' : '' }}
+                                    style="width:18px;height:18px;cursor:pointer;">
                                 <i class="fa fa-route" style="color:#2563eb;"></i>
                                 Trier par distance
                             </label>
-                            <small style="display:block;margin-left:26px;color:var(--gray-600);font-size:0.85rem;margin-top:4px;">
+                            <small
+                                style="display:block;margin-left:26px;color:var(--gray-600);font-size:0.85rem;margin-top:4px;">
                                 Affiche les trajets du plus court au plus long
                             </small>
                         </div>
@@ -243,19 +300,25 @@
                             <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--gray-700);">
                                 👥 Places disponibles minimum
                             </label>
-                            <select name="PlacesMin" id="PlacesMin" class="form-select" style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--border-radius);font-size:var(--font-size-base);">
+                            <select name="PlacesMin" id="PlacesMin" class="form-select"
+                                style="width:100%;padding:10px;border:2px solid var(--gray-200);border-radius:var(--border-radius);font-size:var(--font-size-base);">
                                 <option value="">Toutes</option>
                                 <option value="1" {{ request('PlacesMin') == '1' ? 'selected' : '' }}>1 place minimum</option>
-                                <option value="2" {{ request('PlacesMin') == '2' ? 'selected' : '' }}>2 places minimum</option>
-                                <option value="3" {{ request('PlacesMin') == '3' ? 'selected' : '' }}>3 places minimum</option>
-                                <option value="4" {{ request('PlacesMin') == '4' ? 'selected' : '' }}>4 places minimum</option>
-                                <option value="5" {{ request('PlacesMin') == '5' ? 'selected' : '' }}>5 places minimum</option>
+                                <option value="2" {{ request('PlacesMin') == '2' ? 'selected' : '' }}>2 places minimum
+                                </option>
+                                <option value="3" {{ request('PlacesMin') == '3' ? 'selected' : '' }}>3 places minimum
+                                </option>
+                                <option value="4" {{ request('PlacesMin') == '4' ? 'selected' : '' }}>4 places minimum
+                                </option>
+                                <option value="5" {{ request('PlacesMin') == '5' ? 'selected' : '' }}>5 places minimum
+                                </option>
                             </select>
                         </div>
 
                         <!-- Filtre Type de Conversation -->
                         <div class="filter-group" style="margin-bottom:16px;">
-                            <div style="font-weight:600;margin-bottom:8px;color:var(--gray-700);">💬 Type de conversation</div>
+                            <div style="font-weight:600;margin-bottom:8px;color:var(--gray-700);">💬 Type de conversation
+                            </div>
                             <fieldset style="border:0;padding:0;margin:0;">
                                 <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;">
                                     <input type="radio" name="TypeConversation" value="" {{ !request('TypeConversation') || request('TypeConversation') === '' ? 'checked' : '' }}> Tous
@@ -283,7 +346,8 @@
                                     <input type="checkbox" name="Musique" value="1" {{ request('Musique') ? 'checked' : '' }}> 🎵 Musique
                                 </label>
                                 <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                                    <input type="checkbox" name="Fumeur" value="1" {{ request('Fumeur') ? 'checked' : '' }}> 🚬 Fumeur
+                                    <input type="checkbox" name="Fumeur" value="1" {{ request('Fumeur') ? 'checked' : '' }}>
+                                    🚬 Fumeur
                                 </label>
                             </div>
                         </div>
@@ -304,34 +368,37 @@
             </form>
         </div>
     </div>
-    
+
     <style>
         /* For disconnected users make stars static and non-interactive */
-        .rating-static .star { pointer-events: none; cursor: default; }
+        .rating-static .star {
+            pointer-events: none;
+            cursor: default;
+        }
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('searchForm');
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', function (e) {
                 const depart = document.getElementById('Depart').value.trim();
                 const destination = document.getElementById('Destination').value.trim();
                 console.log('Soumission du formulaire - Départ:', depart, 'Destination:', destination);
             });
-            
+
             const slider = document.getElementById('PrixMax');
             const numberInput = document.getElementById('PrixMaxNumber');
-            
+
             if (slider) {
-                slider.addEventListener('input', function() {
+                slider.addEventListener('input', function () {
                     if (numberInput) numberInput.value = this.value;
                     form.submit();
                 });
             }
-            
+
             if (numberInput) {
                 let timeout;
-                numberInput.addEventListener('input', function() {
+                numberInput.addEventListener('input', function () {
                     if (slider) slider.value = this.value;
                     clearTimeout(timeout);
                     timeout = setTimeout(() => {
@@ -339,53 +406,53 @@
                     }, 800);
                 });
             }
-            
+
             const placesSelect = document.getElementById('PlacesMin');
             if (placesSelect) {
-                placesSelect.addEventListener('change', function() {
+                placesSelect.addEventListener('change', function () {
                     form.submit();
                 });
             }
-            
+
             document.querySelectorAll('input[name="TypeConversation"]').forEach(radio => {
-                radio.addEventListener('change', function() {
+                radio.addEventListener('change', function () {
                     form.submit();
                 });
             });
-            
+
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
                 if (checkbox.name === 'AnimauxAcceptes' || checkbox.name === 'Musique' || checkbox.name === 'Fumeur') {
-                    checkbox.addEventListener('change', function() {
+                    checkbox.addEventListener('change', function () {
                         form.submit();
                     });
                 }
             });
-            
+
             // NOUVEAU: Gestionnaire pour le filtre chemin le plus court
             const shortestPathCheckbox = document.getElementById('filterShortestPath');
             if (shortestPathCheckbox) {
-                shortestPathCheckbox.addEventListener('change', function() {
+                shortestPathCheckbox.addEventListener('change', function () {
                     form.submit();
                 });
             }
         });
-        
-        document.getElementById('showAllBtn')?.addEventListener('click', function() {
+
+        document.getElementById('showAllBtn')?.addEventListener('click', function () {
             window.location.href = '/rechercher';
         });
 
-        window.reinitialiserFiltres = function() {
+        window.reinitialiserFiltres = function () {
             console.log('Réinitialiser les filtres');
             document.getElementById('PrixMax').value = 2000;
             document.getElementById('PrixMaxNumber').value = 2000;
             document.getElementById('PlacesMin').value = '';
-            
+
             // NOUVEAU: Réinitialiser le filtre chemin le plus court
             const shortestPathCheckbox = document.getElementById('filterShortestPath');
             if (shortestPathCheckbox) {
                 shortestPathCheckbox.checked = false;
             }
-            
+
             document.querySelectorAll('input[name="TypeConversation"]').forEach(radio => {
                 radio.checked = (radio.value === '');
             });
@@ -395,16 +462,16 @@
             window.location.href = '/rechercher';
         };
 
-        window.toggleDetails = function(idTrajet) {
+        window.toggleDetails = function (idTrajet) {
             console.log('Toggle details pour trajet:', idTrajet);
             const detailsDiv = document.getElementById('details-' + idTrajet);
             const btn = document.querySelector('.btn-details-' + idTrajet);
-            
+
             if (!detailsDiv) {
                 console.error('Div détails non trouvée pour trajet', idTrajet);
                 return;
             }
-            
+
             if (detailsDiv.style.display === 'none' || !detailsDiv.style.display) {
                 detailsDiv.style.display = 'block';
                 if (btn) btn.textContent = 'Masquer';
@@ -420,13 +487,13 @@
                 setTimeout(initFavoritesForStaticTrajets, 100);
                 return;
             }
-            
+
             const trajets = document.querySelectorAll('#results .trajet');
             const resultsEl = document.getElementById('results');
             const filterFavoris = document.getElementById('filterFavoris');
-            
+
             const favorites = await window.FavoritesManager.getFavorites();
-            
+
             trajets.forEach(trajet => {
                 const id = trajet.dataset.id;
                 const starBtn = trajet.querySelector('.btn-favorite');
@@ -436,23 +503,23 @@
                     starBtn.innerHTML = isFav ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
                     starBtn.style.color = isFav ? '#ffc107' : '#666';
                     starBtn.title = isFav ? 'Retirer des favoris' : 'Ajouter aux favoris';
-                    
-                    starBtn.addEventListener('click', async function(e) {
+
+                    starBtn.addEventListener('click', async function (e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        
+
                         starBtn.disabled = true;
                         const originalHTML = starBtn.innerHTML;
                         starBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-                        
+
                         const isNowFavorite = await window.FavoritesManager.toggleFavorite(id);
-                        
+
                         starBtn.disabled = false;
                         starBtn.classList.toggle('active', isNowFavorite);
                         starBtn.innerHTML = isNowFavorite ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
                         starBtn.style.color = isNowFavorite ? '#ffc107' : '#666';
                         starBtn.title = isNowFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris';
-                        
+
                         if (filterFavoris && filterFavoris.checked && !isNowFavorite) {
                             trajet.style.display = 'none';
                             const remainingFavs = document.querySelectorAll('#results .trajet:not([style*="display: none"])');
@@ -469,19 +536,19 @@
                     });
                 }
             });
-            
+
             if (filterFavoris) {
-                filterFavoris.addEventListener('change', async function() {
+                filterFavoris.addEventListener('change', async function () {
                     const showOnlyFavorites = this.checked;
                     let visibleCount = 0;
-                    
+
                     if (resultsEl) {
                         const existingMsg = resultsEl.querySelector('.no-favorites-message');
                         if (existingMsg) {
                             existingMsg.remove();
                         }
                     }
-                    
+
                     if (!showOnlyFavorites) {
                         trajets.forEach(trajet => {
                             trajet.style.display = '';
@@ -489,18 +556,18 @@
                         });
                         return;
                     }
-                    
+
                     const favoritesList = await window.FavoritesManager.getFavorites();
-                    
+
                     trajets.forEach(trajet => {
                         const id = trajet.dataset.id;
                         if (!id) {
                             trajet.style.display = 'none';
                             return;
                         }
-                        
+
                         const isFav = favoritesList.includes(String(id));
-                        
+
                         if (isFav) {
                             trajet.style.display = '';
                             visibleCount++;
@@ -508,7 +575,7 @@
                             trajet.style.display = 'none';
                         }
                     });
-                    
+
                     if (showOnlyFavorites && visibleCount === 0 && resultsEl) {
                         const noResultsMsg = document.createElement('p');
                         noResultsMsg.className = 'no-favorites-message';
@@ -519,34 +586,57 @@
                 });
             }
         }
-        
-        document.addEventListener('DOMContentLoaded', function() {
+
+        document.addEventListener('DOMContentLoaded', function () {
             initFavoritesForStaticTrajets();
+             document.querySelectorAll('i.comments').forEach(icon => {
+            const trajetId = icon.dataset.trajet;
+            
+
+            icon.addEventListener('click', () => {
+                const box = document.getElementById('CommentsContainer' + trajetId);
+                if (!box) return;
+                    console.log('Toggle comments box for trajet', trajetId);
+                if (box.hasAttribute('hidden')) {
+                    box.removeAttribute('hidden');
+                } else {
+                    box.setAttribute('hidden', '');
+                }
+            });
+
+            icon.addEventListener('mouseenter', () => {
+                icon.classList.replace('fa-regular', 'fa-solid');
+            });
+
+            icon.addEventListener('mouseleave', () => {
+                icon.classList.replace('fa-solid', 'fa-regular');
+            });
+        });
         });
 
-        window.reserverTrajet = async function(idTrajet, placesMax) {
+        window.reserverTrajet = async function (idTrajet, placesMax) {
             console.log('Fonction reserverTrajet appelée - IdTrajet:', idTrajet);
-            
+
             const selectEl = document.getElementById('places-' + idTrajet);
             const btnEl = document.querySelector('.btn-reserve-' + idTrajet);
-            
+
             if (!selectEl || !btnEl) {
                 console.error('Éléments non trouvés', selectEl, btnEl);
                 alert('Erreur: Impossible de trouver les éléments du formulaire');
                 return;
             }
-            
+
             const places = parseInt(selectEl.value) || 1;
-            
+
             if (places > placesMax) {
                 alert('Le nombre de places demandé dépasse les places disponibles.');
                 return;
             }
-            
+
             btnEl.disabled = true;
             const origText = btnEl.textContent;
             btnEl.textContent = 'Ajout en cours…';
-            
+
             try {
                 const response = await fetch('/reservations', {
                     method: 'POST',
@@ -557,17 +647,17 @@
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ 
-                        IdTrajet: parseInt(idTrajet), 
-                        PlacesReservees: places 
+                    body: JSON.stringify({
+                        IdTrajet: parseInt(idTrajet),
+                        PlacesReservees: places
                     })
                 });
-                
+
                 console.log('Réponse:', response.status);
-                
+
                 const data = await response.json();
                 console.log('Data:', data);
-                
+
                 if (response.ok) {
                     btnEl.textContent = 'Réservé ! Redirection...';
                     setTimeout(() => {
@@ -675,7 +765,7 @@
                             bounds.extend(leg.start_location);
                             bounds.extend(leg.end_location);
                             map.fitBounds(bounds);
-                        } catch (e) {}
+                        } catch (e) { }
                     } else {
                         directionsRenderer.set('directions', null);
                     }
@@ -716,7 +806,7 @@
                 }
                 clearRoute();
             }
-            
+
             function removeDestinationMarker() {
                 if (destinationMarker) {
                     destinationMarker.setMap(null);
@@ -765,7 +855,7 @@
                     removeDepartMarker();
                 }
             });
-            
+
             destinationInput.addEventListener('input', () => {
                 if (!destinationInput.value || destinationInput.value.trim() === '') {
                     removeDestinationMarker();
@@ -782,7 +872,7 @@
                     });
                 }
             });
-            
+
             destinationInput.addEventListener('blur', () => {
                 if (!destinationMarker && departInput.value && destinationInput.value) {
                     const geocoder = new google.maps.Geocoder();
@@ -839,7 +929,7 @@
 
                 input.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") {
-                        e.preventDefault(); 
+                        e.preventDefault();
                         const query = input.value.trim();
                         if (!query) return;
 
@@ -888,7 +978,7 @@
                 const avg = parseFloat(avgStr) || 0;
                 const whole = Math.floor(avg);
                 const hasHalf = (avg - whole) > 0;
-                
+
                 stars.forEach(s => {
                     const val = parseInt(s.dataset.star) || 0;
                     s.classList.remove('fa-solid', 'fa-regular', 'fa-star-half-stroke', 'fa-star', 'star-selected');
@@ -1015,6 +1105,10 @@
                     }
                 });
             });
-        });
+       
+
+    
+    });
+
     </script>
 @endsection
