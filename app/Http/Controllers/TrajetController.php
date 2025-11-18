@@ -266,6 +266,7 @@ class TrajetController extends Controller
     {
         $query = DB::table('Trajets')->select('*');
 
+        // Filtrer par départ
         if ($depart = $request->input('Depart')) {
             $departNormalized = $this->normalizeString($depart);
             $query->whereRaw('LOWER(Depart) LIKE ?', ['%' . strtolower($depart) . '%']);
@@ -291,6 +292,9 @@ class TrajetController extends Controller
                 $query->where('PlacesDisponibles', '>=', intval($placesMin));
             }
         }
+
+        // Exclure les trajets avec 0 places disponibles
+        $query->where('PlacesDisponibles', '>', 0);
 
         if ($type = $request->input('TypeConversation')) {
             $allowed = ['Silencieux', 'Normal', 'Bavard'];
@@ -358,7 +362,10 @@ class TrajetController extends Controller
 
     public function index()
     {
-        $trajets = Trajet::all();
+        $trajets = DB::table('Trajets')
+        ->where('PlacesDisponibles', '>', 0) // Exclure les trajets avec 0 ou moins de places disponibles
+        ->get();        
+        
 
         $reviews = DB::table('evaluation')
             ->select('IdTrajet', DB::raw('AVG(Note) as average_note'), DB::raw('COUNT(*) as review_count'))

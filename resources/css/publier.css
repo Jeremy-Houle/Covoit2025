@@ -248,6 +248,24 @@
   margin-top: var(--spacing-lg);
   width: 100%;
 }
+.mes-favoris .actions {
+    display: flex;
+    gap: 10px; /* Espacement entre les boutons */
+    align-items: center;
+}
+
+.mes-favoris .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+}
+
+.mes-favoris .btn i {
+    margin-right: 5px; /* Espacement entre l'icône et le texte */
+}
+
 
 .btn-submit:hover {
   transform: translateY(-3px);
