@@ -555,6 +555,9 @@ class TrajetController extends Controller
             DB::table('favoris')->where('IdTrajet', $id)->delete();
         }
 
+        // Supprimer les réservations liées au trajet
+        DB::table('Reservations')->where('IdTrajet', $id)->delete();
+
         DB::table('Paiements')
             ->where('IdTrajet', $id)
             ->whereIn('Statut', ['En attente', 'Annulé'])
