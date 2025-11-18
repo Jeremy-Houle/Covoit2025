@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('trajets', function (Blueprint $table) {
+        Schema::table('Trajets', function (Blueprint $table) {
             $table->boolean('RappelEmail')->default(false)->after('Fumeur');
             $table->boolean('RappelEnvoye')->default(false)->after('RappelEmail');
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('trajets', function (Blueprint $table) {
+        Schema::table('Trajets', function (Blueprint $table) {
             $table->dropColumn(['RappelEmail', 'RappelEnvoye']);
         });
     }
