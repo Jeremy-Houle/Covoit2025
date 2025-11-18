@@ -21,7 +21,12 @@
                 <h4>Navigation</h4>
                 <ul>
                     <li><a href="/accueil">Accueil</a></li>
-                    <li><a href="/rechercher">Rechercher un trajet</a></li>
+                    @php
+                        $role = session('utilisateur_role');
+                    @endphp
+                    @if($role !== 'Conducteur')
+                        <li><a href="/rechercher">Rechercher un trajet</a></li>
+                    @endif
                     <li><a href="/publier">Publier un trajet</a></li>
                     <li><a href="/mes-reservations">Mes réservations</a></li>
                 </ul>
