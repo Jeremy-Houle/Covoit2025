@@ -24,7 +24,7 @@
     <header>
         <nav class="navbar">
             <div class="navbar-container">
-                <a href="/" class="navbar-logo">
+                <a href="/accueil" class="navbar-logo">
                     <i class="fa fa-car"></i> <span class="logo-text">Covoit2025</span>
                 </a>
                 <button class="navbar-toggle" id="navbarToggle" aria-label="Menu">
@@ -39,7 +39,7 @@
                 @endphp
                 <div class="navbar-menu" id="navbarMenu">
                     <div class="navbar-center">
-                        <a href="/" class="nav-link">Accueil</a>
+                        <a href="/accueil" class="nav-link">Accueil</a>
                         
                         @if($userId)
                             @if($role === 'Passager')

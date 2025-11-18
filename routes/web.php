@@ -15,6 +15,13 @@ use App\Http\Controllers\ContactController;
 
 
 Route::get('/', function () {
+    if (session('utilisateur_id')) {
+        return redirect('/accueil');
+    }
+    return view('presentation');
+});
+
+Route::get('/accueil', function () {
     $trajetsPopulaires = DB::table('trajets as t')
         ->join('utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
         ->select(

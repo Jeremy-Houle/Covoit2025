@@ -20,7 +20,7 @@
             <div class="footer-nav">
                 <h4>Navigation</h4>
                 <ul>
-                    <li><a href="/">Accueil</a></li>
+                    <li><a href="/accueil">Accueil</a></li>
                     <li><a href="/rechercher">Rechercher un trajet</a></li>
                     <li><a href="/publier">Publier un trajet</a></li>
                     <li><a href="/mes-reservations">Mes réservations</a></li>
