@@ -173,8 +173,8 @@
                                                 <form action="{{ route('trajets.favoris') }}" method="POST">
                                                     @csrf
                                                     <input type="hidden" name="IdTrajet" value="{{ $trajet->IdTrajet }}">
-                                                    <button type="submit" class="btn btn-sm btn-primary" title="Sauvegarder ce trajet>
-                                                        <i class="fas fa-heart"></i>
+                                                    <button type="submit" class="btn btn-sm btn-primary" title="Sauvegarder ce trajet">
+                                                        <i class="fas fa-save"></i>
                                                     </button>
                                                 </form>
                                             </td>
@@ -210,21 +210,26 @@
                                             <td>{{ $favori->PlacesDisponibles }}</td>
                                             <td>{{ $favori->Prix }} $</td>
                                             <td>
-                                                <button 
-                                                    class="btn btn-sm btn-success btn-reajouter" 
-                                                    data-depart="{{ $favori->Depart }}" 
-                                                    data-destination="{{ $favori->Destination }}" 
-                                                    data-places="{{ $favori->PlacesDisponibles }}" 
-                                                    data-prix="{{ $favori->Prix }}">
-                                                    Réajouter
-                                                </button>
-                                                <form action="{{ route('favoris.delete', $favori->IdFavori) }}" method="POST" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
-                                                        <i class="fas fa-trash-alt"></i>
+                                                <div style="display: flex; gap: 10px; align-items: center;">
+                                                    <!-- Bouton Réajouter -->
+                                                    <button title="Réajouter ce trajet"
+                                                        class="btn btn-sm btn-success btn-reajouter" 
+                                                        data-depart="{{ $favori->Depart }}" 
+                                                        data-destination="{{ $favori->Destination }}" 
+                                                        data-places="{{ $favori->PlacesDisponibles }}" 
+                                                        data-prix="{{ $favori->Prix }}">
+                                                        <i class="fas fa-redo"></i> Réajouter
                                                     </button>
-                                                </form>
+
+                                                    <!-- Bouton Enlever -->
+                                                    <form action="{{ route('favoris.delete', $favori->IdFavori) }}" method="POST" style="display:inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                                            <i class="fas fa-trash-alt"></i> Enlever
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
