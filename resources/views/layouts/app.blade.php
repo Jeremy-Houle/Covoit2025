@@ -24,7 +24,7 @@
     <header>
         <nav class="navbar">
             <div class="navbar-container">
-                <a href="/" class="navbar-logo">
+                <a href="/accueil" class="navbar-logo">
                     <i class="fa fa-car"></i> <span class="logo-text">Covoit2025</span>
                 </a>
                 <button class="navbar-toggle" id="navbarToggle" aria-label="Menu">
@@ -39,7 +39,7 @@
                 @endphp
                 <div class="navbar-menu" id="navbarMenu">
                     <div class="navbar-center">
-                        <a href="/" class="nav-link">Accueil</a>
+                        <a href="/accueil" class="nav-link">Accueil</a>
                         
                         @if($userId)
                             @if($role === 'Passager')
@@ -54,16 +54,22 @@
                         @if(!$userId)
                             <a href="/rechercher" class="nav-link">Rechercher</a>
                             <a href="/about" class="nav-link">À propos</a>
-                            <a href="/faq" class="nav-link">FAQ</a>
-                            <a href="/contact" class="nav-link">Contact</a>
                         @endif
                         
-                        <a href="/tarifs" class="nav-link">Tarifs</a>
+                        <a href="/faq" class="nav-link">FAQ</a>
+                        <a href="/contact" class="nav-link">Contact</a>
        
                         
                         @if($userId)
-                            <a href="/cart" class="nav-link"><i class="fa fa-shopping-cart"></i> <span class="nav-text">Panier</span></a>
-                            <a href="{{ route('messages.index') }}" class="nav-link"><i class="fa fa-comments"></i> <span class="nav-text">Messages</span></a>
+                            @if($role === 'Passager')
+                                <a href="/cart" class="nav-link"><i class="fa fa-shopping-cart"></i> <span class="nav-text">Panier</span></a>
+                            @endif
+                            <a href="{{ route('messages.index') }}" class="nav-link messages-link">
+                                <i class="fa fa-comments messages-icon">
+                                    <span class="message-badge" id="messageBadge" style="display: none;"></span>
+                                </i>
+                                <span class="nav-text">Messages</span>
+                            </a>
                         @endif
                     </div>
                     <div class="navbar-right">
@@ -138,6 +144,36 @@
                     icon.classList.add('fa-bars');
                 }
             });
+
+            async function loadUnreadMessages() {
+                try {
+                    const response = await fetch('/api/messages/unread-count', {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        const badge = document.getElementById('messageBadge');
+                        if (badge && data.count > 0) {
+                            badge.textContent = data.count > 99 ? '99+' : data.count;
+                            badge.style.display = 'flex';
+                        } else if (badge) {
+                            badge.style.display = 'none';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Erreur lors du chargement des messages non lus:', error);
+                }
+            }
+
+            @if($userId)
+            loadUnreadMessages();
+            setInterval(loadUnreadMessages, 30000);
+            @endif
         });
     </script>
 </body>

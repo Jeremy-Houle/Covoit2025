@@ -20,11 +20,10 @@
             <div class="footer-nav">
                 <h4>Navigation</h4>
                 <ul>
-                    <li><a href="/">Accueil</a></li>
+                    <li><a href="/accueil">Accueil</a></li>
                     <li><a href="/rechercher">Rechercher un trajet</a></li>
                     <li><a href="/publier">Publier un trajet</a></li>
                     <li><a href="/mes-reservations">Mes réservations</a></li>
-                    <li><a href="/tarifs">Tarifs</a></li>
                 </ul>
             </div>
 
@@ -34,8 +33,6 @@
                     <li><a href="/about">À propos</a></li>
                     <li><a href="/faq">FAQ</a></li>
                     <li><a href="/contact">Contact</a></li>
-                    <li><a href="/privacy">Confidentialité</a></li>
-                    <li><a href="/terms">Conditions d'utilisation</a></li>
                 </ul>
             </div>
 
@@ -43,15 +40,15 @@
                 <h4>Contact</h4>
                 <div class="contact-item">
                     <i class="fas fa-envelope"></i>
-                    <span>contact@covoit2025.com</span>
+                    <span>covoit.2025@gmail.com</span>
                 </div>
                 <div class="contact-item">
                     <i class="fas fa-phone"></i>
-                    <span>+1 (555) 123-4567</span>
+                    <span>(450) 430-3120</span>
                 </div>
                 <div class="contact-item">
                     <i class="fas fa-map-marker-alt"></i>
-                    <span>Montréal, QC, Canada</span>
+                    <span>100 Rue Duquet<br>Sainte-Thérèse, QC J7E 3G6</span>
                 </div>
             </div>
         </div>

@@ -24,6 +24,8 @@ class Trajet extends Model
         'TypeConversation',
         'Musique',
         'Fumeur',
+        'RappelEmail',
+        'RappelEnvoye',
     ];
 
 }

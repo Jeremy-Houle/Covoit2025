@@ -119,6 +119,275 @@
     font-size: var(--font-size-base);
 }
 
+/* Section Trajets Populaires */
+.trajets-populaires-section {
+    padding: var(--spacing-3xl) 0;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+    position: relative;
+}
+
+.trajets-populaires-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--accent-yellow), var(--primary-blue));
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: var(--spacing-3xl);
+}
+
+.section-title {
+    font-size: var(--font-size-4xl);
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-sm);
+}
+
+.section-subtitle {
+    color: var(--gray-600);
+    font-size: var(--font-size-lg);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.trajets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.trajet-card {
+    background: var(--white);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: var(--spacing-lg);
+    border: 2px solid transparent;
+    transition: all var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.trajet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-blue);
+}
+
+.trajet-header {
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--gray-100);
+}
+
+.trajet-route {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xs);
+}
+
+.route-point {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.route-point i {
+    color: var(--primary-blue);
+    font-size: var(--font-size-base);
+    flex-shrink: 0;
+}
+
+.route-point span {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--gray-800);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+}
+
+.route-arrow {
+    color: var(--accent-yellow);
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+    padding: 0 4px;
+}
+
+.trajet-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 6px var(--spacing-sm);
+    background: var(--gray-50);
+    border-radius: var(--border-radius-md);
+}
+
+.detail-item i {
+    color: var(--primary-blue);
+    font-size: var(--font-size-sm);
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.detail-item span {
+    color: var(--gray-700);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.trajet-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--spacing-sm);
+    border-top: 2px solid var(--gray-100);
+}
+
+.conducteur-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.conducteur-info i {
+    color: var(--gray-500);
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+}
+
+.conducteur-info span {
+    color: var(--gray-700);
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.prix-info .prix {
+    font-size: var(--font-size-2xl);
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.btn-voir-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: 10px var(--spacing-md);
+    background: var(--gradient-primary);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: var(--border-radius-lg);
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-blue);
+    margin-top: var(--spacing-xs);
+}
+
+.btn-voir-details:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.no-trajets {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    background: var(--white);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.no-trajets i {
+    font-size: var(--font-size-5xl);
+    color: var(--gray-300);
+    margin-bottom: var(--spacing-md);
+}
+
+.no-trajets p {
+    color: var(--gray-600);
+    font-size: var(--font-size-lg);
+}
+
+.voir-plus {
+    text-align: center;
+    margin-top: var(--spacing-2xl);
+}
+
+.btn-voir-plus {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-2xl);
+    background: var(--gradient-secondary);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: var(--border-radius-lg);
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-voir-plus:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+}
+
+@media (max-width: 1024px) {
+    .trajets-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-md);
+    }
+}
+
+@media (max-width: 768px) {
+    .trajets-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .section-title {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .section-subtitle {
+        font-size: var(--font-size-base);
+    }
+    
+    .trajet-card {
+        padding: var(--spacing-md);
+    }
+}
+
 .how-it-works-section {
     padding: var(--spacing-3xl) 0;
     background: var(--gray-50);
@@ -476,6 +745,79 @@
                 <p>Avec le prix de l'essence en constante augmentation, ne payez plus des centaines de dollars en essence par année ! Partagez les coûts et économisez ensemble.</p>
             </div>
         </div>
+    </div>
+</section>
+
+<section class="trajets-populaires-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">🔥 Trajets Populaires</h2>
+            <p class="section-subtitle">Découvrez les derniers trajets disponibles et réservez votre place dès maintenant</p>
+        </div>
+        
+        @if($trajetsPopulaires->isEmpty())
+            <div class="no-trajets">
+                <i class="fas fa-car-side"></i>
+                <p>Aucun trajet disponible pour le moment. Revenez plus tard !</p>
+            </div>
+        @else
+            <div class="trajets-grid">
+                @foreach($trajetsPopulaires as $trajet)
+                    <div class="trajet-card">
+                        <div class="trajet-header">
+                            <div class="trajet-route">
+                                <div class="route-point">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ $trajet->Depart }}</span>
+                                </div>
+                                <div class="route-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                                <div class="route-point">
+                                    <i class="fas fa-flag-checkered"></i>
+                                    <span>{{ $trajet->Destination }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="trajet-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>{{ \Carbon\Carbon::parse($trajet->DateTrajet)->format('d/m/Y') }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ \Carbon\Carbon::parse($trajet->HeureTrajet)->format('H:i') }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-user-friends"></i>
+                                <span>{{ $trajet->PlacesDisponibles }} place(s)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="trajet-footer">
+                            <div class="conducteur-info">
+                                <i class="fas fa-user-circle"></i>
+                                <span>{{ $trajet->ConducteurPrenom }}</span>
+                            </div>
+                            <div class="prix-info">
+                                <span class="prix">{{ $trajet->Prix }}$</span>
+                            </div>
+                        </div>
+                        
+                        <a href="/rechercher" class="btn-voir-details">
+                            <i class="fas fa-search"></i> Voir les détails
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+            
+            <div class="voir-plus">
+                <a href="/rechercher" class="btn-voir-plus">
+                    Voir tous les trajets <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        @endif
     </div>
 </section>
 

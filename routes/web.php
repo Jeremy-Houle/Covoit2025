@@ -11,12 +11,38 @@ use App\Http\Controllers\LesMessageController;
 use App\Http\Controllers\MotDePasseController;
 use App\Http\Controllers\FavoriController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CommentsController;
 
 
 
 Route::get('/', function () {
-    return view('front-page');
+    if (session('utilisateur_id')) {
+        return redirect('/accueil');
+    }
+    return view('presentation');
+});
+
+Route::get('/accueil', function () {
+    $trajetsPopulaires = DB::table('trajets as t')
+        ->join('utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
+        ->select(
+            't.IdTrajet',
+            't.Depart',
+            't.Destination',
+            't.DateTrajet',
+            't.HeureTrajet',
+            't.Prix',
+            't.PlacesDisponibles',
+            'u.Nom as ConducteurNom',
+            'u.Prenom as ConducteurPrenom'
+        )
+        ->where('t.DateTrajet', '>=', DB::raw('CURDATE()')) 
+        ->orderBy('t.IdTrajet', 'desc') 
+        ->limit(6)
+        ->get();
+    
+    return view('front-page', compact('trajetsPopulaires'));
 });
 
 Route::get('/about', function () {
@@ -31,17 +57,12 @@ Route::get('/mes-reservations', function () {
     return view('mes-reservations');
 });
 
-Route::get('/tarifs', function () {
-    return view('tarifs');
-});
-
 Route::get('/faq', function () {
     return view('faq');
 });
 
-Route::get('/contact', function () {
-    return view('contact');
-});
+Route::get('/contact', [ContactController::class, 'show']);
+Route::post('/contact', [ContactController::class, 'submit']);
 
 Route::get('/cart', function () {
     $userId = session('utilisateur_id');
@@ -101,7 +122,6 @@ Route::get('/trajets/{id}/availability', function($id) {
 
 Route::get('/api/reservations', [ReservationController::class, 'myReservations'])->middleware('auth');
 
-// Routes pour les favoris
 Route::get('/api/favoris', [FavoriController::class, 'index'])->name('favoris.index');
 Route::post('/api/favoris/toggle', [FavoriController::class, 'toggle'])->name('favoris.toggle');
 Route::get('/api/favoris/check/{idTrajet}', [FavoriController::class, 'check'])->name('favoris.check');
@@ -109,12 +129,14 @@ Route::get('/api/favoris/check/{idTrajet}', [FavoriController::class, 'check'])-
 Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
 Route::post('/messages', [LesMessageController::class, 'store'])->name('messages.store');
 Route::get('/messages', [LesMessageController::class, 'index'])->name('messages.index');
-Route::get('/messages/{id}', [LesMessageController::class, 'show'])->name('messages.show');
+Route::get('/api/messages/unread-count', [LesMessageController::class, 'unreadCount'])->name('messages.unread-count');
 
 Route::get('/message', [LesMessageController::class, 'index'])->name('message.index');
 Route::get('/message/{id}', [LesMessageController::class, 'show'])->name('message.show');
 Route::post('/message/{id}', [LesMessageController::class, 'store'])->name('message.send');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+Route::post('/trajets/favoris', [TrajetController::class, 'addToFavorites'])->name('trajets.favoris');
+Route::delete('/favoris/{id}', [TrajetController::class, 'deleteFavorite'])->name('favoris.delete');
 Route::get('/trajet/{trajet}/commenter', [CommentsController::class, 'create'])
     ->name('comments.create');
 Route::post('/comments/store', [CommentsController::class, 'store'])->name('comments.store');

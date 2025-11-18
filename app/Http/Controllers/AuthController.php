@@ -30,7 +30,7 @@ class AuthController extends Controller
             session(['utilisateur_prenom' => $utilisateur->Prenom]);
             session(['utilisateur_role' => $utilisateur->Role]);
             
-            return redirect('/')->with('success', 'Connexion réussie ! Bienvenue ' . $utilisateur->Prenom);
+            return redirect('/accueil')->with('success', 'Connexion réussie ! Bienvenue ' . $utilisateur->Prenom);
         }
         
         return back()->with('error', 'Courriel ou mot de passe incorrect');
@@ -102,6 +102,6 @@ class AuthController extends Controller
     public function deconnexion()
     {
         session()->flush();
-        return redirect('/')->with('success', 'Vous avez été déconnecté');
+        return redirect('/accueil')->with('success', 'Vous avez été déconnecté');
     }
 }

@@ -345,24 +345,8 @@
                 </button>
             </form>
             
-            <div class="divider">
-                <span>ou s'inscrire avec</span>
-            </div>
-            
-            <div class="social-buttons">
-                <button class="social-button google-button">
-                    <span class="social-icon">🌐</span>
-                    Google
-                </button>
-                <button class="social-button facebook-button">
-                    <span class="social-icon">📘</span>
-                    Facebook
-                </button>
-            </div>
-            
             <div class="auth-footer">
                 <p>Déjà membre ? <a href="/connexion">Se connecter</a></p>
-                <p class="terms">En vous inscrivant, vous acceptez nos <a href="#">conditions d'utilisation</a></p>
             </div>
         </div>
     </div>

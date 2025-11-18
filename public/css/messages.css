@@ -81,7 +81,7 @@
     margin-bottom: 25px;
 }
 
-/* Liste des conversations */
+
 .conversations-list {
     background: white;
     border-radius: 20px;
@@ -204,7 +204,6 @@
     height: 700px;
 }
 
-/* En-tête de la conversation */
 .chat-header {
     background: linear-gradient(135deg, var(--message-primary) 0%, var(--message-primary-dark) 100%);
     color: white;
@@ -244,7 +243,6 @@
     margin: 0;
 }
 
-/* Corps de la conversation (messages) */
 .chat-body {
     flex: 1;
     padding: 25px;
@@ -296,7 +294,6 @@
     }
 }
 
-/* Message envoyé (utilisateur connecté - à droite) */
 .chat-message.sent {
     flex-direction: row-reverse;
 }
@@ -311,7 +308,6 @@
     text-align: right;
 }
 
-/* Message reçu (autre utilisateur - à gauche) */
 .chat-message.received .message-bubble {
     background: var(--message-received-bg);
     color: var(--message-received-text);
@@ -379,7 +375,6 @@
     font-size: 0.7rem;
 }
 
-/* Pied de page (formulaire d'envoi) */
 .chat-footer {
     background: white;
     padding: 20px 25px;
@@ -431,7 +426,6 @@
     transform: scale(0.95);
 }
 
-/* Message vide */
 .empty-chat {
     display: flex;
     flex-direction: column;
@@ -531,7 +525,6 @@
     }
 }
 
-/* Effet de typing pour les nouveaux messages */
 @keyframes typing {
     0%, 100% {
         transform: scale(1);

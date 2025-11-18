@@ -103,21 +103,16 @@ class TrajetController extends Controller
 
     public function create()
     {
-        $userId = session('utilisateur_id');
+        $userId = session('utilisateur_id'); 
         if (!$userId) {
-            return redirect('/connexion')->with('error', 'Veuillez vous connecter pour publier un trajet.');
+            return redirect('/connexion')->with('error', 'Veuillez vous connecter pour accéder à cette page.');
         }
 
-        // Récupère tous les trajets du conducteur connecté **sans réservation**
-        $mesTrajets = DB::table('Trajets')
-            ->leftJoin('Reservations', 'Trajets.IdTrajet', '=', 'Reservations.IdTrajet')
-            ->where('Trajets.IdConducteur', $userId)
-            ->whereNull('Reservations.IdReservation') // aucun passager réservé
-            ->orderBy('Trajets.DateTrajet', 'asc')
-            ->select('Trajets.*') // on récupère juste les colonnes de Trajets
-            ->get();
+        $mesTrajets = DB::table('Trajets')->where('IdConducteur', $userId)->get();
 
-        return view('publier', compact('mesTrajets'));
+        $mesFavoris = DB::table('trajet_favoris')->where('IdUtilisateur', $userId)->get();
+
+        return view('publier', compact('mesTrajets', 'mesFavoris'));
     }
 
 
@@ -138,9 +133,52 @@ class TrajetController extends Controller
             'TypeConversation' => 'nullable|string|max:20',
             'Musique' => 'nullable|boolean',
             'Fumeur' => 'nullable|boolean',
+            'RappelEmail' => 'nullable|boolean',
         ]);
 
-        Trajet::create($request->all());
+        $data = $request->all();
+        $data['RappelEmail'] = $request->has('RappelEmail') ? 1 : 0;
+        $data['RappelEnvoye'] = 0; 
+        
+        $trajet = Trajet::create($data);
+
+        if ($request->has('RappelEmail')) {
+            $dateTimeTrajet = \Carbon\Carbon::parse($request->DateTrajet . ' ' . $request->HeureTrajet);
+            $now = \Carbon\Carbon::now();
+            $diffEnHeures = $now->diffInHours($dateTimeTrajet, false);
+            
+            if ($diffEnHeures >= 0 && $diffEnHeures <= 2) {
+                try {
+                    $conducteur = DB::table('utilisateurs')
+                        ->where('IdUtilisateur', $request->IdConducteur)
+                        ->first();
+                    
+                    if ($conducteur) {
+                        $emailData = [
+                            'conducteurNom' => $conducteur->Prenom . ' ' . $conducteur->Nom,
+                            'depart' => $request->Depart,
+                            'destination' => $request->Destination,
+                            'dateTrajet' => \Carbon\Carbon::parse($request->DateTrajet)->format('d/m/Y'),
+                            'heureTrajet' => \Carbon\Carbon::parse($request->HeureTrajet)->format('H:i'),
+                            'placesDisponibles' => $request->PlacesDisponibles,
+                        ];
+                        
+                        $heuresRestantes = round(\Carbon\Carbon::now()->diffInHours(\Carbon\Carbon::parse(request()->DateTrajet . ' ' . request()->HeureTrajet)));
+                        
+                        \Mail::send('emails.rappel-trajet', $emailData, function($message) use ($conducteur, $heuresRestantes) {
+                            $message->to($conducteur->Courriel)
+                                    ->subject('🚗 Rappel : Votre trajet dans ' . $heuresRestantes . 'h - Covoit2025');
+                        });
+                        
+                        DB::table('trajets')
+                            ->where('IdTrajet', $trajet->IdTrajet)
+                            ->update(['RappelEnvoye' => true]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Erreur lors de l\'envoi du rappel immédiat: ' . $e->getMessage());
+                }
+            }
+        }
 
         return redirect()->route('trajets.index')->with('success', 'Trajet ajouté avec succès!');
     }
@@ -282,18 +320,18 @@ class TrajetController extends Controller
             }
         }
 
-        // NOUVEAU FILTRE: Chemin le plus court
+       
         if ($request->input('ShortestPath') == '1') {
-            // Trier par distance croissante (du plus court au plus long)
+           
             $query->orderByRaw('CAST(Distance AS DECIMAL(10,2)) ASC');
         } else {
-            // Ordre par défaut : par date croissante
+           
             $query->orderBy('DateTrajet', 'asc');
         }
 
         $trajets = $query->limit(100)->get();
 
-        // Récupérer les reviews pour chaque trajet
+       
         $reviews = DB::table('evaluation')
             ->select('IdTrajet', DB::raw('AVG(Note) as average_note'), DB::raw('COUNT(*) as review_count'))
             ->groupBy('IdTrajet')
@@ -501,7 +539,6 @@ class TrajetController extends Controller
             return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
         }
 
-        // Vérifier s'il existe des paiements actifs (statut différent de 'En attente' ou 'Annulé')
         $activePaymentsCount = DB::table('Paiements')
             ->where('IdTrajet', $id)
             ->whereNotIn('Statut', ['En attente', 'Annulé'])
@@ -512,7 +549,6 @@ class TrajetController extends Controller
                 ->with('error', 'Impossible de supprimer ce trajet : certains paiements sont déjà effectués.');
         }
 
-        // Supprimer les dépendances
         DB::table('Commentaires')->where('IdTrajet', $id)->delete();
         DB::table('Evaluation')->where('IdTrajet', $id)->delete();
         DB::table('RecurrenceTrajet')->where('IdTrajet', $id)->delete();
@@ -521,17 +557,73 @@ class TrajetController extends Controller
             DB::table('favoris')->where('IdTrajet', $id)->delete();
         }
 
-        // Supprimer les paiements en attente ou annulés
         DB::table('Paiements')
             ->where('IdTrajet', $id)
             ->whereIn('Statut', ['En attente', 'Annulé'])
             ->delete();
 
-        // Supprimer le trajet
         DB::table('Trajets')->where('IdTrajet', $id)->delete();
 
         return redirect('/publier')->with('success', 'Trajet supprimé avec succès.');
     }
 
+    public function addToFavorites(Request $request)
+    {
+        $userId = session('utilisateur_id'); 
+        if (!$userId) {
+            return redirect()->back()->with('error', 'Vous devez être connecté pour ajouter un trajet à vos favoris.');
+        }
 
+        $validated = $request->validate([
+            'IdTrajet' => 'required|exists:Trajets,IdTrajet',
+        ]);
+
+        $trajet = Trajet::find($validated['IdTrajet']);
+
+        $favoriExiste = DB::table('trajet_favoris')
+            ->where('IdUtilisateur', $userId)
+            ->where('Depart', $trajet->Depart)
+            ->where('Destination', $trajet->Destination)
+            ->exists();
+
+        if ($favoriExiste) {
+            return redirect()->back()->with('error', 'Ce trajet est déjà dans vos favoris.');
+        }
+
+        DB::table('trajet_favoris')->insert([
+            'IdUtilisateur' => $userId,
+            'Depart' => $trajet->Depart,
+            'Destination' => $trajet->Destination,
+            'DateDernierePublication' => $trajet->DateTrajet,
+            'HeureTrajet' => $trajet->HeureTrajet,
+            'PlacesDisponibles' => $trajet->PlacesDisponibles,
+            'Prix' => $trajet->Prix,
+            'AnimauxAcceptes' => $trajet->AnimauxAcceptes,
+            'TypeConversation' => $trajet->TypeConversation,
+            'Musique' => $trajet->Musique,
+            'Fumeur' => $trajet->Fumeur,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Trajet ajouté à vos favoris.');
+    }
+
+    public function deleteFavorite($id)
+    {
+        $userId = session('utilisateur_id'); 
+        if (!$userId) {
+            return redirect()->back()->with('error', 'Vous devez être connecté pour effectuer cette action.');
+        }
+
+        $favori = DB::table('trajet_favoris')->where('IdFavori', $id)->where('IdUtilisateur', $userId)->first();
+
+        if (!$favori) {
+            return redirect()->back()->with('error', 'Trajet sauvegardé introuvable.');
+        }
+
+        DB::table('trajet_favoris')->where('IdFavori', $id)->delete();
+
+        return redirect()->back()->with('success', 'Trajet sauvegardé supprimé avec succès.');
+    }
 }

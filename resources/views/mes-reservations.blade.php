@@ -57,30 +57,31 @@
 
                 <div class="reservation-card" data-trajet-id="{{ $resa->IdTrajet }}" data-date-trajet="{{ $resa->DateTrajet }}">
 
-                    <div class="reservation-header">
-                        @if($isConducteur)
-                            <div class="conducteur-info">
-                                <i class="fas fa-user-circle"></i>
-                                <span class="conducteur-nom">{{ $resa->PrenomPassager }} {{ $resa->NomPassager }}</span>
-                                <div class="small text-muted">Trajet : {{ $resa->Depart }} → {{ $resa->Destination }}</div>
-                            </div>
-                        @else
-                            <div class="conducteur-info">
-                                <i class="fas fa-user-circle"></i>
-                                <span class="conducteur-nom">{{ $resa->PrenomConducteur }} {{ $resa->NomConducteur }}</span>
-                            </div>
-                        @endif
-                        <div class="reservation-status" style="display: flex; align-items: center; gap: 10px;">
-                            <span class="badge badge-reservation">Réservé</span>
-                            @if(!$isConducteur)
-                                <button type="button" class="btn-favorite btn btn-sm" data-trajet-id="{{ $resa->IdTrajet }}"
-                                    title="Ajouter aux favoris"
-                                    style="color:#666;border:none;background:transparent;padding:4px 8px;cursor:pointer;">
-                                    <i class="fa-regular fa-star"></i>
-                                </button>
-                            @endif
-                        </div>
+            <div class="reservation-header">
+                @if($isConducteur)
+                    <div class="conducteur-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="conducteur-nom">{{ $resa->PrenomPassager }} {{ $resa->NomPassager }}</span>
+                        <div class="small text-muted">Trajet : {{ $resa->Depart }} → {{ $resa->Destination }}</div>
                     </div>
+                @else
+                    <div class="conducteur-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="conducteur-nom">{{ $resa->PrenomConducteur }} {{ $resa->NomConducteur }}</span>
+                    </div>
+                @endif
+                 <div class="reservation-status" style="display: flex; align-items: center; gap: 10px;">
+                     <span class="badge badge-reservation">Réservé</span>
+                     <button type="button" 
+                         class="btn-favorite btn btn-sm" 
+                         data-trajet-id="{{ $resa->IdTrajet }}"
+                         data-user-role="{{ $isConducteur ? 'Conducteur' : 'Passager' }}"
+                         title="Ajouter aux favoris"
+                         style="color:#666;border:none;background:transparent;padding:4px 8px;cursor:pointer;">
+                         <i class="fa-regular fa-star"></i>
+                     </button>
+                 </div>
+             </div>
 
                     <div class="reservation-route">
                         <div class="route-points">

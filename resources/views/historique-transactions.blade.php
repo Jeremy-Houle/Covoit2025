@@ -18,6 +18,10 @@
             <p class="historique-subtitle">Consultez toutes vos transactions de covoiturage</p>
         </div>
 
+        @php
+            $isConducteur = isset($role) && strtolower($role) === 'conducteur';
+        @endphp
+
         @if($transactions->isEmpty())
             <div class="empty-history">
                 <div class="empty-history-icon">
@@ -25,10 +29,17 @@
                 </div>
                 <h3>Aucune transaction</h3>
                 <p>Vous n'avez effectué aucune transaction pour le moment.</p>
-                <a href="/rechercher" class="btn-back">
-                    <i class="fas fa-search"></i>
-                    Rechercher des trajets
-                </a>
+                @if($isConducteur)
+                    <a href="/publier" class="btn-back">
+                        <i class="fas fa-plus"></i>
+                        Publier un trajet
+                    </a>
+                @else
+                    <a href="/rechercher" class="btn-back">
+                        <i class="fas fa-search"></i>
+                        Rechercher des trajets
+                    </a>
+                @endif
             </div>
         @else
             @foreach($transactions as $transaction)
@@ -36,7 +47,13 @@
                     <div class="transaction-header">
                         <div class="conducteur-info">
                             <i class="fas fa-user-circle"></i>
-                            <span class="conducteur-nom">{{ $transaction->NomConducteur ?? $transaction->ConducteurNom ?? '' }} {{ $transaction->PrenomConducteur ?? $transaction->ConducteurPrenom ?? '' }}</span>
+                            @if($isConducteur)
+                                <span class="conducteur-nom">{{ $transaction->PrenomPassager ?? '' }} {{ $transaction->NomPassager ?? '' }}</span>
+                                <div class="small text-muted">Passager</div>
+                            @else
+                                <span class="conducteur-nom">{{ $transaction->NomConducteur ?? $transaction->ConducteurNom ?? '' }} {{ $transaction->PrenomConducteur ?? $transaction->ConducteurPrenom ?? '' }}</span>
+                                <div class="small text-muted">Conducteur</div>
+                            @endif
                         </div>
                         <div class="transaction-status">
                             @if($transaction->Statut === 'Payé' || $transaction->Statut === 'Complété')
@@ -96,7 +113,11 @@
                             <span>{{ $transaction->NombrePlaces }}</span>
                         </div>
                         <div class="price-item total">
-                            <span>Total :</span>
+                            @if($isConducteur)
+                                <span>Revenu reçu :</span>
+                            @else
+                                <span>Total payé :</span>
+                            @endif
                             <span class="price-value">{{ number_format($transaction->Montant, 2) }} $</span>
                         </div>
                     </div>

@@ -325,21 +325,6 @@
                 </button>
             </form>
             
-            <div class="divider">
-                <span>ou continuer avec</span>
-            </div>
-            
-            <div class="social-buttons">
-                <button class="social-button google-button">
-                    <span class="social-icon">🌐</span>
-                    Google
-                </button>
-                <button class="social-button facebook-button">
-                    <span class="social-icon">📘</span>
-                    Facebook
-                </button>
-            </div>
-            
             <div class="auth-footer">
                 <p>Pas encore de compte ? <a href="/inscription">Créer un compte</a></p>
                 <p><a href="/forgot-password" class="forgot-password">Mot de passe oublié ?</a></p>

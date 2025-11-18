@@ -83,17 +83,17 @@
                   <p>Gérer mon panier</p>
                 </div>
               </a>
-              
-              <a href="/historique-transactions" class="action-card">
-                <div class="action-icon">
-                  <i class="fas fa-history"></i>
-                </div>
-                <div class="action-content">
-                  <h3>Historique</h3>
-                  <p>Voir l'historique de mes transactions</p>
-                </div>
-              </a>
             @endif
+            
+            <a href="/historique-transactions" class="action-card">
+              <div class="action-icon">
+                <i class="fas fa-history"></i>
+              </div>
+              <div class="action-content">
+                <h3>Historique</h3>
+                <p>Voir l'historique de mes transactions</p>
+              </div>
+            </a>
           </div>
         </section>
 
@@ -163,14 +163,16 @@
                 <span class="booking-date">{{ \Carbon\Carbon::parse($resa->DateTrajet)->translatedFormat('l d M') }}</span>
               </div>
               <div class="booking-guests">
-                <div class="guest-avatars">
-                  @foreach($resa->passagers as $p)
-                    <img src="https://ui-avatars.com/api/?name={{ $p->Prenom }}+{{ $p->Nom }}&background=2563eb&color=fff&size=28" alt="{{ $p->Prenom }}" />
-                  @endforeach
+                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                  <div class="guest-avatars">
+                    @foreach($resa->passagers as $p)
+                      <img src="https://ui-avatars.com/api/?name={{ $p->Prenom }}+{{ $p->Nom }}&background=2563eb&color=fff&size=28" alt="{{ $p->Prenom }}" />
+                    @endforeach
+                  </div>
+                  <span class="guest-count">{{ $resa->PlacesDisponibles ?? 4}} places libre</span>
                 </div>
-                <span class="guest-count">{{ $resa->PlacesDisponibles ?? 4}} places libre</span>
+                <span class="booking-price">{{ $resa->Prix ?? '0' }} $</span>
               </div>
-              <span class="booking-price">{{ $resa->Prix ?? '0' }} $</span>
             </div>
           @empty
             <div class="booking-item">

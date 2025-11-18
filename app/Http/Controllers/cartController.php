@@ -84,7 +84,6 @@ class CartController extends Controller
             $paymentType
         ]);
 
-        // Insérer dans l'historique des transactions
         try {
             $conducteur = DB::table('Utilisateurs')
                 ->where('IdUtilisateur', $p_conducteurId)
@@ -95,7 +94,7 @@ class CartController extends Controller
                 'IdTrajet' => $trajet->IdTrajet,
                 'IdConducteur' => $p_conducteurId,
                 'IdPaiement' => $p_Idpaiement,
-                'IdReservation' => null, // Sera mis à jour si une réservation est créée
+                'IdReservation' => null, 
                 'NombrePlaces' => $paiement->NombrePlaces,
                 'Montant' => $montantAttendu,
                 'Statut' => 'Payé',
@@ -173,12 +172,10 @@ class CartController extends Controller
             $newPlaces = $request->input('places');
             $userId = session('utilisateur_id', 1);
 
-           
             if (!$paiementId || !$newPlaces || $newPlaces < 1) {
                 return response()->json(['success' => false, 'message' => 'Données invalides']);
             }
 
-            
             $paiement = DB::table('Paiements')
                 ->where('IdPaiement', $paiementId)
                 ->where('IdUtilisateur', $userId)
@@ -290,16 +287,33 @@ class CartController extends Controller
     public function historique()
     {
         $userId = session('utilisateur_id');
+        $role = session('utilisateur_role');
+        
         if (!$userId) {
             return redirect('/connexion')->with('error', 'Veuillez vous connecter pour consulter votre historique de transactions.');
         }
 
-        // Récupérer uniquement l'historique depuis la table HistoriqueTransactions
-        $transactions = DB::table('HistoriqueTransactions')
-            ->where('IdUtilisateur', $userId)
-            ->orderBy('DateTransaction', 'desc')
-            ->get();
+        if (strtolower($role) === 'conducteur') {
+            $transactions = DB::table('HistoriqueTransactions')
+                ->where('IdConducteur', $userId)
+                ->join('Utilisateurs', 'HistoriqueTransactions.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
+                ->select(
+                    'HistoriqueTransactions.*',
+                    'Utilisateurs.Nom as NomPassager',
+                    'Utilisateurs.Prenom as PrenomPassager'
+                )
+                ->orderBy('DateTransaction', 'desc')
+                ->get();
+        } else {
+            $transactions = DB::table('HistoriqueTransactions')
+                ->where('IdUtilisateur', $userId)
+                ->orderBy('DateTransaction', 'desc')
+                ->get();
+        }
 
-        return view('historique-transactions', ['transactions' => $transactions]);
+        return view('historique-transactions', [
+            'transactions' => $transactions,
+            'role' => $role
+        ]);
     }
 }
