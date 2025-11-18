@@ -180,7 +180,7 @@ class TrajetController extends Controller
             }
         }
 
-        return redirect()->route('trajets.index')->with('success', 'Trajet ajouté avec succès!');
+        return redirect()->route('trajets.create')->with('success', 'Trajet ajouté avec succès!');
     }
     /*
     public function index()
@@ -266,7 +266,6 @@ class TrajetController extends Controller
     {
         $query = DB::table('Trajets')->select('*');
 
-        // Filtrer par départ
         if ($depart = $request->input('Depart')) {
             $departNormalized = $this->normalizeString($depart);
             $query->whereRaw('LOWER(Depart) LIKE ?', ['%' . strtolower($depart) . '%']);
@@ -293,7 +292,6 @@ class TrajetController extends Controller
             }
         }
 
-        // Exclure les trajets avec 0 places disponibles
         $query->where('PlacesDisponibles', '>', 0);
 
         if ($type = $request->input('TypeConversation')) {
@@ -362,8 +360,13 @@ class TrajetController extends Controller
 
     public function index()
     {
+        $role = session('utilisateur_role');
+        if ($role === 'Conducteur') {
+            return redirect('/publier')->with('error', 'La page de recherche est réservée aux passagers.');
+        }
+        
         $trajets = DB::table('Trajets')
-        ->where('PlacesDisponibles', '>', 0) // Exclure les trajets avec 0 ou moins de places disponibles
+        ->where('PlacesDisponibles', '>', 0) 
         ->get();        
         
 
@@ -582,7 +585,6 @@ class TrajetController extends Controller
             DB::table('favoris')->where('IdTrajet', $id)->delete();
         }
 
-        // Supprimer les réservations liées au trajet
         DB::table('Reservations')->where('IdTrajet', $id)->delete();
 
         DB::table('Paiements')

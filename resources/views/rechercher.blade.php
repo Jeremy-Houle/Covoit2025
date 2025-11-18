@@ -11,10 +11,10 @@
 @endpush
 
 @section('content')
-    <div class="rechercher-page">
+    <div class="rechercher-page" style="margin-bottom: 60px;">
         <div class="container" style="padding-top: 100px;">
-            <div class="page-header">
-                <h1 class="page-title">
+            <div class="page-header" style="text-align: center;">
+                <h1 class="page-title" style="display: block;">
                     <i class="fa fa-search"></i> Rechercher des trajets
                 </h1>
                 <p class="page-subtitle">Trouvez le trajet idéal en quelques clics</p>
@@ -252,15 +252,11 @@
                         </div>
                     @endif
                 </div>
-
-            </div> 
-
-                                        
+                                        </div>
                                     @empty
                                         <p>Aucun trajet trouvé.</p>
-                                    @endforelse</div>
+                                    @endforelse
                                 @endisset
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -270,7 +266,6 @@
                             <i class="fa fa-filter"></i> Filtres & Options
                         </h4>
 
-                        <!-- Filtre Favoris -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <label
                                 style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--gray-700);">
@@ -280,7 +275,6 @@
                             </label>
                         </div>
 
-                        <!-- Filtre Prix Maximum -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
                                 <label style="margin:0;font-weight:600;color:var(--gray-700);">💰 Prix max :</label>
@@ -291,7 +285,6 @@
                                 value="{{ request('PrixMax', 2000) }}" style="width:100%;">
                         </div>
 
-                        <!-- NOUVEAU FILTRE: Trier par distance -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <label
                                 style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--gray-700);">
@@ -306,7 +299,6 @@
                             </small>
                         </div>
 
-                        <!-- Filtre Places Disponibles -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--gray-700);">
                                 👥 Places disponibles minimum
@@ -326,7 +318,6 @@
                             </select>
                         </div>
 
-                        <!-- Filtre Type de Conversation -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <div style="font-weight:600;margin-bottom:8px;color:var(--gray-700);">💬 Type de conversation
                             </div>
@@ -346,7 +337,6 @@
                             </fieldset>
                         </div>
 
-                        <!-- Filtre Préférences -->
                         <div class="filter-group" style="margin-bottom:16px;">
                             <div style="font-weight:600;margin-bottom:8px;color:var(--gray-700);">⚙️ Préférences</div>
                             <div style="display:flex;flex-direction:column;gap:8px;">
@@ -363,7 +353,6 @@
                             </div>
                         </div>
 
-                        <!-- Boutons d'action -->
                         <div class="filter-buttons">
                             <button type="button" onclick="reinitialiserFiltres()" class="btn-reset">
                                 <i class="fa fa-redo"></i>
@@ -381,7 +370,6 @@
     </div>
 
     <style>
-        /* For disconnected users make stars static and non-interactive */
         .rating-static .star {
             pointer-events: none;
             cursor: default;
@@ -439,7 +427,6 @@
                 }
             });
 
-            // NOUVEAU: Gestionnaire pour le filtre chemin le plus court
             const shortestPathCheckbox = document.getElementById('filterShortestPath');
             if (shortestPathCheckbox) {
                 shortestPathCheckbox.addEventListener('change', function () {
@@ -458,7 +445,6 @@
             document.getElementById('PrixMaxNumber').value = 2000;
             document.getElementById('PlacesMin').value = '';
 
-            // NOUVEAU: Réinitialiser le filtre chemin le plus court
             const shortestPathCheckbox = document.getElementById('filterShortestPath');
             if (shortestPathCheckbox) {
                 shortestPathCheckbox.checked = false;
@@ -492,7 +478,6 @@
             }
         };
 
-        // Gestion des favoris dans le HTML initial - attendre que FavoritesManager soit disponible
         async function initFavoritesForStaticTrajets() {
             if (typeof window.FavoritesManager === 'undefined') {
                 setTimeout(initFavoritesForStaticTrajets, 100);
