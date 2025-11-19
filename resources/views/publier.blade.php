@@ -32,7 +32,7 @@
             color: #333;
             margin-bottom: 15px;
         }
-        
+
         .mes-favoris {
             margin-top: 40px;
         }
