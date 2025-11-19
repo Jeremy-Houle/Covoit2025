@@ -191,7 +191,8 @@
                                                         <i class="fa-regular fa-star"></i>
                                                     </button>
                                                     <button type="button"
-                                                        class="btn-details-{{ $t->IdTrajet }} btn btn-sm btn-outline-secondary"
+                                                        class="btn-details btn-details-{{ $t->IdTrajet }} btn btn-sm btn-outline-secondary"
+                                                        data-id="{{ $t->IdTrajet }}"
                                                         onclick="toggleDetails({{ $t->IdTrajet }})">
                                                         Détails
                                                     </button>
@@ -290,7 +291,7 @@
                                                 </div>
                                             @endif
 
-                                            <div class="trajet-details-{{ $t->IdTrajet }}" id="details-{{ $t->IdTrajet }}"
+                                            <div class="trajet-details trajet-details-{{ $t->IdTrajet }}" id="details-{{ $t->IdTrajet }}"
                                                 style="display:none;margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:0.95rem;background:var(--gray-50);padding:12px;border-radius:8px;box-shadow:inset 2px 2px 5px rgba(0, 0, 0, 0.2),inset -2px -2px 5px rgba(255, 255, 255, 0.8);">
                                                 <div><strong style="color:var(--primary-blue);font-size:1.1rem;">Détails
                                                         complets</strong></div>
