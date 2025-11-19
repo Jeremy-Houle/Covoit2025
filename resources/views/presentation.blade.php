@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Covoit2025 - Présentation du Projet</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/fav_icon.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     @vite(['resources/js/presentation.js'])
@@ -30,10 +31,11 @@
         }
         
         .preloader-logo {
-            font-size: 3.5rem;
-            color: white;
+            width: 80px;
+            height: 80px;
             margin-bottom: 2rem;
             animation: bounce 1s ease-in-out infinite;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
         
         .preloader-spinner {
@@ -906,9 +908,7 @@
 <body>
     <!-- Preloader -->
     <div id="preloader">
-        <div class="preloader-logo">
-            🚗
-        </div>
+        <img src="{{ asset('images/fav_icon.png') }}" alt="Covoit2025" class="preloader-logo">
         <div class="preloader-spinner"></div>
         <div class="preloader-text">Chargement de Covoit2025...</div>
     </div>
