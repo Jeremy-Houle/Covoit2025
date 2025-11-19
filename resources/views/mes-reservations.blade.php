@@ -5,6 +5,45 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/reservations.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        /* Styles personnalisés pour SweetAlert */
+        .swal-custom-popup {
+            border-radius: 16px !important;
+            padding: 30px !important;
+        }
+        
+        .swal-custom-title {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+            color: #dc2626 !important;
+        }
+        
+        .swal-custom-text {
+            margin: 20px 0 !important;
+        }
+        
+        .swal-custom-confirm {
+            font-size: 1rem !important;
+            padding: 12px 30px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .swal-custom-confirm:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4) !important;
+        }
+        
+        .swal2-close {
+            font-size: 2rem !important;
+            color: #666 !important;
+        }
+        
+        .swal2-close:hover {
+            color: #dc2626 !important;
+        }
+    </style>
 @endpush
 
 @push('scripts')
