@@ -265,14 +265,19 @@
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
                     Swal.fire({
-                        title: 'Êtes-vous sûr ?',
-                        text: "Cette réservation sera annulée !",
+                        title: 'Supprimer la réservation',
+                        html: '<p style="font-size: 1.1rem; margin: 0;">Cette réservation sera définitivement supprimée.</p><p style="color: #666; font-size: 0.9rem; margin-top: 8px;">Êtes-vous certain de vouloir continuer ?</p>',
                         icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Oui, annuler',
-                        cancelButtonText: 'Non, garder'
+                        showCancelButton: false,
+                        showCloseButton: true,
+                        confirmButtonColor: '#dc2626',
+                        confirmButtonText: '<i class="fas fa-trash-alt"></i> Supprimer',
+                        customClass: {
+                            popup: 'swal-custom-popup',
+                            title: 'swal-custom-title',
+                            htmlContainer: 'swal-custom-text',
+                            confirmButton: 'swal-custom-confirm'
+                        }
                     }).then((result) => {
                         if (result.isConfirmed) {
                             form.submit();
