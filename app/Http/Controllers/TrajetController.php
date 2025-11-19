@@ -337,7 +337,7 @@ class TrajetController extends Controller
         }
 
         $request->validate([
-            'IdTrajet' => 'required|integer|exists:Trajets,IdTrajet',
+            'IdTrajet' => 'required|integer|exists:trajets,IdTrajet',
             'PlacesReservees' => 'nullable|integer|min:1'
         ]);
 
@@ -497,7 +497,7 @@ class TrajetController extends Controller
         }
 
         $validated = $request->validate([
-            'IdTrajet' => 'required|exists:Trajets,IdTrajet',
+            'IdTrajet' => 'required|exists:trajets,IdTrajet',
         ]);
 
         $trajet = Trajet::find($validated['IdTrajet']);

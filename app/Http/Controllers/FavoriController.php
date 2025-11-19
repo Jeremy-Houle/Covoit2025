@@ -40,7 +40,7 @@ class FavoriController extends Controller
         }
 
         $request->validate([
-            'IdTrajet' => 'required|integer|exists:Trajets,IdTrajet',
+            'IdTrajet' => 'required|integer|exists:trajets,IdTrajet',
             'TypeFavori' => 'required|string|in:Rechercher,reserver'
         ]);
 

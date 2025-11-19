@@ -117,7 +117,7 @@ Route::put('/mes-reservations/{id}/update', [ReservationController::class, 'upda
 Route::delete('/mes-reservations/{id}', [ReservationController::class, 'destroy'])->name('mes-reservations.destroy');
 
 Route::get('/trajets/{id}/availability', function($id) {
-    $trajet = DB::table('Trajets')->where('IdTrajet', $id)->select('PlacesDisponibles')->first();
+    $trajet = DB::table('trajets')->where('IdTrajet', $id)->select('PlacesDisponibles')->first();
     if (!$trajet) {
         return response()->json(['error' => 'Trajet introuvable'], 404);
     }
