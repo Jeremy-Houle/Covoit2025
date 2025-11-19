@@ -298,7 +298,7 @@ class CartController extends Controller
                 ->where('IdConducteur', $userId)
                 ->join('utilisateurs', 'historiquetransactions.IdUtilisateur', '=', 'utilisateurs.IdUtilisateur')
                 ->select(
-                    'HistoriqueTransactions.*',
+                    'historiquetransactions.*',
                     'utilisateurs.Nom as NomPassager',
                     'utilisateurs.Prenom as PrenomPassager'
                 )
