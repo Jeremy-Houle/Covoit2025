@@ -107,6 +107,10 @@ class TrajetController extends Controller
         if (!$userId) {
             return redirect('/connexion')->with('error', 'Veuillez vous connecter pour accéder à cette page.');
         }
+        $role = session('utilisateur_role');
+        if($role == "Passager"){
+            return redirect('/');
+        }
 
         $mesTrajets = DB::table('Trajets')->where('IdConducteur', $userId)->get();
 
@@ -375,22 +379,25 @@ class TrajetController extends Controller
             ->groupBy('IdTrajet')
             ->get()
             ->keyBy('IdTrajet');
-            
+
 
         $commentsByTrajet = DB::table('Commentaires')
             ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
+            ->leftJoin('Evaluation', function ($join) {
+                $join->on('Commentaires.IdUtilisateur', '=', 'Evaluation.IdUtilisateur')
+                    ->on('Commentaires.IdTrajet', '=', 'Evaluation.IdTrajet');
+            })
             ->select(
                 'Commentaires.*',
                 'Utilisateurs.Prenom as user_prenom',
-                'Utilisateurs.Nom as user_nom'
+                'Utilisateurs.Nom as user_nom',
+                'Evaluation.Note'
             )
             ->orderBy('DateCommentaire', 'desc')
             ->get()
             ->groupBy('IdTrajet');
 
-        $reviewAll = DB::table('evaluation')->get();
-
-        return view('rechercher', compact('trajets', 'reviews', 'commentsByTrajet', 'reviewAll'));
+        return view('rechercher', compact('trajets', 'reviews', 'commentsByTrajet'));
     }
 
 

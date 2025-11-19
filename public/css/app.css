@@ -1480,3 +1480,6 @@ header {
   margin:1%;
   font-size: var(--font-size-lg);
 }
+.comments:hover{
+  animation: slideUp 0.3s ease-out; 
+  transform: translateY(-3px);}

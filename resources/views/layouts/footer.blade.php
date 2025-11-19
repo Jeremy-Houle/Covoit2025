@@ -27,7 +27,9 @@
                     @if($role !== 'Conducteur')
                         <li><a href="/rechercher">Rechercher un trajet</a></li>
                     @endif
-                    <li><a href="/publier">Publier un trajet</a></li>
+                    @if($role == 'Conducteur')
+                        <li><a href="/publier">Publier un trajet</a></li>
+                    @endif
                     <li><a href="/mes-reservations">Mes réservations</a></li>
                 </ul>
             </div>

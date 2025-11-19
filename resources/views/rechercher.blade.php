@@ -348,7 +348,6 @@
                 <div class="commentsWrapper" id="CommentsContainer{{ $t->IdTrajet }}" hidden>
                     @php
                         $comments = $commentsByTrajet[$t->IdTrajet] ?? collect();
-                        $review = $reviewAll[$t->IdTrajet] ?? null;
                     @endphp
 
                     @foreach ($comments as $c)
@@ -360,13 +359,13 @@
 
                             <div class="comment-body">{{ $c->Commentaire }}</div>
 
-                            @isset($review)
-                                @for($i = 1; $i < 5; $i++)
-                                    @if($i <= $review->Note)
-                                        <i class="fa-solid fa-star" style="color: #fbbf24;"></i>
-                                    @endif
-                                @endfor
-                            @endisset
+                                @if($c->Note)
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $c->Note)
+                                            <i class="fa-solid fa-star" style="color: #fbbf24;"></i>
+                                        @endif
+                                    @endfor
+                                @endif
                         </div>
                     @endforeach
 

@@ -69,6 +69,10 @@ Route::get('/cart', function () {
     if (!$userId) {
         return redirect('/connexion')->with('error', 'Veuillez vous connecter pour consulter votre panier.');
     }
+    $role = session('utilisateur_role');
+    if($role == "Conducteur"){
+        return redirect('/');
+    }
     $paiements = DB::table('Paiements as p')
         ->join('Trajets as t', 'p.IdTrajet', '=', 't.IdTrajet')
         ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
