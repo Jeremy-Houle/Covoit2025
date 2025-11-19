@@ -17,7 +17,7 @@ class LesMessageController extends Controller
 
         $otherId = (int) $id;
 
-        $messages = \DB::table('LesMessages')
+        $messages = \DB::table('lesmessages')
             ->where(function($q) use ($userId, $otherId) {
                 $q->where('IdExpediteur', $userId)->where('IdDestinataire', $otherId);
             })
@@ -27,17 +27,17 @@ class LesMessageController extends Controller
             ->orderBy('DateEnvoi')
             ->get();
 
-        $other = \DB::table('Utilisateurs')->where('IdUtilisateur', $otherId)->first();
+        $other = \DB::table('utilisateurs')->where('IdUtilisateur', $otherId)->first();
         $otherName = $other
             ? trim(($other->Prenom ?? '') . ' ' . ($other->Nom ?? ''))
             : "Utilisateur #{$otherId}";
 
-        $currentUser = \DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        $currentUser = \DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
         $currentUserName = $currentUser
             ? trim(($currentUser->Prenom ?? '') . ' ' . ($currentUser->Nom ?? ''))
             : "Vous";
 
-        DB::table('LesMessages')
+        DB::table('lesmessages')
             ->where('IdDestinataire', $userId)
             ->where('IdExpediteur', $otherId)
             ->update(['MessageLu' => 1]);
@@ -58,7 +58,7 @@ class LesMessageController extends Controller
             return redirect()->route('message.show', $otherId);
         }
 
-        \DB::table('LesMessages')->insert([
+        \DB::table('lesmessages')->insert([
             'IdExpediteur'   => $userId,
             'IdDestinataire' => $otherId,
             'LeMessage'      => $text,
@@ -89,7 +89,7 @@ class LesMessageController extends Controller
             $participantIds[] = $m->IdDestinataire;
         }
         $participantIds = array_values(array_unique($participantIds));
-        $users = DB::table('Utilisateurs')->whereIn('IdUtilisateur', $participantIds)->get()->keyBy('IdUtilisateur');
+        $users = DB::table('utilisateurs')->whereIn('IdUtilisateur', $participantIds)->get()->keyBy('IdUtilisateur');
 
         $threads = [];
         foreach ($messages as $m) {
@@ -102,7 +102,7 @@ class LesMessageController extends Controller
             }
         }
 
-        DB::table('LesMessages')
+        DB::table('lesmessages')
             ->where('IdDestinataire', $userId)
             ->update(['MessageLu' => 1]);
 
@@ -116,7 +116,7 @@ class LesMessageController extends Controller
             return response()->json(['count' => 0]);
         }
 
-        $count = DB::table('LesMessages')
+        $count = DB::table('lesmessages')
             ->where('IdDestinataire', $userId)
             ->where('MessageLu', 0)
             ->count();

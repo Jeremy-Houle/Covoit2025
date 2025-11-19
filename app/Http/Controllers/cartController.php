@@ -26,7 +26,7 @@ class CartController extends Controller
             'paypal_order_id' => $paypalOrderId
         ]);
         
-        $paiement = DB::table('Paiements')
+        $paiement = DB::table('paiements')
             ->where('IdPaiement', $p_Idpaiement)
             ->where('IdUtilisateur', $p_idUtilisateur)
             ->first();
@@ -35,7 +35,7 @@ class CartController extends Controller
             throw new \Exception("Paiement introuvable (#{$p_Idpaiement})");
         }
 
-        $trajet = DB::table('Trajets')
+        $trajet = DB::table('trajets')
             ->where('IdTrajet', $paiement->IdTrajet)
             ->first();
 
@@ -43,7 +43,7 @@ class CartController extends Controller
             throw new \Exception("Trajet introuvable pour le paiement #{$p_Idpaiement}");
         }
 
-        $utilisateur = DB::table('Utilisateurs')
+        $utilisateur = DB::table('utilisateurs')
             ->where('IdUtilisateur', $p_idUtilisateur)
             ->first();
 
@@ -85,11 +85,11 @@ class CartController extends Controller
         ]);
 
         try {
-            $conducteur = DB::table('Utilisateurs')
+            $conducteur = DB::table('utilisateurs')
                 ->where('IdUtilisateur', $p_conducteurId)
                 ->first();
             
-            DB::table('HistoriqueTransactions')->insert([
+            DB::table('historiquetransactions')->insert([
                 'IdUtilisateur' => $p_idUtilisateur,
                 'IdTrajet' => $trajet->IdTrajet,
                 'IdConducteur' => $p_conducteurId,
@@ -176,7 +176,7 @@ class CartController extends Controller
                 return response()->json(['success' => false, 'message' => 'Données invalides']);
             }
 
-            $paiement = DB::table('Paiements')
+            $paiement = DB::table('paiements')
                 ->where('IdPaiement', $paiementId)
                 ->where('IdUtilisateur', $userId)
                 ->first();
@@ -185,7 +185,7 @@ class CartController extends Controller
                 return response()->json(['success' => false, 'message' => 'Paiement introuvable']);
             }
 
-            $trajet = DB::table('Trajets')
+            $trajet = DB::table('trajets')
                 ->where('IdTrajet', $paiement->IdTrajet)
                 ->first();
 
@@ -213,11 +213,11 @@ class CartController extends Controller
                 ]);
             }
 
-            $updatedPaiement = DB::table('Paiements')
+            $updatedPaiement = DB::table('paiements')
                 ->where('IdPaiement', $paiementId)
                 ->first();
 
-            $updatedTrajet = DB::table('Trajets')
+            $updatedTrajet = DB::table('trajets')
                 ->where('IdTrajet', $paiement->IdTrajet)
                 ->first();
 
@@ -253,7 +253,7 @@ class CartController extends Controller
                 return response()->json(['success' => false, 'message' => 'ID de paiement manquant']);
             }
 
-            $paiement = DB::table('Paiements')
+            $paiement = DB::table('paiements')
                 ->where('IdPaiement', $paiementId)
                 ->where('IdUtilisateur', $userId)
                 ->first();
@@ -262,7 +262,7 @@ class CartController extends Controller
                 return response()->json(['success' => false, 'message' => 'Paiement introuvable']);
             }
 
-            DB::table('Paiements')
+            DB::table('paiements')
                 ->where('IdPaiement', $paiementId)
                 ->where('IdUtilisateur', $userId)
                 ->delete();
@@ -294,7 +294,7 @@ class CartController extends Controller
         }
 
         if (strtolower($role) === 'conducteur') {
-            $transactions = DB::table('HistoriqueTransactions')
+            $transactions = DB::table('historiquetransactions')
                 ->where('IdConducteur', $userId)
                 ->join('Utilisateurs', 'HistoriqueTransactions.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
                 ->select(
@@ -305,7 +305,7 @@ class CartController extends Controller
                 ->orderBy('DateTransaction', 'desc')
                 ->get();
         } else {
-            $transactions = DB::table('HistoriqueTransactions')
+            $transactions = DB::table('historiquetransactions')
                 ->where('IdUtilisateur', $userId)
                 ->orderBy('DateTransaction', 'desc')
                 ->get();

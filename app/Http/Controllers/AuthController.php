@@ -20,7 +20,7 @@ class AuthController extends Controller
         $courriel = $request->input('courriel');
         $motDePasse = $request->input('mot_de_passe');
         
-        $utilisateur = DB::table('Utilisateurs')
+        $utilisateur = DB::table('utilisateurs')
             ->where('Courriel', $courriel)
             ->first();
         
@@ -65,7 +65,7 @@ class AuthController extends Controller
             return back()->with('error', 'Le mot de passe doit contenir au moins 6 caractères');
         }
         
-        $existeUtilisateur = DB::table('Utilisateurs')
+        $existeUtilisateur = DB::table('utilisateurs')
             ->where('Courriel', $courriel)
             ->exists();
         
@@ -74,7 +74,7 @@ class AuthController extends Controller
         }
         
         try {
-            DB::table('Utilisateurs')->insert([
+            DB::table('utilisateurs')->insert([
                 'Nom' => $nom,
                 'Prenom' => $prenom,
                 'Courriel' => $courriel,
@@ -83,7 +83,7 @@ class AuthController extends Controller
                 'Solde' => 1000.00
             ]);
 
-            $nouvelUtilisateur = DB::table('Utilisateurs')
+            $nouvelUtilisateur = DB::table('utilisateurs')
                 ->where('Courriel', $courriel)
                 ->first();
 

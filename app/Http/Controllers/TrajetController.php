@@ -101,7 +101,7 @@ class TrajetController extends Controller
             return redirect('/');
         }
 
-        $mesTrajets = DB::table('Trajets')->where('IdConducteur', $userId)->get();
+        $mesTrajets = DB::table('trajets')->where('IdConducteur', $userId)->get();
 
         $mesFavoris = DB::table('trajet_favoris')->where('IdUtilisateur', $userId)->get();
 
@@ -178,7 +178,7 @@ class TrajetController extends Controller
    
     public function search(Request $request)
     {
-        $query = DB::table('Trajets')->select('*');
+        $query = DB::table('trajets')->select('*');
 
         if ($depart = $request->input('Depart')) {
             $departNormalized = $this->normalizeString($depart);
@@ -250,7 +250,7 @@ class TrajetController extends Controller
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
 
             $trajetIds = $trajets->pluck('IdTrajet')->toArray();
-            $commentCounts = DB::table('Commentaires')
+            $commentCounts = DB::table('commentaires')
                 ->select('IdTrajet', DB::raw('COUNT(*) as comment_count'))
                 ->whereIn('IdTrajet', $trajetIds)
                 ->groupBy('IdTrajet')
@@ -270,17 +270,17 @@ class TrajetController extends Controller
             ->get()
             ->keyBy('IdTrajet');
 
-        $commentsByTrajet = DB::table('Commentaires')
-            ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
-            ->leftJoin('Evaluation', function ($join) {
-                $join->on('Commentaires.IdUtilisateur', '=', 'Evaluation.IdUtilisateur')
-                    ->on('Commentaires.IdTrajet', '=', 'Evaluation.IdTrajet');
+        $commentsByTrajet = DB::table('commentaires')
+            ->join('utilisateurs', 'commentaires.IdUtilisateur', '=', 'utilisateurs.IdUtilisateur')
+            ->leftJoin('evaluation', function ($join) {
+                $join->on('commentaires.IdUtilisateur', '=', 'evaluation.IdUtilisateur')
+                    ->on('commentaires.IdTrajet', '=', 'evaluation.IdTrajet');
             })
             ->select(
-                'Commentaires.*',
-                'Utilisateurs.Prenom as user_prenom',
-                'Utilisateurs.Nom as user_nom',
-                'Evaluation.Note'
+                'commentaires.*',
+                'utilisateurs.Prenom as user_prenom',
+                'utilisateurs.Nom as user_nom',
+                'evaluation.Note'
             )
             ->orderBy('DateCommentaire', 'desc')
             ->get()
@@ -297,7 +297,7 @@ class TrajetController extends Controller
             return redirect('/publier')->with('error', 'La page de recherche est réservée aux passagers.');
         }
         
-        $trajets = DB::table('Trajets')
+        $trajets = DB::table('trajets')
         ->where('PlacesDisponibles', '>', 0) 
         ->get();        
         
@@ -309,17 +309,17 @@ class TrajetController extends Controller
             ->keyBy('IdTrajet');
 
 
-        $commentsByTrajet = DB::table('Commentaires')
-            ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
-            ->leftJoin('Evaluation', function ($join) {
-                $join->on('Commentaires.IdUtilisateur', '=', 'Evaluation.IdUtilisateur')
-                    ->on('Commentaires.IdTrajet', '=', 'Evaluation.IdTrajet');
+        $commentsByTrajet = DB::table('commentaires')
+            ->join('utilisateurs', 'commentaires.IdUtilisateur', '=', 'utilisateurs.IdUtilisateur')
+            ->leftJoin('evaluation', function ($join) {
+                $join->on('commentaires.IdUtilisateur', '=', 'evaluation.IdUtilisateur')
+                    ->on('commentaires.IdTrajet', '=', 'evaluation.IdTrajet');
             })
             ->select(
-                'Commentaires.*',
-                'Utilisateurs.Prenom as user_prenom',
-                'Utilisateurs.Nom as user_nom',
-                'Evaluation.Note'
+                'commentaires.*',
+                'utilisateurs.Prenom as user_prenom',
+                'utilisateurs.Nom as user_nom',
+                'evaluation.Note'
             )
             ->orderBy('DateCommentaire', 'desc')
             ->get()
@@ -346,7 +346,7 @@ class TrajetController extends Controller
 
         try {
             $result = DB::transaction(function () use ($idTrajet, $places, $userId) {
-                $trajet = DB::table('Trajets')->where('IdTrajet', $idTrajet)->lockForUpdate()->first();
+                $trajet = DB::table('trajets')->where('IdTrajet', $idTrajet)->lockForUpdate()->first();
 
                 if (!$trajet) {
                     return ['error' => 'Trajet introuvable', 'status' => 404];
@@ -357,20 +357,20 @@ class TrajetController extends Controller
                     return ['error' => 'Pas assez de places disponibles', 'status' => 422];
                 }
 
-                $idReservation = DB::table('Reservations')->insertGetId([
+                $idReservation = DB::table('reservations')->insertGetId([
                     'IdTrajet' => $idTrajet,
                     'IdPassager' => $userId,
                     'Distance' => null,
                     'PlacesReservees' => $places,
                 ]);
 
-                DB::table('Trajets')
+                DB::table('trajets')
                     ->where('IdTrajet', $idTrajet)
                     ->update(['PlacesDisponibles' => DB::raw("PlacesDisponibles - {$places}")]);
 
                 try {
-                    $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
-                    $trajetInfo = DB::table('Trajets')->where('IdTrajet', $idTrajet)->first();
+                    $passager = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
+                    $trajetInfo = DB::table('trajets')->where('IdTrajet', $idTrajet)->first();
 
                     if ($passager && $trajetInfo) {
                         $reservation = (object) [
@@ -407,7 +407,7 @@ class TrajetController extends Controller
             return redirect('/connexion');
         }
 
-        $trajet = DB::table('Trajets')->where('IdTrajet', $id)->first();
+        $trajet = DB::table('trajets')->where('IdTrajet', $id)->first();
 
         if (!$trajet || $trajet->IdConducteur != $userId) {
             return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
@@ -419,19 +419,19 @@ class TrajetController extends Controller
             'Prix' => 'required|numeric|min:0',
         ]);
 
-        DB::table('Trajets')->where('IdTrajet', $id)->update([
+        DB::table('trajets')->where('IdTrajet', $id)->update([
             'DateTrajet' => $request->DateTrajet,
             'HeureTrajet' => $request->HeureTrajet,
             'Prix' => $request->Prix,
         ]);
 
-        $trajetUpdated = DB::table('Trajets')->where('IdTrajet', $id)->first();
-        $conducteur = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        $trajetUpdated = DB::table('trajets')->where('IdTrajet', $id)->first();
+        $conducteur = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
 
-        $reservations = DB::table('Reservations')
-            ->join('Utilisateurs', 'Reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
+        $reservations = DB::table('reservations')
+            ->join('utilisateurs', 'reservations.IdPassager', '=', 'utilisateurs.IdUtilisateur')
             ->where('Reservations.IdTrajet', $id)
-            ->select('Utilisateurs.*', 'Reservations.*')
+            ->select('utilisateurs.*', 'reservations.*')
             ->get();
 
         foreach ($reservations as $resa) {
@@ -454,12 +454,12 @@ class TrajetController extends Controller
             return redirect('/connexion');
         }
 
-        $trajet = DB::table('Trajets')->where('IdTrajet', $id)->first();
+        $trajet = DB::table('trajets')->where('IdTrajet', $id)->first();
         if (!$trajet || $trajet->IdConducteur != $userId) {
             return redirect('/mes-reservations')->with('error', 'Trajet introuvable ou vous n’êtes pas le conducteur.');
         }
 
-        $activePaymentsCount = DB::table('Paiements')
+        $activePaymentsCount = DB::table('paiements')
             ->where('IdTrajet', $id)
             ->whereNotIn('Statut', ['En attente', 'Annulé'])
             ->count();
@@ -469,22 +469,22 @@ class TrajetController extends Controller
                 ->with('error', 'Impossible de supprimer ce trajet : certains paiements sont déjà effectués.');
         }
 
-        DB::table('Commentaires')->where('IdTrajet', $id)->delete();
-        DB::table('Evaluation')->where('IdTrajet', $id)->delete();
-        DB::table('RecurrenceTrajet')->where('IdTrajet', $id)->delete();
+        DB::table('commentaires')->where('IdTrajet', $id)->delete();
+        DB::table('evaluation')->where('IdTrajet', $id)->delete();
+        DB::table('recurrencetrajet')->where('IdTrajet', $id)->delete();
 
         if (Schema::hasTable('favoris')) {
             DB::table('favoris')->where('IdTrajet', $id)->delete();
         }
 
-        DB::table('Reservations')->where('IdTrajet', $id)->delete();
+        DB::table('reservations')->where('IdTrajet', $id)->delete();
 
-        DB::table('Paiements')
+        DB::table('paiements')
             ->where('IdTrajet', $id)
             ->whereIn('Statut', ['En attente', 'Annulé'])
             ->delete();
 
-        DB::table('Trajets')->where('IdTrajet', $id)->delete();
+        DB::table('trajets')->where('IdTrajet', $id)->delete();
 
         return redirect('/publier')->with('success', 'Trajet supprimé avec succès.');
     }

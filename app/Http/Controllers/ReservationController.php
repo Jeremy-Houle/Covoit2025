@@ -22,13 +22,13 @@ class ReservationController extends Controller
             return redirect('/connexion')->with('error', 'Veuillez vous connecter pour voir vos réservations.');
         }
 
-        DB::table('Reservations')
+        DB::table('reservations')
             ->whereNull('IdPassager')
             ->orWhere('PlacesReservees', '<=', 0)
             ->delete();
 
         if (strtolower($role) === 'conducteur') {
-            $reservations = DB::table('Trajets as t')
+            $reservations = DB::table('trajets as t')
                 ->join('Reservations as r', 't.IdTrajet', '=', 'r.IdTrajet')
                 ->leftJoin('Utilisateurs as u', 'r.IdPassager', '=', 'u.IdUtilisateur')
                 ->where('t.IdConducteur', $utilisateurId)
@@ -80,12 +80,12 @@ class ReservationController extends Controller
             'PlacesReservees' => 'required|integer|min:1'
         ]);
 
-        $reservation = DB::table('Reservations')->where('IdReservation', $id)->first();
+        $reservation = DB::table('reservations')->where('IdReservation', $id)->first();
         if (!$reservation || $reservation->IdPassager != $userId) {
             return redirect('/mes-reservations')->with('error', 'Réservation introuvable.');
         }
 
-        $trajet = DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)->first();
+        $trajet = DB::table('trajets')->where('IdTrajet', $reservation->IdTrajet)->first();
         if (!$trajet) {
             return redirect('/mes-reservations')->with('error', 'Trajet introuvable.');
         }
@@ -99,7 +99,7 @@ class ReservationController extends Controller
 
             $montant = $diff * $trajet->Prix;
 
-            DB::table('Paiements')->insert([
+            DB::table('paiements')->insert([
                 'IdUtilisateur' => $userId,
                 'IdTrajet' => $trajet->IdTrajet,
                 'NombrePlaces' => $diff,
@@ -113,16 +113,16 @@ class ReservationController extends Controller
         }
 
         elseif ($diff < 0) {
-            DB::table('Reservations')->where('IdReservation', $id)
+            DB::table('reservations')->where('IdReservation', $id)
                 ->update(['PlacesReservees' => $request->PlacesReservees]);
 
-            DB::table('Trajets')->where('IdTrajet', $trajet->IdTrajet)
+            DB::table('trajets')->where('IdTrajet', $trajet->IdTrajet)
                 ->increment('PlacesDisponibles', abs($diff));
 
             try {
-                $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+                $passager = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
                 if ($passager) {
-                    $updatedReservation = DB::table('Reservations')->where('IdReservation', $id)->first();
+                    $updatedReservation = DB::table('reservations')->where('IdReservation', $id)->first();
                     Mail::to($passager->Courriel)->send(
                         new TrajetConfirmeMail($trajet, $passager, $updatedReservation, 'modified')
                     );
@@ -142,15 +142,15 @@ class ReservationController extends Controller
         $userId = session('utilisateur_id');
         if (!$userId) return redirect('/connexion');
 
-        $reservation = DB::table('Reservations')->where('IdReservation', $id)->first();
+        $reservation = DB::table('reservations')->where('IdReservation', $id)->first();
         if (!$reservation || $reservation->IdPassager != $userId) {
             return redirect('/mes-reservations')->with('error', 'Réservation introuvable.');
         }
 
-        $trajet = DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)->first();
-        $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        $trajet = DB::table('trajets')->where('IdTrajet', $reservation->IdTrajet)->first();
+        $passager = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
 
-        DB::table('Trajets')->where('IdTrajet', $trajet->IdTrajet)
+        DB::table('trajets')->where('IdTrajet', $trajet->IdTrajet)
             ->increment('PlacesDisponibles', $reservation->PlacesReservees);
 
         try {
@@ -163,7 +163,7 @@ class ReservationController extends Controller
             Log::error('Erreur email annulation réservation : ' . $e->getMessage());
         }
 
-        DB::table('Reservations')->where('IdReservation', $id)->delete();
+        DB::table('reservations')->where('IdReservation', $id)->delete();
 
         return redirect('/mes-reservations')->with('success', 'Réservation annulée. Aucun remboursement effectué.');
     }
@@ -185,7 +185,7 @@ class ReservationController extends Controller
 
         try {
             $paiementId = DB::transaction(function () use ($userId, $idTrajet, $places) {
-                $trajet = DB::table('Trajets')->where('IdTrajet', $idTrajet)->first();
+                $trajet = DB::table('trajets')->where('IdTrajet', $idTrajet)->first();
                 if (! $trajet) {
                     throw new \Exception('Trajet introuvable');
                 }
@@ -193,7 +193,7 @@ class ReservationController extends Controller
                 $prixUnitaire = isset($trajet->Prix) ? floatval($trajet->Prix) : 0.0;
                 $montant = round($prixUnitaire * $places, 2);
 
-                return DB::table('Paiements')->insertGetId([
+                return DB::table('paiements')->insertGetId([
                     'IdUtilisateur' => $userId,
                     'IdTrajet' => $idTrajet,
                     'NombrePlaces' => $places,

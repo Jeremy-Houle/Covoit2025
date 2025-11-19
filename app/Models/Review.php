@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-    protected $table = 'Evaluation';
+    protected $table = 'evaluation';
     protected $primaryKey = 'IdEvaluation';
     public $timestamps = false;
 

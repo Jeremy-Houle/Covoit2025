@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LesMessage extends Model
 {
-    protected $table = 'LesMessages'; 
+    protected $table = 'lesmessages'; 
 
     protected $primaryKey = 'IdMessage';
 

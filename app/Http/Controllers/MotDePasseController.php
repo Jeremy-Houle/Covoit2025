@@ -22,7 +22,7 @@ class MotDePasseController extends Controller
             'email' => 'required|email',
         ]);
 
-        $user = DB::table('Utilisateurs')
+        $user = DB::table('utilisateurs')
             ->where('Courriel', $request->email)
             ->first();
 
@@ -90,7 +90,7 @@ class MotDePasseController extends Controller
             return back()->with('error', 'Ce lien de réinitialisation n\'est pas valide.');
         }
 
-        $user = DB::table('Utilisateurs')
+        $user = DB::table('utilisateurs')
             ->where('Courriel', $request->email)
             ->first();
 
@@ -98,7 +98,7 @@ class MotDePasseController extends Controller
             return back()->with('error', 'Aucun compte trouvé avec cette adresse email.');
         }
 
-        DB::table('Utilisateurs')
+        DB::table('utilisateurs')
             ->where('Courriel', $request->email)
             ->update([
                 'MotDePasse' => Hash::make($request->password),

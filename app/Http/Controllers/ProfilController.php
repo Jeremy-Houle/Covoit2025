@@ -18,7 +18,7 @@ class ProfilController extends Controller
             return redirect('/connexion');
         }
 
-        $user = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        $user = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
 
         return view('edit-profil', compact('user'));
     }
@@ -38,7 +38,7 @@ public function update(Request $request)
         'Role' => 'required|in:Passager,Conducteur',
     ]);
 
-    $oldUser = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+    $oldUser = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
     
     $data = [
         'Prenom' => $request->Prenom,
@@ -67,10 +67,10 @@ public function update(Request $request)
         $changedFields['Mot de passe'] = '••••••••';
     }
 
-    DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->update($data);
+    DB::table('utilisateurs')->where('IdUtilisateur', $userId)->update($data);
 
     if (!empty($changedFields)) {
-        $updatedUser = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        $updatedUser = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
         
         try {
             $emailTo = isset($changedFields['Courriel']) ? $oldUser->Courriel : $updatedUser->Courriel;
@@ -94,15 +94,15 @@ public function update(Request $request)
             return redirect('/connexion');
         }
 
-        $user = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
+        $user = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
 
-        $moyenneNote = DB::table('Evaluation as e')
+        $moyenneNote = DB::table('evaluation as e')
             ->join('Trajets as t', 'e.IdTrajet', '=', 't.IdTrajet')
             ->where('t.IdConducteur', $userId)
             ->avg('e.Note') ?? 0;
 
         if ($user->Role === 'Passager') {
-            $prochainesReservations = DB::table('Reservations as r')
+            $prochainesReservations = DB::table('reservations as r')
                 ->join('Trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
                 ->where('r.IdPassager', $userId)
                 ->where('t.DateTrajet', '>=', Carbon::today())
@@ -110,7 +110,7 @@ public function update(Request $request)
                 ->limit(5)
                 ->get()
                 ->map(function ($resa) {
-                    $passagers = DB::table('Reservations')
+                    $passagers = DB::table('reservations')
                         ->where('IdTrajet', $resa->IdTrajet)
                         ->join('Utilisateurs', 'Reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
                         ->select('Utilisateurs.Prenom', 'Utilisateurs.Nom')
@@ -119,14 +119,14 @@ public function update(Request $request)
                     return $resa;
                 });
         } else { 
-            $prochainesReservations = DB::table('Trajets as t')
+            $prochainesReservations = DB::table('trajets as t')
                 ->where('t.IdConducteur', $userId)
                 ->where('t.DateTrajet', '>=', Carbon::today())
                 ->orderBy('t.DateTrajet', 'asc')
                 ->limit(5)
                 ->get()
                 ->map(function ($trajet) {
-                    $reservations = DB::table('Reservations')
+                    $reservations = DB::table('reservations')
                         ->where('IdTrajet', $trajet->IdTrajet)
                         ->join('Utilisateurs', 'Reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
                         ->select('Reservations.PlacesReservees', 'Utilisateurs.Prenom', 'Utilisateurs.Nom')
@@ -134,7 +134,7 @@ public function update(Request $request)
                     $trajet->PlacesReservees = $reservations->sum('PlacesReservees');
                     $trajet->passagers = $reservations;
 
-                    $trajet->commentaires = DB::table('Commentaires')
+                    $trajet->commentaires = DB::table('commentaires')
                         ->where('IdTrajet', $trajet->IdTrajet)
                         ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
                         ->select('Commentaires.Commentaire', 'Utilisateurs.Prenom', 'Utilisateurs.Nom')
@@ -144,7 +144,7 @@ public function update(Request $request)
                 });
         }
 
-        $messagesRecents = DB::table('LesMessages as m')
+        $messagesRecents = DB::table('lesmessages as m')
             ->join('Utilisateurs as u', 'm.IdExpediteur', '=', 'u.IdUtilisateur')
             ->where('m.IdDestinataire', $userId)
             ->orderBy('m.DateEnvoi', 'desc')
@@ -154,7 +154,7 @@ public function update(Request $request)
 
         $activites = [];
 
-        $paiements = DB::table('Paiements')
+        $paiements = DB::table('paiements')
             ->where('IdUtilisateur', $userId)
             ->orderBy('DateCreation', 'desc')
             ->limit(3)
@@ -168,7 +168,7 @@ public function update(Request $request)
             ];
         }
 
-        $userActivites = DB::table('Activites')
+        $userActivites = DB::table('activites')
             ->where('IdUtilisateur', $userId)
             ->orderBy('DateActivite', 'desc')
             ->limit(3)

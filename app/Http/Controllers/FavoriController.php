@@ -20,7 +20,7 @@ class FavoriController extends Controller
             return response()->json([]);
         }
 
-        $favoris = DB::table('Favoris')
+        $favoris = DB::table('favoris')
             ->where('IdUtilisateur', $userId)
             ->where('TypeFavori', $typeFavori)
             ->pluck('IdTrajet')
@@ -47,14 +47,14 @@ class FavoriController extends Controller
         $idTrajet = (int) $request->input('IdTrajet');
         $typeFavori = $request->input('TypeFavori');
 
-        $favori = DB::table('Favoris')
+        $favori = DB::table('favoris')
             ->where('IdUtilisateur', $userId)
             ->where('IdTrajet', $idTrajet)
             ->where('TypeFavori', $typeFavori)
             ->first();
 
         if ($favori) {
-            DB::table('Favoris')
+            DB::table('favoris')
                 ->where('IdUtilisateur', $userId)
                 ->where('IdTrajet', $idTrajet)
                 ->where('TypeFavori', $typeFavori)
@@ -73,7 +73,7 @@ class FavoriController extends Controller
                     $typeFavori
                 ]);
 
-                $verification = DB::table('Favoris')
+                $verification = DB::table('favoris')
                     ->where('IdUtilisateur', $userId)
                     ->where('IdTrajet', $idTrajet)
                     ->where('TypeFavori', $typeFavori)
@@ -90,14 +90,14 @@ class FavoriController extends Controller
                 ]);
             } catch (\Exception $e) {
                 try {
-                    $existeDeja = DB::table('Favoris')
+                    $existeDeja = DB::table('favoris')
                         ->where('IdUtilisateur', $userId)
                         ->where('IdTrajet', $idTrajet)
                         ->where('TypeFavori', $typeFavori)
                         ->exists();
                     
                     if (!$existeDeja) {
-                        DB::table('Favoris')->insert([
+                        DB::table('favoris')->insert([
                             'IdUtilisateur' => $userId,
                             'IdTrajet' => $idTrajet,
                             'TypeFavori' => $typeFavori,
@@ -130,7 +130,7 @@ class FavoriController extends Controller
 
         $typeFavori = $request->input('type');
 
-        $query = DB::table('Favoris')
+        $query = DB::table('favoris')
             ->where('IdUtilisateur', $userId)
             ->where('IdTrajet', $idTrajet);
         

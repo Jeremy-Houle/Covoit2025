@@ -45,18 +45,18 @@ class CommentsController extends Controller
 
     public function getByTrajet($idTrajet)
     {
-        $comments = DB::table('Commentaires')
-            ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
-            ->leftJoin('Evaluation', function ($join) {
-                $join->on('Commentaires.IdUtilisateur', '=', 'Evaluation.IdUtilisateur')
-                    ->on('Commentaires.IdTrajet', '=', 'Evaluation.IdTrajet');
+        $comments = DB::table('commentaires')
+            ->join('utilisateurs', 'commentaires.IdUtilisateur', '=', 'utilisateurs.IdUtilisateur')
+            ->leftJoin('evaluation', function ($join) {
+                $join->on('commentaires.IdUtilisateur', '=', 'evaluation.IdUtilisateur')
+                    ->on('commentaires.IdTrajet', '=', 'evaluation.IdTrajet');
             })
-            ->where('Commentaires.IdTrajet', $idTrajet)
+            ->where('commentaires.IdTrajet', $idTrajet)
             ->select(
-                'Commentaires.*',
-                'Utilisateurs.Prenom as user_prenom',
-                'Utilisateurs.Nom as user_nom',
-                'Evaluation.Note'
+                'commentaires.*',
+                'utilisateurs.Prenom as user_prenom',
+                'utilisateurs.Nom as user_nom',
+                'evaluation.Note'
             )
             ->orderBy('DateCommentaire', 'desc')
             ->get();
