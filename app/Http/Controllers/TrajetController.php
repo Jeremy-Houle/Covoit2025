@@ -346,17 +346,19 @@ class TrajetController extends Controller
 
         $commentsByTrajet = DB::table('Commentaires')
             ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
+            ->leftJoin('Evaluation', function ($join) {
+                $join->on('Commentaires.IdUtilisateur', '=', 'Evaluation.IdUtilisateur')
+                    ->on('Commentaires.IdTrajet', '=', 'Evaluation.IdTrajet');
+            })
             ->select(
                 'Commentaires.*',
                 'Utilisateurs.Prenom as user_prenom',
-                'Utilisateurs.Nom as user_nom'
+                'Utilisateurs.Nom as user_nom',
+                'Evaluation.Note'
             )
             ->orderBy('DateCommentaire', 'desc')
             ->get()
             ->groupBy('IdTrajet');
-        if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
-            return response()->json($trajets);
-        }
 
 
         return view('rechercher', compact('trajets', 'reviews', 'commentsByTrajet'));
