@@ -11,7 +11,7 @@
 @endpush
 
 @push('scripts')
-@vite(['resources/js/panier.js', 'resources/js/animations/panier-animations.js'])
+@vite(['resources/js/panier.js'])
 <script>
     window.csrfToken = '{{ csrf_token() }}';
     console.log('CSRF Token:', window.csrfToken);
