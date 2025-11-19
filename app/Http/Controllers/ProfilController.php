@@ -69,10 +69,8 @@ public function update(Request $request)
 
     DB::table('utilisateurs')->where('IdUtilisateur', $userId)->update($data);
 
-    // Récupérer les données mises à jour
     $updatedUser = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
     
-    // Mettre à jour la session avec les nouvelles données
     session(['utilisateur_nom' => $updatedUser->Nom]);
     session(['utilisateur_prenom' => $updatedUser->Prenom]);
     if ($oldUser->Role !== $request->Role) {

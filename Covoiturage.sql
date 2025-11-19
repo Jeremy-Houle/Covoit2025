@@ -1,6 +1,7 @@
--- Base de données Railway (déjà créée)
--- CREATE DATABASE Covoiturage;
-USE railway;
+-- Base de données Railway (pour jay)
+-- USE railway;
+CREATE DATABASE Covoiturage;
+USE Covoiturage;;
 
 -- --------------------------------------------------------
 CREATE TABLE `password_resets` (
@@ -176,67 +177,162 @@ CREATE TABLE HistoriqueTransactions (
     FOREIGN KEY (IdTrajet) REFERENCES Trajets(IdTrajet) ON DELETE CASCADE
 ) ;
 
--- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE `sessions` (
+    `id` VARCHAR(255) NOT NULL,
+    `user_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+    `ip_address` VARCHAR(45) NULL DEFAULT NULL,
+    `user_agent` TEXT NULL DEFAULT NULL,
+    `payload` LONGTEXT NOT NULL,
+    `last_activity` INT NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `sessions_user_id_index` (`user_id`),
+    INDEX `sessions_last_activity_index` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `cache` (
+    `key` VARCHAR(255) NOT NULL,
+    `value` MEDIUMTEXT NOT NULL,
+    `expiration` INT NOT NULL,
+    PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `cache_locks` (
+    `key` VARCHAR(255) NOT NULL,
+    `owner` VARCHAR(255) NOT NULL,
+    `expiration` INT NOT NULL,
+    PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `jobs` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `queue` VARCHAR(255) NOT NULL,
+    `payload` LONGTEXT NOT NULL,
+    `attempts` TINYINT UNSIGNED NOT NULL,
+    `reserved_at` INT UNSIGNED NULL DEFAULT NULL,
+    `available_at` INT UNSIGNED NOT NULL,
+    `created_at` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `jobs_queue_index` (`queue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `job_batches` (
+    `id` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `total_jobs` INT NOT NULL,
+    `pending_jobs` INT NOT NULL,
+    `failed_jobs` INT NOT NULL,
+    `failed_job_ids` LONGTEXT NOT NULL,
+    `options` MEDIUMTEXT NULL DEFAULT NULL,
+    `cancelled_at` INT NULL DEFAULT NULL,
+    `created_at` INT NOT NULL,
+    `finished_at` INT NULL DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `failed_jobs` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `uuid` VARCHAR(255) NOT NULL,
+    `connection` TEXT NOT NULL,
+    `queue` TEXT NOT NULL,
+    `payload` LONGTEXT NOT NULL,
+    `exception` LONGTEXT NOT NULL,
+    `failed_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+RENAME TABLE Trajets TO trajets;
+RENAME TABLE Utilisateurs TO utilisateurs;
+RENAME TABLE Reservations TO reservations;
+RENAME TABLE Paiements TO paiements;
+RENAME TABLE Commentaires TO commentaires;
+RENAME TABLE Evaluation TO evaluation;
+RENAME TABLE LesMessages TO lesmessages;
+RENAME TABLE Favoris TO favoris;
+RENAME TABLE HistoriqueTransactions TO historiquetransactions;
+RENAME TABLE RecurrenceTrajet TO recurrencetrajet;
+RENAME TABLE Vehicules TO vehicules;
+RENAME TABLE Activites TO activites;
+
+
+ALTER TABLE trajets 
+ADD COLUMN RappelEmail TINYINT(1) DEFAULT 0 AFTER Fumeur,
+ADD COLUMN RappelEnvoye TINYINT(1) DEFAULT 0 AFTER RappelEmail;
+
+DROP PROCEDURE IF EXISTS ModifierNombrePlaces;
+DROP PROCEDURE IF EXISTS GetConducteurByPaiement;
+DROP PROCEDURE IF EXISTS PayerPanier;
+DROP PROCEDURE IF EXISTS AjouterTrajet;
+DROP PROCEDURE IF EXISTS AjouterFavori;
+
+
+-- =========================================
+-- 1. ModifierNombrePlaces
+-- =========================================
 DELIMITER $$
 
 CREATE PROCEDURE ModifierNombrePlaces(
-    IN p_idPaiement INT,
-    IN p_nouveauNombrePlaces INT
+    IN p_IdPaiement INT,
+    IN p_NouvellesPlaces INT
 )
 BEGIN
-    DECLARE v_idTrajet INT;
-    DECLARE v_ancienNombrePlaces INT;
-    DECLARE v_ancienMontant DECIMAL(10,2);
-    DECLARE v_prixParPersonne DECIMAL(10,2);
-    DECLARE v_placesDisponibles INT;
-    
-    SELECT IdTrajet, NombrePlaces, Montant INTO v_idTrajet, v_ancienNombrePlaces, v_ancienMontant
-    FROM Paiements 
-    WHERE IdPaiement = p_idPaiement;
-    
-    SET v_prixParPersonne = v_ancienMontant / v_ancienNombrePlaces;
-    
-    SELECT PlacesDisponibles INTO v_placesDisponibles
-    FROM Trajets 
-    WHERE IdTrajet = v_idTrajet;
-    
-    IF p_nouveauNombrePlaces > v_placesDisponibles THEN
+    DECLARE v_IdTrajet INT;
+    DECLARE v_AnciennesPlaces INT;
+    DECLARE v_Difference INT;
+    DECLARE v_PrixUnitaire DECIMAL(10,2);
+    DECLARE v_NouveauMontant DECIMAL(10,2);
+    DECLARE v_PlacesDisponibles INT;
+
+    SELECT IdTrajet, NombrePlaces INTO v_IdTrajet, v_AnciennesPlaces
+    FROM paiements
+    WHERE IdPaiement = p_IdPaiement;
+
+    SELECT Prix, PlacesDisponibles INTO v_PrixUnitaire, v_PlacesDisponibles
+    FROM trajets
+    WHERE IdTrajet = v_IdTrajet;
+
+    SET v_Difference = p_NouvellesPlaces - v_AnciennesPlaces;
+
+    IF v_Difference > v_PlacesDisponibles THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Pas assez de places disponibles';
     END IF;
-    
-    START TRANSACTION;
-    
-    UPDATE Paiements 
-    SET NombrePlaces = p_nouveauNombrePlaces,
-        Montant = v_prixParPersonne * p_nouveauNombrePlaces
-    WHERE IdPaiement = p_idPaiement;
-    
-    COMMIT;
+
+    SET v_NouveauMontant = v_PrixUnitaire * p_NouvellesPlaces;
+
+    UPDATE paiements
+    SET NombrePlaces = p_NouvellesPlaces,
+        Montant = v_NouveauMontant
+    WHERE IdPaiement = p_IdPaiement;
+
+    UPDATE trajets
+    SET PlacesDisponibles = PlacesDisponibles - v_Difference
+    WHERE IdTrajet = v_IdTrajet;
 END$$
 
 DELIMITER ;
 
--- ----------------------------------------------------------
-
+-- =========================================
+-- 2. GetConducteurByPaiement
+-- =========================================
 DELIMITER $$
 
-create procedure GetConducteurByPaiement(
-    in p_IdPaiement int,
-    out p_IdConducteur int
+CREATE PROCEDURE GetConducteurByPaiement(
+    IN p_IdPaiement INT,
+    OUT p_IdConducteur INT
 )
-begin
-    select t.IdConducteur
-    into p_IdConducteur
-    from Paiements p
-    join Trajets t on p.IdTrajet = t.IdTrajet
-    where p.IdPaiement = p_IdPaiement;
-end$$
+BEGIN
+    SELECT t.IdConducteur INTO p_IdConducteur
+    FROM paiements p
+    INNER JOIN trajets t ON p.IdTrajet = t.IdTrajet
+    WHERE p.IdPaiement = p_IdPaiement;
+END$$
 
-delimiter ;
+DELIMITER ;
 
--- ----------------------------------------------------------
-
+-- =========================================
+-- 3. PayerPanier
+-- =========================================
 DELIMITER $$
 
 CREATE PROCEDURE PayerPanier(
@@ -255,11 +351,11 @@ BEGIN
     DECLARE v_PlacesDisponibles INT;
     
     SELECT p.IdTrajet, p.Montant, p.NombrePlaces INTO v_IdTrajet, v_Montant, v_Places
-    FROM Paiements p 
+    FROM paiements p 
     WHERE p.IdPaiement = p_idPaiement AND p.IdUtilisateur = p_idUtilisateur;
     
     SELECT t.Distance, t.Prix, t.PlacesDisponibles INTO v_Distance, v_PrixTrajet, v_PlacesDisponibles
-    FROM Trajets t 
+    FROM trajets t 
     WHERE t.IdTrajet = v_IdTrajet;
     
     SET v_Montant = v_PrixTrajet * v_Places;
@@ -269,24 +365,24 @@ BEGIN
     END IF;
     
     SELECT Solde INTO v_SoldePassager 
-    FROM Utilisateurs 
+    FROM utilisateurs 
     WHERE IdUtilisateur = p_idUtilisateur;
     
     START TRANSACTION;
     
     IF p_typePaiement = 'paypal' THEN
-        UPDATE Utilisateurs 
+        UPDATE utilisateurs 
         SET Solde = Solde + v_Montant 
         WHERE IdUtilisateur = p_conducteurId;
         
     ELSE
         IF v_Montant > 0 AND v_Montant <= v_SoldePassager THEN
             -- Débiter le passager
-            UPDATE Utilisateurs 
+            UPDATE utilisateurs 
             SET Solde = Solde - v_Montant 
             WHERE IdUtilisateur = p_idUtilisateur;
             
-            UPDATE Utilisateurs 
+            UPDATE utilisateurs 
             SET Solde = Solde + v_Montant 
             WHERE IdUtilisateur = p_conducteurId;
         ELSE
@@ -294,22 +390,23 @@ BEGIN
         END IF;
     END IF;
     
-    INSERT INTO Reservations (IdTrajet, IdPassager, Distance, PlacesReservees, DateReservation)
+    INSERT INTO reservations (IdTrajet, IdPassager, Distance, PlacesReservees, DateReservation)
     VALUES (v_IdTrajet, p_idUtilisateur, v_Distance, v_Places, NOW());
     
-    UPDATE Trajets 
+    UPDATE trajets 
     SET PlacesDisponibles = PlacesDisponibles - v_Places
     WHERE IdTrajet = v_IdTrajet;
     
-    DELETE FROM Paiements WHERE IdPaiement = p_idPaiement;
+    DELETE FROM paiements WHERE IdPaiement = p_idPaiement;
     
     COMMIT;
 END$$
 
 DELIMITER ;
 
--- ----------------------------------------------------------
-
+-- =========================================
+-- 4. AjouterTrajet
+-- =========================================
 DELIMITER $$
 
 CREATE PROCEDURE AjouterTrajet(
@@ -330,7 +427,7 @@ CREATE PROCEDURE AjouterTrajet(
 BEGIN
     START TRANSACTION;
 
-    INSERT INTO Trajets (
+    INSERT INTO trajets (
         IdConducteur, 
         NomConducteur, 
         Distance, 
@@ -365,26 +462,27 @@ END$$
 
 DELIMITER ;
 
--- ----------------------------------------------------------
+-- =========================================
+-- 5. AjouterFavori
+-- =========================================
+DELIMITER $$
 
-delimiter $$
-
-create procedure AjouterFavori(
-     in p_IdUtilisateur int,
-    in p_IdTrajet int,
-    in p_TypeFavori varchar(20)
+CREATE PROCEDURE AjouterFavori(
+    IN p_IdUtilisateur int,
+    IN p_IdTrajet int,
+    IN p_TypeFavori varchar(20)
 )
-begin
-    if not exists (
-        select 1
-        from favoris
-        where IdUtilisateur = p_IdUtilisateur
-          and IdTrajet = p_IdTrajet
-          and TypeFavori = p_TypeFavori
-    ) then
-        insert into favoris (IdUtilisateur, IdTrajet, TypeFavori)
-        values (p_IdUtilisateur, p_IdTrajet, p_TypeFavori);
-    end if;
-end $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM favoris
+        WHERE IdUtilisateur = p_IdUtilisateur
+          AND IdTrajet = p_IdTrajet
+          AND TypeFavori = p_TypeFavori
+    ) THEN
+        INSERT INTO favoris (IdUtilisateur, IdTrajet, TypeFavori)
+        VALUES (p_IdUtilisateur, p_IdTrajet, p_TypeFavori);
+    END IF;
+END$$
 
-delimiter ;
+DELIMITER ;
