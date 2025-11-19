@@ -30,13 +30,6 @@
             visibility: hidden;
         }
         
-        .preloader-logo {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 2rem;
-            animation: bounce 1s ease-in-out infinite;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-        }
         
         .preloader-spinner {
             width: 60px;
@@ -60,10 +53,6 @@
             100% { transform: rotate(360deg); }
         }
         
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
         
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -908,7 +897,6 @@
 <body>
     <!-- Preloader -->
     <div id="preloader">
-        <img src="{{ asset('images/fav_icon.png') }}" alt="Covoit2025" class="preloader-logo">
         <div class="preloader-spinner"></div>
         <div class="preloader-text">Chargement de Covoit2025...</div>
     </div>
