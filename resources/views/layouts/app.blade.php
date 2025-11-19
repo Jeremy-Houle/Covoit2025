@@ -108,7 +108,7 @@
                     <div class="navbar-right">
                         @if(session('utilisateur_id'))
                             <a href="/profil" class=" nav-link profile-link">
-                                <i class="fa fa-user"></i> <span class="greeting-text">{{ session('utilisateur_prenom') }}</span>
+                                <i class="fa fa-user"></i> <span class="greeting-text">{{ session('utilisateur_prenom') }} {{ session('utilisateur_nom') }}</span>
                                 <small class="user-role">({{ session('utilisateur_role') }})</small>
                             </a>
                             <a href="/deconnexion" class="btn-logout"><i class="fa fa-sign-out-alt"></i> <span class="nav-text">Déconnexion</span></a>
