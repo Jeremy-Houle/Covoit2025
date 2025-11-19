@@ -113,7 +113,7 @@ public function update(Request $request)
                     $passagers = DB::table('reservations')
                         ->where('IdTrajet', $resa->IdTrajet)
                         ->join('utilisateurs', 'reservations.IdPassager', '=', 'utilisateurs.IdUtilisateur')
-                        ->select('Utilisateurs.Prenom', 'Utilisateurs.Nom')
+                        ->select('utilisateurs.Prenom', 'utilisateurs.Nom')
                         ->get();
                     $resa->passagers = $passagers;
                     return $resa;
@@ -129,7 +129,7 @@ public function update(Request $request)
                     $reservations = DB::table('reservations')
                         ->where('IdTrajet', $trajet->IdTrajet)
                         ->join('utilisateurs', 'reservations.IdPassager', '=', 'utilisateurs.IdUtilisateur')
-                        ->select('reservations.PlacesReservees', 'Utilisateurs.Prenom', 'Utilisateurs.Nom')
+                        ->select('reservations.PlacesReservees', 'utilisateurs.Prenom', 'utilisateurs.Nom')
                         ->get();
                     $trajet->PlacesReservees = $reservations->sum('PlacesReservees');
                     $trajet->passagers = $reservations;
@@ -137,7 +137,7 @@ public function update(Request $request)
                     $trajet->commentaires = DB::table('commentaires')
                         ->where('IdTrajet', $trajet->IdTrajet)
                         ->join('utilisateurs', 'commentaires.IdUtilisateur', '=', 'utilisateurs.IdUtilisateur')
-                        ->select('Commentaires.Commentaire', 'Utilisateurs.Prenom', 'Utilisateurs.Nom')
+                        ->select('commentaires.Commentaire', 'utilisateurs.Prenom', 'utilisateurs.Nom')
                         ->get();
 
                     return $trajet;

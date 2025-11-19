@@ -430,7 +430,7 @@ class TrajetController extends Controller
 
         $reservations = DB::table('reservations')
             ->join('utilisateurs', 'reservations.IdPassager', '=', 'utilisateurs.IdUtilisateur')
-            ->where('Reservations.IdTrajet', $id)
+            ->where('reservations.IdTrajet', $id)
             ->select('utilisateurs.*', 'reservations.*')
             ->get();
 

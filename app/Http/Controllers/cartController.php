@@ -299,8 +299,8 @@ class CartController extends Controller
                 ->join('utilisateurs', 'historiquetransactions.IdUtilisateur', '=', 'utilisateurs.IdUtilisateur')
                 ->select(
                     'HistoriqueTransactions.*',
-                    'Utilisateurs.Nom as NomPassager',
-                    'Utilisateurs.Prenom as PrenomPassager'
+                    'utilisateurs.Nom as NomPassager',
+                    'utilisateurs.Prenom as PrenomPassager'
                 )
                 ->orderBy('DateTransaction', 'desc')
                 ->get();
