@@ -1,0 +1,65 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-BVS7GN0N.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/css/messages.css": {
+    "file": "assets/messages-CdtYYRbd.css",
+    "src": "resources/css/messages.css",
+    "isEntry": true,
+    "names": [
+      "messages.css"
+    ]
+  },
+  "resources/css/panier.css": {
+    "file": "assets/panier-BzIKR2Ci.css",
+    "src": "resources/css/panier.css",
+    "isEntry": true,
+    "names": [
+      "panier.css"
+    ]
+  },
+  "resources/css/profil.css": {
+    "file": "assets/profil-bhl6-l1X.css",
+    "src": "resources/css/profil.css",
+    "isEntry": true,
+    "names": [
+      "profil.css"
+    ]
+  },
+  "resources/css/publier.css": {
+    "file": "assets/publier-CAkQFgZz.css",
+    "src": "resources/css/publier.css",
+    "isEntry": true,
+    "names": [
+      "publier.css"
+    ]
+  },
+  "resources/css/reservations.css": {
+    "file": "assets/reservations-Ba-kDmP_.css",
+    "src": "resources/css/reservations.css",
+    "isEntry": true,
+    "names": [
+      "reservations.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-Du_xeIAy.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "resources/js/panier.js"
+    ]
+  },
+  "resources/js/panier.js": {
+    "file": "assets/panier-sp9nzpPV.js",
+    "name": "panier",
+    "src": "resources/js/panier.js",
+    "isEntry": true
+  }
+}
