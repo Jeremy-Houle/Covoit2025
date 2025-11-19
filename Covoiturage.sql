@@ -1,5 +1,6 @@
-CREATE DATABASE Covoiturage;
-USE Covoiturage;
+-- Base de données Railway (déjà créée)
+-- CREATE DATABASE Covoiturage;
+USE railway;
 
 -- --------------------------------------------------------
 CREATE TABLE `password_resets` (
@@ -148,7 +149,7 @@ CREATE TABLE trajet_favoris (
     Fumeur BOOLEAN,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (IdUtilisateur) REFERENCES utilisateurs(idUtilisateur) ON DELETE CASCADE
+    FOREIGN KEY (IdUtilisateur) REFERENCES Utilisateurs(IdUtilisateur) ON DELETE CASCADE
 );
 
 CREATE TABLE HistoriqueTransactions (
