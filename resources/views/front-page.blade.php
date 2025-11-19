@@ -79,12 +79,42 @@
 
 .hero-subtitle {
     font-size: var(--font-size-xl);
-    margin-bottom: var(--spacing-3xl);
+    margin-bottom: var(--spacing-lg);
     opacity: 0.9;
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
     line-height: 1.6;
+}
+
+.hero-cta-button {
+    background: var(--gradient-primary);
+    color: var(--white);
+    padding: var(--spacing-md) var(--spacing-2xl);
+    border: none;
+    border-radius: var(--border-radius-full);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-md);
+}
+
+.hero-cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    color: var(--white);
+    text-decoration: none;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.hero-cta-button i {
+    font-size: 1.1rem;
 }
 
 .values-section {
@@ -749,6 +779,11 @@
         padding: 0 var(--spacing-sm);
     }
     
+    .hero-cta-button {
+        font-size: 0.9rem;
+        padding: var(--spacing-sm) var(--spacing-lg);
+    }
+    
     .hero-section {
         min-height: 60vh;
         padding: calc(60px + var(--spacing-lg)) 0 var(--spacing-lg);
@@ -927,6 +962,9 @@
     <div class="hero-content">
         <h1 class="hero-title">Voyagez ensemble,<br>économisez ensemble </h1>
         <p class="hero-subtitle">Découvrez comment nos utilisateurs fidèles voyagent avec Covoit2025</p>
+        <a href="/inscription" class="hero-cta-button">
+            <i class="fas fa-user-plus"></i> Créer un compte gratuitement
+        </a>
     </div>
 </section>
 
