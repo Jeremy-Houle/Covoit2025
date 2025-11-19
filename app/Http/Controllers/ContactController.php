@@ -29,7 +29,7 @@ class ContactController extends Controller
                 'messageContent' => $validated['message'],
             ];
 
-            Mail::send('emails.contact', $data, function($message) use ($data) {
+            Mail::queue('emails.contact', $data, function($message) use ($data) {
                 $message->to('covoit.2025@gmail.com')
                         ->subject('Nouveau message de contact: ' . $data['subject'])
                         ->replyTo($data['email'], $data['name']);

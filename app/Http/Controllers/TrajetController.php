@@ -158,7 +158,7 @@ class TrajetController extends Controller
 
                         $heuresRestantes = round(\Carbon\Carbon::now()->diffInHours(\Carbon\Carbon::parse(request()->DateTrajet . ' ' . request()->HeureTrajet)));
 
-                        \Mail::send('emails.rappel-trajet', $emailData, function ($message) use ($conducteur, $heuresRestantes) {
+                        \Mail::queue('emails.rappel-trajet', $emailData, function ($message) use ($conducteur, $heuresRestantes) {
                             $message->to($conducteur->Courriel)
                                 ->subject('🚗 Rappel : Votre trajet dans ' . $heuresRestantes . 'h - Covoit2025');
                         });
