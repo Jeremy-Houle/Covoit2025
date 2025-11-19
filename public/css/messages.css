@@ -1,7 +1,3 @@
-/* ========================================
-   SYSTÈME DE MESSAGERIE - STYLE MODERNE
-   ======================================== */
-
 :root {
     --message-primary: #007bff;
     --message-primary-dark: #0056b3;
@@ -15,9 +11,6 @@
     --message-time-color: #6c757d;
 }
 
-/* ========================================
-   PAGE LISTE DES MESSAGES
-   ======================================== */
 
 .messages-page {
     min-height: 100vh;
@@ -156,9 +149,6 @@
     text-overflow: ellipsis;
 }
 
-/* ========================================
-   PAGE CONVERSATION (CHAT)
-   ======================================== */
 
 .chat-page {
     min-height: 100vh;
@@ -446,9 +436,6 @@
     margin: 0;
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
 
 @media (max-width: 768px) {
     .messages-page,
@@ -506,9 +493,6 @@
     }
 }
 
-/* ========================================
-   ANIMATIONS
-   ======================================== */
 
 .fade-in {
     animation: fadeIn 0.5s ease;

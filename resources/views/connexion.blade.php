@@ -528,11 +528,6 @@
                     <input type="password" id="mot_de_passe" name="mot_de_passe" class="form-input" placeholder="••••••••" required>
                 </div>
                 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="remember" name="remember">
-                    <label for="remember" class="checkbox-label">Se souvenir de moi</label>
-                </div>
-                
                 <button type="submit" class="auth-button">
                     <i class="fas fa-sign-in-alt"></i> Se connecter
                 </button>

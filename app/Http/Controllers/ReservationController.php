@@ -22,7 +22,6 @@ class ReservationController extends Controller
             return redirect('/connexion')->with('error', 'Veuillez vous connecter pour voir vos réservations.');
         }
 
-        // Nettoyage des réservations invalides
         DB::table('Reservations')
             ->whereNull('IdPassager')
             ->orWhere('PlacesReservees', '<=', 0)
@@ -93,13 +92,11 @@ class ReservationController extends Controller
 
         $diff = $request->PlacesReservees - $reservation->PlacesReservees;
 
-        // Si on ajoute des places
         if ($diff > 0) {
             if ($diff > $trajet->PlacesDisponibles) {
                 return redirect('/mes-reservations')->with('error', 'Pas assez de places disponibles.');
             }
 
-            // On n’ajoute pas directement à la réservation : on crée un paiement en attente
             $montant = $diff * $trajet->Prix;
 
             DB::table('Paiements')->insert([
@@ -115,7 +112,6 @@ class ReservationController extends Controller
             return redirect('/cart')->with('success', 'Les places supplémentaires ont été ajoutées au panier. Veuillez finaliser le paiement pour confirmer.');
         }
 
-        // Si on réduit le nombre de places (pas de remboursement)
         elseif ($diff < 0) {
             DB::table('Reservations')->where('IdReservation', $id)
                 ->update(['PlacesReservees' => $request->PlacesReservees]);
@@ -123,7 +119,6 @@ class ReservationController extends Controller
             DB::table('Trajets')->where('IdTrajet', $trajet->IdTrajet)
                 ->increment('PlacesDisponibles', abs($diff));
 
-            // Envoi du mail informatif
             try {
                 $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
                 if ($passager) {
@@ -139,7 +134,6 @@ class ReservationController extends Controller
             return redirect('/mes-reservations')->with('success', 'Nombre de places réduit. Aucun remboursement effectué.');
         }
 
-        // Si aucun changement
         return redirect('/mes-reservations')->with('info', 'Aucune modification détectée.');
     }
 
@@ -156,11 +150,9 @@ class ReservationController extends Controller
         $trajet = DB::table('Trajets')->where('IdTrajet', $reservation->IdTrajet)->first();
         $passager = DB::table('Utilisateurs')->where('IdUtilisateur', $userId)->first();
 
-        // On libère les places du trajet
         DB::table('Trajets')->where('IdTrajet', $trajet->IdTrajet)
             ->increment('PlacesDisponibles', $reservation->PlacesReservees);
 
-        // Pas de remboursement ni modification de paiement ici
         try {
             if ($passager && $trajet) {
                 Mail::to($passager->Courriel)->send(
