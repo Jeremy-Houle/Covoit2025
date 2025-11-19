@@ -171,6 +171,10 @@
     box-shadow: var(--shadow-md);
 }
 
+.btn-contact {
+    border: 2px solid var(--primary-blue) !important;
+}
+
 .empty-reservations {
     text-align: center;
     margin-top: var(--spacing-4xl);
