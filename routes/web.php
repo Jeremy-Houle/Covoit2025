@@ -73,9 +73,9 @@ Route::get('/cart', function () {
     if($role == "Conducteur"){
         return redirect('/');
     }
-    $paiements = DB::table('Paiements as p')
-        ->join('Trajets as t', 'p.IdTrajet', '=', 't.IdTrajet')
-        ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
+    $paiements = DB::table('paiements as p')
+        ->join('trajets as t', 'p.IdTrajet', '=', 't.IdTrajet')
+        ->join('utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
         ->select('p.*', 't.*', 'u.Nom as ConducteurNom', 'u.Prenom as ConducteurPrenom')
         ->where('p.IdUtilisateur', session('utilisateur_id', 1))
         ->distinct()

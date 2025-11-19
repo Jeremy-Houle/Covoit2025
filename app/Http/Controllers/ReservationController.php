@@ -176,7 +176,7 @@ class ReservationController extends Controller
         }
 
         $request->validate([
-            'IdTrajet' => 'required|integer|exists:Trajets,IdTrajet',
+            'IdTrajet' => 'required|integer|exists:trajets,IdTrajet',
             'PlacesReservees' => 'required|integer|min:1'
         ]);
 
