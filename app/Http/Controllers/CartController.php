@@ -122,7 +122,7 @@ class CartController extends Controller
         ]);
 
         try {
-            Mail::to($utilisateur->Courriel)->send(
+            Mail::to($utilisateur->Courriel)->queue(
                 new ConfirmationPaiementMail($paiement, $trajet, $utilisateur)
             );
         } catch (\Exception $e) {
