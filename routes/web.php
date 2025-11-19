@@ -144,4 +144,5 @@ Route::delete('/favoris/{id}', [TrajetController::class, 'deleteFavorite'])->nam
 Route::get('/trajet/{trajet}/commenter', [CommentsController::class, 'create'])
     ->name('comments.create');
 Route::post('/comments/store', [CommentsController::class, 'store'])->name('comments.store');
+Route::get('/api/comments/{idTrajet}', [CommentsController::class, 'getByTrajet'])->name('comments.getByTrajet');
 

@@ -43,4 +43,25 @@ class CommentsController extends Controller
         return view('CreateComment', compact('trajet'));
     }
 
+    public function getByTrajet($idTrajet)
+    {
+        $comments = DB::table('Commentaires')
+            ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
+            ->leftJoin('Evaluation', function ($join) {
+                $join->on('Commentaires.IdUtilisateur', '=', 'Evaluation.IdUtilisateur')
+                    ->on('Commentaires.IdTrajet', '=', 'Evaluation.IdTrajet');
+            })
+            ->where('Commentaires.IdTrajet', $idTrajet)
+            ->select(
+                'Commentaires.*',
+                'Utilisateurs.Prenom as user_prenom',
+                'Utilisateurs.Nom as user_nom',
+                'Evaluation.Note'
+            )
+            ->orderBy('DateCommentaire', 'desc')
+            ->get();
+
+        return response()->json($comments);
+    }
+
 }

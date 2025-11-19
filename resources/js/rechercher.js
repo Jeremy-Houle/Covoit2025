@@ -371,8 +371,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         `;
 
+                        const commentCount = t.comment_count || 0;
+                        const commentBadge = commentCount > 0 
+                            ? `<span class="comment-badge" style="position: absolute; top: -8px; right: -8px; background: #dc2626; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">${commentCount}</span>`
+                            : '';
+
                         return `
-                        <div class="trajet card mb-2 p-2" data-id="${t.IdTrajet}">
+                        <div class="trajet card mb-2 p-2" data-id="${t.IdTrajet}" style="position: relative; padding-bottom: 50px;">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div><strong>${t.NomConducteur || 'Conducteur'}</strong></div>
                                 <div style="display:flex;gap:6px;">
@@ -400,6 +405,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div><i class="fa fa-music"></i> Musique : ${t.Musique ? 'Oui' : 'Non'}</div>
                                 <div><i class="fa fa-smoking"></i> Fumeur : ${t.Fumeur ? 'Oui' : 'Non'}</div>
                             </div>
+                            <div style="margin-top: 12px; position: relative; min-height: 40px;">
+                                <div style="position: absolute; top: 0; left: 0; z-index: 10; cursor: pointer;" class="comment-icon-wrapper">
+                                    <div style="position: relative; display: inline-block;">
+                                        <i class="fa-regular fa-comment comments" data-trajet="${t.IdTrajet}" style="font-size: 1.5rem; color: #2563eb;"></i>
+                                        ${commentBadge}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         `;
                     }).join('');
@@ -408,6 +421,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (filterFavoris && filterFavoris.checked) {
                         await filterByFavorites(true);
                     }
+                    
+                    initCommentsForDynamicTrajets();
                 }
 
                 loadMyReservations();
@@ -595,4 +610,86 @@ document.addEventListener('DOMContentLoaded', () => {
             handleTrajetClick(ev);
         }
     });
+    
+    window.initCommentsForDynamicTrajets = async function() {
+        const commentIcons = document.querySelectorAll('#results i.comments');
+        
+        commentIcons.forEach(icon => {
+            const trajetId = icon.dataset.trajet;
+            if (!trajetId) return;
+            
+            const newIcon = icon.cloneNode(true);
+            icon.parentNode.replaceChild(newIcon, icon);
+            
+            const iconWrapper = newIcon.closest('.comment-icon-wrapper');
+            if (!iconWrapper) return;
+            
+            iconWrapper.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const commentSection = iconWrapper.closest('div[style*="min-height: 40px"]');
+                if (!commentSection) return;
+                
+                let commentsContainer = commentSection.querySelector(`#CommentsContainer${trajetId}`);
+                
+                if (!commentsContainer) {
+                    commentsContainer = document.createElement('div');
+                    commentsContainer.className = 'commentsWrapper';
+                    commentsContainer.id = `CommentsContainer${trajetId}`;
+                    commentsContainer.style.cssText = 'display: block; margin-top: 48px; padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;';
+                    commentsContainer.innerHTML = '<p>Chargement des commentaires...</p>';
+                    commentSection.appendChild(commentsContainer);
+                    
+                    try {
+                        const response = await fetch(`/api/comments/${trajetId}`);
+                        if (response.ok) {
+                            const comments = await response.json();
+                            
+                            if (comments.length === 0) {
+                                commentsContainer.innerHTML = `
+                                    <div class="commentsContainer" style="padding: 16px; background: white; border-radius: 8px;">
+                                        <p style="color: #666; margin: 0;">Aucun commentaire pour ce trajet.</p>
+                                    </div>
+                                `;
+                            } else {
+                                commentsContainer.innerHTML = comments.map(c => {
+                                    const stars = c.Note ? Array.from({length: 5}, (_, i) => 
+                                        i < c.Note ? '<i class="fa-solid fa-star" style="color: #fbbf24;"></i>' : ''
+                                    ).join('') : '';
+                                    
+                                    return `
+                                        <div class="commentsContainer" style="padding: 16px; background: white; border-radius: 8px; margin-top: 8px; border-left: 4px solid #2563eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                                            <div class="comment-header" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                                <span class="comment-user" style="font-weight: 600; color: #2563eb;">${c.user_prenom} ${c.user_nom}</span>
+                                                <span class="comment-date" style="color: #666; font-size: 0.85rem;">${c.DateCommentaire}</span>
+                                            </div>
+                                            <div class="comment-body" style="margin-bottom: 8px; color: #374151; line-height: 1.5;">${c.Commentaire}</div>
+                                            ${stars ? `<div style="margin-top: 4px;">${stars}</div>` : ''}
+                                        </div>
+                                    `;
+                                }).join('');
+                            }
+                        } else {
+                            commentsContainer.innerHTML = '<p style="color: #dc2626; padding: 12px;">Erreur lors du chargement des commentaires.</p>';
+                        }
+                    } catch (error) {
+                        commentsContainer.innerHTML = '<p style="color: #dc2626; padding: 12px;">Erreur réseau lors du chargement des commentaires.</p>';
+                    }
+                } else {
+                    if (commentsContainer.style.display === 'none') {
+                        commentsContainer.style.display = 'block';
+                    } else {
+                        commentsContainer.style.display = 'none';
+                    }
+                }
+            });
+            
+            newIcon.addEventListener('mouseenter', () => {
+                newIcon.classList.replace('fa-regular', 'fa-solid');
+            });
+            
+            newIcon.addEventListener('mouseleave', () => {
+                newIcon.classList.replace('fa-solid', 'fa-regular');
+            });
+        });
+    };
 });

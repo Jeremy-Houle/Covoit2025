@@ -21,6 +21,69 @@
         display: block;
     }
     
+    .commentsWrapper {
+        padding: 12px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .commentsContainer {
+        padding: 16px;
+        background: white;
+        border-radius: 8px;
+        margin-top: 8px;
+        border-left: 4px solid #2563eb;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+    
+    .comment-user {
+        font-weight: 600;
+        color: #2563eb;
+    }
+    
+    .comment-date {
+        color: #6b7280;
+        font-size: 0.85rem;
+    }
+    
+    .comment-body {
+        margin-bottom: 8px;
+        color: #374151;
+        line-height: 1.5;
+    }
+    
+    .comment-icon-wrapper {
+        transition: transform 0.2s ease;
+    }
+    
+    .comment-icon-wrapper:hover {
+        transform: scale(1.15);
+    }
+    
+    .trajet.card {
+        position: relative;
+    }
+    
+    .comment-badge {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.8;
+        }
+    }
+    
     @media (max-width: 768px) {
         .rechercher-page {
             margin-bottom: 40px;
@@ -96,13 +159,17 @@
         }
         
         .commentsWrapper {
-            margin-top: var(--spacing-sm);
+            margin-top: 48px !important;
         }
         
         .comments {
-            font-size: var(--font-size-lg) !important;
-            padding: var(--spacing-xs) !important;
-            cursor: pointer;
+            font-size: 1.3rem !important;
+        }
+        
+        .comment-icon-wrapper {
+            position: relative !important;
+            top: 0 !important;
+            left: 0 !important;
         }
     }
     
@@ -181,7 +248,7 @@
                                             $userRole = session('utilisateur_role', '');
                                             $isConducteur = (strtolower($userRole) === 'conducteur');
                                         @endphp
-                                        <div class="trajet card mb-2 p-2" data-id="{{ $t->IdTrajet }}">
+                                        <div class="trajet card mb-2 p-2" data-id="{{ $t->IdTrajet }}" style="position: relative;">
                                             <div class="d-flex justify-content-between align-items-start">
                                                 <div><strong>{{ $t->NomConducteur ?? "Trajet #{$t->IdTrajet}" }}</strong></div>
                                                 <div style="display:flex;gap:6px;">
@@ -344,38 +411,52 @@
                                                         {{ $t->Description }}</div>
                                                 @endif
                                             </div>
-                                            <i class="fa-regular fa-comment comments" data-trajet="{{ $t->IdTrajet }}"></i>
+                                            @php
+                                                $comments = $commentsByTrajet[$t->IdTrajet] ?? collect();
+                                                $commentCount = $comments->count();
+                                            @endphp
+                                            
+                                            <div style="margin-top: 12px; position: relative; min-height: 40px;">
+                                                <div style="position: absolute; top: 0; left: 0; z-index: 10; cursor: pointer;" class="comment-icon-wrapper">
+                                                    <div style="position: relative; display: inline-block;">
+                                                        <i class="fa-regular fa-comment comments" data-trajet="{{ $t->IdTrajet }}" style="font-size: 1.5rem; color: #2563eb;"></i>
+                                                        @if($commentCount > 0)
+                                                            <span class="comment-badge" style="position: absolute; top: -8px; right: -8px; background: #dc2626; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">{{ $commentCount }}</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            
+                                                <div class="commentsWrapper" id="CommentsContainer{{ $t->IdTrajet }}" style="display: none; margin-top: 48px;">
+                                                @php
+                                                    $comments = $commentsByTrajet[$t->IdTrajet] ?? collect();
+                                                @endphp
 
-                <div class="commentsWrapper" id="CommentsContainer{{ $t->IdTrajet }}" hidden>
-                    @php
-                        $comments = $commentsByTrajet[$t->IdTrajet] ?? collect();
-                    @endphp
+                                                @foreach ($comments as $c)
+                                                    <div class="commentsContainer">
+                                                        <div class="comment-header">
+                                                            <span class="comment-user">{{ $c->user_prenom }} {{ $c->user_nom }}</span>
+                                                            <span class="comment-date">{{ $c->DateCommentaire }}</span>
+                                                        </div>
 
-                    @foreach ($comments as $c)
-                        <div class="commentsContainer">
-                            <div class="comment-header">
-                                <span class="comment-user">{{ $c->user_prenom }} {{ $c->user_nom }}</span>
-                                <span class="comment-date">{{ $c->DateCommentaire }}</span>
-                            </div>
+                                                        <div class="comment-body">{{ $c->Commentaire }}</div>
 
-                            <div class="comment-body">{{ $c->Commentaire }}</div>
+                                                        @if($c->Note)
+                                                            @for($i = 1; $i <= 5; $i++)
+                                                                @if($i <= $c->Note)
+                                                                    <i class="fa-solid fa-star" style="color: #fbbf24;"></i>
+                                                                @endif
+                                                            @endfor
+                                                        @endif
+                                                    </div>
+                                                @endforeach
 
-                                @if($c->Note)
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= $c->Note)
-                                            <i class="fa-solid fa-star" style="color: #fbbf24;"></i>
-                                        @endif
-                                    @endfor
-                                @endif
-                        </div>
-                    @endforeach
-
-                    @if(!$comments->count())
-                        <div class="commentsContainer">
-                            <p>Aucun commentaire pour ce trajet.</p>
-                        </div>
-                    @endif
-                </div>
+                                                @if(!$comments->count())
+                                                    <div class="commentsContainer">
+                                                        <p>Aucun commentaire pour ce trajet.</p>
+                                                    </div>
+                                                @endif
+                                                </div>
+                                            </div>
                                         </div>
                                     @empty
                                         <p>Aucun trajet trouvé.</p>
@@ -713,14 +794,19 @@
             const trajetId = icon.dataset.trajet;
             
 
-            icon.addEventListener('click', () => {
+            const iconWrapper = icon.closest('.comment-icon-wrapper');
+            if (!iconWrapper) return;
+            
+            iconWrapper.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const box = document.getElementById('CommentsContainer' + trajetId);
                 if (!box) return;
-                    console.log('Toggle comments box for trajet', trajetId);
-                if (box.hasAttribute('hidden')) {
-                    box.removeAttribute('hidden');
+                console.log('Toggle comments box for trajet', trajetId);
+                
+                if (box.style.display === 'none' || box.style.display === '') {
+                    box.style.display = 'block';
                 } else {
-                    box.setAttribute('hidden', '');
+                    box.style.display = 'none';
                 }
             });
 
