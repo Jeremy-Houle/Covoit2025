@@ -11,7 +11,7 @@
 
 .auth-page {
     min-height: 100vh;
-    background: var(--gradient-hero);
+    background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 20%, #60a5fa 40%, #3b82f6 60%, #2563eb 80%, #1e40af 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -27,8 +27,19 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-    opacity: 0.3;
+    background: radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    animation: floatBubbles 20s ease-in-out infinite;
+}
+
+@keyframes floatBubbles {
+    0%, 100% { 
+        transform: translate(0, 0) scale(1); 
+    }
+    50% { 
+        transform: translate(20px, -20px) scale(1.05); 
+    }
 }
 
 .auth-container {

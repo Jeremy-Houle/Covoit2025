@@ -238,23 +238,31 @@
 
         .features-section {
             background: #0a0f1e;
+            padding: 6rem 2rem;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(8, 1fr);
             gap: 1.5rem;
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
+            width: 100%;
         }
 
         .feature-card {
             background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            padding: 2.5rem;
+            padding: 1.5rem 1rem;
             border-radius: 20px;
             text-align: center;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 300px;
+            height: 100%;
         }
 
         .feature-card:hover {
@@ -264,21 +272,24 @@
         }
 
         .feature-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
+            font-size: 3rem;
+            margin-bottom: 1rem;
             color: #fbbf24;
+            flex-shrink: 0;
         }
 
         .feature-title {
-            font-size: 1.75rem;
+            font-size: 1.25rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
         }
 
         .feature-description {
-            font-size: 1.1rem;
-            opacity: 0.8;
-            line-height: 1.6;
+            font-size: 0.95rem;
+            opacity: 0.9;
+            line-height: 1.5;
+            flex-grow: 1;
         }
 
         .screenshots-section {
@@ -287,13 +298,19 @@
 
         .screenshots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 2rem;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        @media (max-width: 320px) {
+        @media (max-width: 1024px) {
+            .screenshots-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
             .screenshots-grid {
                 grid-template-columns: 1fr;
             }
@@ -543,7 +560,13 @@
             animation: fadeInUp 0.8s ease;
         }
 
-        @media (max-width: 1400px) {
+        @media (max-width: 1600px) {
+            .features-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 1200px) {
             .features-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
@@ -592,20 +615,25 @@
                 gap: 1.5rem;
             }
 
+            .features-section {
+                padding: 4rem 1rem;
+            }
+
             .feature-card {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem 1rem;
+                min-height: 260px;
             }
 
             .feature-icon {
-                font-size: 3rem;
+                font-size: 2.5rem;
             }
 
             .feature-title {
-                font-size: 1.5rem;
+                font-size: 1.1rem;
             }
 
             .feature-description {
-                font-size: 1rem;
+                font-size: 0.9rem;
             }
 
             .btn-discover,
@@ -688,22 +716,27 @@
                 gap: 0.5rem;
             }
 
+            .features-section {
+                padding: 3rem 0.5rem;
+            }
+
             .feature-card {
-                padding: 1.5rem 1rem;
+                padding: 1.25rem 0.75rem;
+                min-height: 240px;
             }
 
             .feature-icon {
-                font-size: 2.5rem;
-                margin-bottom: 1rem;
-            }
-
-            .feature-title {
-                font-size: 1.25rem;
+                font-size: 2rem;
                 margin-bottom: 0.75rem;
             }
 
+            .feature-title {
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
             .feature-description {
-                font-size: 0.95rem;
+                font-size: 0.85rem;
             }
 
             .screenshot-img {
@@ -782,16 +815,20 @@
                 font-size: 0.95rem;
             }
 
+            .features-section {
+                padding: 2rem 0.5rem;
+            }
+
             .feature-icon {
-                font-size: 2rem;
+                font-size: 1.75rem;
             }
 
             .feature-title {
-                font-size: 1.1rem;
+                font-size: 0.95rem;
             }
 
             .feature-description {
-                font-size: 0.9rem;
+                font-size: 0.8rem;
             }
 
             .screenshot-img {
@@ -824,10 +861,10 @@
     <section class="section video-section" id="video">
         <h2 class="section-title">Vidéo de Présentation</h2>
         <div class="video-container">
-            <div class="video-placeholder">
-                <i class="fas fa-video"></i>
-                <p>Vidéo de démonstration à venir</p>
-            </div>
+            <video width="100%" height="100%" controls style="border-radius: 10px;">
+                <source src="{{ asset('Video/Decouvrez_Coride.mp4') }}" type="video/mp4">
+                Votre navigateur ne supporte pas la lecture de vidéos.
+            </video>
         </div>
     </section>
 
@@ -911,6 +948,26 @@
                     Visualisez les itinéraires en temps réel avec calcul automatique de distance et temps.
                 </p>
             </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="feature-title">Mobile Friendly & Responsive</h3>
+                <p class="feature-description">
+                    Profitez d'une expérience optimale sur tous vos appareils, du smartphone au desktop.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3 class="feature-title">Animations Intégrées</h3>
+                <p class="feature-description">
+                    Interface moderne avec des animations fluides et élégantes pour une expérience agréable.
+                </p>
+            </div>
         </div>
     </section>
 
@@ -931,7 +988,7 @@
             </div>
             <div class="screenshot-card">
                 <div class="screenshot-img">
-                    <i class="fas fa-image" style="font-size: 3rem;"></i>
+                    <img src="{{ asset('images/publier_trajet.png') }}" alt="Publication de Trajet">
                 </div>
                 <p class="screenshot-title">Publication de Trajet</p>
             </div>

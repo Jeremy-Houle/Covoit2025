@@ -289,6 +289,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const paramsObj = Object.fromEntries(new FormData(form));
         const url = (form.action && form.action !== "") ? form.action : '/api/trajets/search';
 
+        const openDetailsIds = new Set();
+        const existingTrajets = resultsEl.querySelectorAll('.trajet');
+        existingTrajets.forEach(trajet => {
+            const id = trajet.dataset.id;
+            if (!id) return;
+            
+            const detailsDiv = document.getElementById(`details-${id}`);
+            const btn = trajet.querySelector(`.btn-details-${id}`);
+            if (detailsDiv && btn) {
+                const styleDisplay = detailsDiv.style.display;
+                const btnText = btn.textContent.trim();
+                if (styleDisplay === 'block' || btnText === 'Masquer') {
+                    openDetailsIds.add(String(id));
+                }
+            }
+        });
+
         resultsEl.innerHTML = '<p>Recherche…</p>';
 
         try {
@@ -317,6 +334,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             return `<option value="${val}" ${disabled}>${val}</option>`;
                         }).join('');
 
+                        const trajetIdStr = String(t.IdTrajet);
+                        const detailsShouldBeOpen = openDetailsIds.has(trajetIdStr);
+                        const detailsDisplayStyle = detailsShouldBeOpen ? 'block' : 'none';
+                        const btnText = detailsShouldBeOpen ? 'Masquer' : 'Détails';
+
                         const addButton = (window.userRole === 'Conducteur')
                             ? ''
                             : `
@@ -336,21 +358,26 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <button type="button" class="btn-favorite btn btn-sm ${isFav ? 'active' : ''}" data-id="${t.IdTrajet}" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}" style="color:${isFav ? '#ffc107' : '#666'};border:none;background:transparent;padding:4px 8px;cursor:pointer;">
                                         <i class="${isFav ? 'fa-solid fa-star' : 'fa-regular fa-star'}"></i>
                                     </button>
-                                    <button type="button" class="btn-details btn btn-sm btn-outline-secondary" data-id="${t.IdTrajet}">Détails</button>
+                                    <button type="button" class="btn-details btn-details-${t.IdTrajet} btn btn-sm btn-outline-secondary" data-id="${t.IdTrajet}" onclick="toggleDetails(${t.IdTrajet})">${btnText}</button>
                                 </div>
                             </div>
                             <div>Départ: ${t.Depart} — Destination: ${t.Destination}</div>
                             <div>Date: ${t.DateTrajet} — Heure: ${t.HeureTrajet}</div>
                             <div>Places: <span class="places-dispo">${t.PlacesDisponibles}</span> — Prix: ${Number(t.Prix).toFixed(2)}$</div>
                             ${addButton}
-                            <div class="trajet-details" style="display:none;margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:.95rem;">
-                                <div><strong>Détails complets</strong></div>
-                                <div>ID Trajet : ${t.IdTrajet}</div>
-                                <div>Conducteur : ${t.NomConducteur || '—'} (ID ${t.IdConducteur || '—'})</div>
-                                <div>Distance : ${t.Distance ?? '—'}</div>
-                                <div>Animaux acceptés : ${t.AnimauxAcceptes ? 'Oui' : 'Non'}</div>
-                                <div>Type conversation : ${t.TypeConversation ?? '—'}</div>
-                                <div>Musique : ${t.Musique ? 'Oui' : 'Non'} — Fumeur : ${t.Fumeur ? 'Oui' : 'Non'}</div>
+                            <div class="trajet-details trajet-details-${t.IdTrajet}" id="details-${t.IdTrajet}" style="display:${detailsDisplayStyle};margin-top:8px;border-top:1px dashed #eee;padding-top:8px;font-size:0.95rem;background:var(--gray-50);padding:12px;border-radius:8px;box-shadow:inset 2px 2px 5px rgba(0, 0, 0, 0.2),inset -2px -2px 5px rgba(255, 255, 255, 0.8);">
+                                <div><strong style="color:var(--primary-blue);font-size:1.1rem;">Détails complets</strong></div>
+                                <div style="margin-top:8px;"><i class="fa fa-user"></i> Conducteur : ${t.NomConducteur || '—'}</div>
+                                <div><i class="fa fa-road"></i> Distance : ${t.Distance ?? '—'}</div>
+                                <div><i class="fa fa-map-marker-alt"></i> Départ : ${t.Depart ?? '—'}</div>
+                                <div><i class="fa fa-flag-checkered"></i> Destination : ${t.Destination ?? '—'}</div>
+                                <div><i class="fa fa-calendar"></i> Date / Heure : ${t.DateTrajet ?? '—'} ${t.HeureTrajet ?? ''}</div>
+                                <div><i class="fa fa-chair"></i> Places disponibles : ${t.PlacesDisponibles ?? '—'}</div>
+                                <div><i class="fa fa-dollar-sign"></i> Prix par place : ${Number(t.Prix ?? 0).toFixed(2)}$</div>
+                                <div><i class="fa fa-paw"></i> Animaux acceptés : ${t.AnimauxAcceptes ? 'Oui' : 'Non'}</div>
+                                <div><i class="fa fa-comments"></i> Type conversation : ${t.TypeConversation ?? '—'}</div>
+                                <div><i class="fa fa-music"></i> Musique : ${t.Musique ? 'Oui' : 'Non'}</div>
+                                <div><i class="fa fa-smoking"></i> Fumeur : ${t.Fumeur ? 'Oui' : 'Non'}</div>
                             </div>
                         </div>
                         `;
