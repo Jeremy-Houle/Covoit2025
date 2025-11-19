@@ -8,6 +8,66 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     @vite(['resources/js/presentation.js'])
     <style>
+        /* Preloader */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .preloader-logo {
+            font-size: 3.5rem;
+            color: white;
+            margin-bottom: 2rem;
+            animation: bounce 1s ease-in-out infinite;
+        }
+        
+        .preloader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .preloader-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            font-weight: 500;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -844,6 +904,15 @@
     </style>
 </head>
 <body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-logo">
+            🚗
+        </div>
+        <div class="preloader-spinner"></div>
+        <div class="preloader-text">Chargement de Covoit2025...</div>
+    </div>
+
     <section class="hero">
         <div class="hero-content fade-in-up">
             <h1 class="logo-title">Covoit2025</h1>
@@ -1097,6 +1166,33 @@
                     openModal(this.src);
                 });
             });
+        });
+
+        // Gestion du preloader
+        window.addEventListener('load', function() {
+            const preloader = document.getElementById('preloader');
+            const video = document.querySelector('.discover-video');
+            
+            // Attendre que la vidéo soit chargée si elle existe
+            if (video) {
+                video.addEventListener('loadeddata', function() {
+                    hidePreloader();
+                });
+                
+                // Timeout de sécurité au cas où la vidéo ne charge pas
+                setTimeout(hidePreloader, 3000);
+            } else {
+                hidePreloader();
+            }
+            
+            function hidePreloader() {
+                if (preloader) {
+                    preloader.classList.add('hidden');
+                    setTimeout(() => {
+                        preloader.remove();
+                    }, 500);
+                }
+            }
         });
 
     </script>
