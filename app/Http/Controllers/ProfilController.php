@@ -97,13 +97,13 @@ public function update(Request $request)
         $user = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
 
         $moyenneNote = DB::table('evaluation as e')
-            ->join('Trajets as t', 'e.IdTrajet', '=', 't.IdTrajet')
+            ->join('trajets as t', 'e.IdTrajet', '=', 't.IdTrajet')
             ->where('t.IdConducteur', $userId)
             ->avg('e.Note') ?? 0;
 
         if ($user->Role === 'Passager') {
             $prochainesReservations = DB::table('reservations as r')
-                ->join('Trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
+                ->join('trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
                 ->where('r.IdPassager', $userId)
                 ->where('t.DateTrajet', '>=', Carbon::today())
                 ->orderBy('r.IdReservation', 'desc')
@@ -112,7 +112,7 @@ public function update(Request $request)
                 ->map(function ($resa) {
                     $passagers = DB::table('reservations')
                         ->where('IdTrajet', $resa->IdTrajet)
-                        ->join('Utilisateurs', 'Reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
+                        ->join('Utilisateurs', 'reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
                         ->select('Utilisateurs.Prenom', 'Utilisateurs.Nom')
                         ->get();
                     $resa->passagers = $passagers;
@@ -128,8 +128,8 @@ public function update(Request $request)
                 ->map(function ($trajet) {
                     $reservations = DB::table('reservations')
                         ->where('IdTrajet', $trajet->IdTrajet)
-                        ->join('Utilisateurs', 'Reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
-                        ->select('Reservations.PlacesReservees', 'Utilisateurs.Prenom', 'Utilisateurs.Nom')
+                        ->join('Utilisateurs', 'reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
+                        ->select('reservations.PlacesReservees', 'Utilisateurs.Prenom', 'Utilisateurs.Nom')
                         ->get();
                     $trajet->PlacesReservees = $reservations->sum('PlacesReservees');
                     $trajet->passagers = $reservations;

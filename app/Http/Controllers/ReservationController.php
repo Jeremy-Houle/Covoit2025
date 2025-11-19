@@ -29,7 +29,7 @@ class ReservationController extends Controller
 
         if (strtolower($role) === 'conducteur') {
             $reservations = DB::table('trajets as t')
-                ->join('Reservations as r', 't.IdTrajet', '=', 'r.IdTrajet')
+                ->join('reservations as r', 't.IdTrajet', '=', 'r.IdTrajet')
                 ->leftJoin('Utilisateurs as u', 'r.IdPassager', '=', 'u.IdUtilisateur')
                 ->where('t.IdConducteur', $utilisateurId)
                 ->where('r.PlacesReservees', '>', 0)
@@ -48,8 +48,8 @@ class ReservationController extends Controller
                 )
                 ->get();
         } else {
-            $reservations = DB::table('Reservations as r')
-                ->join('Trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
+            $reservations = DB::table('reservations as r')
+                ->join('trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
                 ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
                 ->where('r.IdPassager', $utilisateurId)
                 ->select(
