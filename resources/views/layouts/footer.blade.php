@@ -253,6 +253,11 @@
             max-width: none;
         }
 
+        .footer-nav a,
+        .footer-info a {
+            justify-content: center;
+        }
+
         .footer-nav a:hover,
         .footer-info a:hover {
             transform: none;
@@ -261,11 +266,23 @@
         .footer-social {
             justify-content: center;
         }
+        
+        .footer-nav h4::after,
+        .footer-info h4::after,
+        .footer-contact h4::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .contact-item {
+            justify-content: center;
+        }
     }
 
     @media (max-width: 480px) {
         .footer-main {
             gap: var(--spacing-xl);
+            padding: var(--spacing-xl) 0;
         }
 
         .footer-social {
@@ -276,6 +293,82 @@
             width: 40px;
             height: 40px;
             font-size: var(--font-size-base);
+        }
+        
+        .footer-logo {
+            font-size: var(--font-size-xl);
+        }
+        
+        .footer-description {
+            font-size: 0.8rem;
+        }
+        
+        .footer-nav h4,
+        .footer-info h4,
+        .footer-contact h4 {
+            font-size: var(--font-size-base);
+        }
+        
+        .footer-nav a,
+        .footer-info a {
+            font-size: 0.8rem;
+        }
+        
+        .contact-item {
+            font-size: 0.8rem;
+        }
+        
+        .footer-bottom p {
+            font-size: 0.8rem;
+        }
+    }
+    
+    @media (max-width: 360px) {
+        .footer-logo {
+            font-size: var(--font-size-lg);
+        }
+        
+        .footer-description {
+            font-size: 0.75rem;
+        }
+        
+        .footer-nav h4,
+        .footer-info h4,
+        .footer-contact h4 {
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .social-link {
+            width: 36px;
+            height: 36px;
+            font-size: var(--font-size-sm);
+        }
+        
+        .contact-item {
+            font-size: 0.75rem;
+            gap: var(--spacing-sm);
+        }
+        
+        .contact-item i {
+            font-size: var(--font-size-sm);
+        }
+        
+        .footer-bottom {
+            padding: var(--spacing-md) 0;
+        }
+        
+        .footer-bottom p {
+            font-size: 0.75rem;
+        }
+    }
+    
+    @media (hover: none) and (pointer: coarse) {
+        .social-link,
+        .footer-nav a,
+        .footer-info a {
+            min-height: 44px;
+            -webkit-tap-highlight-color: rgba(251, 191, 36, 0.3);
         }
     }
 </style>

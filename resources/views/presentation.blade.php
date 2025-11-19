@@ -18,6 +18,25 @@
             background: #0a0f1e;
             color: #fff;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .btn-discover,
+            .btn-enter-site {
+                min-height: 48px;
+            }
+
+            .modal-close {
+                min-width: 48px;
+                min-height: 48px;
+            }
+
+            .screenshot-img img {
+                cursor: pointer;
+                -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+            }
         }
 
         /* Hero Section */
@@ -124,7 +143,6 @@
             box-shadow: 0 15px 50px rgba(59, 130, 246, 0.6);
         }
 
-        /* Section Styles */
         .section {
             padding: 6rem 2rem;
             position: relative;
@@ -141,7 +159,6 @@
             background-clip: text;
         }
 
-        /* Video Section */
         .video-section {
             background: #111827;
         }
@@ -174,7 +191,6 @@
             opacity: 0.7;
         }
 
-        /* About Section */
         .about-section {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         }
@@ -188,7 +204,6 @@
             opacity: 0.9;
         }
 
-        /* Features Section */
         .features-section {
             background: #0a0f1e;
         }
@@ -234,17 +249,22 @@
             line-height: 1.6;
         }
 
-        /* Screenshots Section */
         .screenshots-section {
             background: #111827;
         }
 
         .screenshots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
             max-width: 1400px;
             margin: 0 auto;
+        }
+
+        @media (max-width: 320px) {
+            .screenshots-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .screenshot-card {
@@ -286,7 +306,6 @@
             opacity: 0.8;
         }
 
-        /* Modal styles */
         .image-modal {
             display: none;
             position: fixed;
@@ -359,7 +378,6 @@
             text-align: center;
         }
 
-        /* Team Section */
         .team-section {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         }
@@ -413,7 +431,6 @@
             font-weight: 600;
         }
 
-        /* Footer */
         .footer {
             background: #0a0f1e;
             padding: 3rem 2rem;
@@ -479,7 +496,6 @@
             box-shadow: 0 15px 50px rgba(59, 130, 246, 0.6);
         }
 
-        /* Animations */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -495,7 +511,6 @@
             animation: fadeInUp 0.8s ease;
         }
 
-        /* Responsive */
         @media (max-width: 1400px) {
             .features-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -506,23 +521,32 @@
             .features-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            .section {
+                padding: 4rem 1.5rem;
+            }
         }
 
         @media (max-width: 768px) {
             .logo-title {
-                font-size: 3.5rem;
+                font-size: 2.5rem;
             }
 
             .tagline {
-                font-size: 1.5rem;
+                font-size: 1.25rem;
             }
 
             .description {
                 font-size: 1rem;
+                padding: 0 1rem;
             }
 
             .section-title {
-                font-size: 2rem;
+                font-size: 1.75rem;
+            }
+
+            .section {
+                padding: 3rem 1rem;
             }
 
             .features-grid,
@@ -530,11 +554,227 @@
             .team-grid {
                 grid-template-columns: 1fr;
             }
+
+            .screenshots-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .feature-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .feature-icon {
+                font-size: 3rem;
+            }
+
+            .feature-title {
+                font-size: 1.5rem;
+            }
+
+            .feature-description {
+                font-size: 1rem;
+            }
+
+            .btn-discover,
+            .btn-enter-site {
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
+                width: 90%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .about-content {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                padding: 0 1rem;
+            }
+
+            .team-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+
+            .team-name {
+                font-size: 1.25rem;
+            }
+
+            .team-member {
+                padding: 1.5rem;
+            }
+
+            .modal-close {
+                top: 10px;
+                right: 10px;
+                font-size: 40px;
+                padding: 2px 12px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-title {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .description {
+                font-size: 0.9rem;
+                line-height: 1.6;
+                margin-bottom: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .section {
+                padding: 2rem 1rem;
+            }
+
+            .hero-content {
+                padding: 1rem;
+            }
+
+            .btn-discover,
+            .btn-enter-site {
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+                width: 95%;
+                gap: 0.5rem;
+            }
+
+            .feature-card {
+                padding: 1.5rem 1rem;
+            }
+
+            .feature-icon {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .feature-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .feature-description {
+                font-size: 0.95rem;
+            }
+
+            .screenshot-img {
+                height: 200px;
+            }
+
+            .screenshot-title {
+                font-size: 1.1rem;
+            }
+
+            .about-content {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+
+            .team-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+
+            .team-name {
+                font-size: 1.1rem;
+            }
+
+            .team-role {
+                font-size: 0.9rem;
+            }
+
+            .team-member {
+                padding: 1.25rem;
+            }
+
+            .footer {
+                padding: 2rem 1rem;
+            }
+
+            .footer-logo {
+                font-size: 2rem;
+            }
+
+            .footer-text {
+                font-size: 0.95rem;
+            }
+
+            .video-placeholder i {
+                font-size: 3rem;
+            }
+
+            .video-placeholder p {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .logo-title {
+                font-size: 1.75rem;
+            }
+
+            .tagline {
+                font-size: 0.9rem;
+            }
+
+            .description {
+                font-size: 0.85rem;
+            }
+
+            .section-title {
+                font-size: 1.35rem;
+            }
+
+            .btn-discover,
+            .btn-enter-site {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.95rem;
+            }
+
+            .feature-icon {
+                font-size: 2rem;
+            }
+
+            .feature-title {
+                font-size: 1.1rem;
+            }
+
+            .feature-description {
+                font-size: 0.9rem;
+            }
+
+            .screenshot-img {
+                height: 180px;
+            }
+
+            .team-avatar {
+                width: 70px;
+                height: 70px;
+                font-size: 1.75rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content fade-in-up">
             <h1 class="logo-title">Covoit2025</h1>
@@ -549,7 +789,6 @@
         </div>
     </section>
 
-    <!-- Video Section -->
     <section class="section video-section" id="video">
         <h2 class="section-title">Vidéo de Présentation</h2>
         <div class="video-container">
@@ -560,7 +799,6 @@
         </div>
     </section>
 
-    <!-- About Section -->
     <section class="section about-section" id="about">
         <h2 class="section-title">À Propos du Projet</h2>
         <div class="about-content">
@@ -579,7 +817,6 @@
         </div>
     </section>
 
-    <!-- Features Section -->
     <section class="section features-section" id="features">
         <h2 class="section-title">Fonctionnalités Principales</h2>
         <div class="features-grid">
@@ -645,7 +882,6 @@
         </div>
     </section>
 
-    <!-- Screenshots Section -->
     <section class="section screenshots-section" id="screenshots">
         <h2 class="section-title">Captures d'Écran</h2>
         <div class="screenshots-grid">
@@ -688,7 +924,6 @@
         </div>
     </section>
 
-    <!-- Team Section -->
     <section class="section team-section" id="team">
         <h2 class="section-title">Notre Équipe</h2>
         <div class="team-grid">
@@ -720,7 +955,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <h2 class="footer-logo">Covoit2025</h2>
@@ -734,7 +968,6 @@
         </div>
     </footer>
 
-    <!-- Image Modal -->
     <div id="imageModal" class="image-modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -743,13 +976,12 @@
     </div>
 
     <script>
-        // Image Modal Functions
         function openModal(imageSrc) {
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImage');
             modal.classList.add('active');
             modalImg.src = imageSrc;
-            modal.scrollTop = 0; // Scroll to top when opening
+            modal.scrollTop = 0; 
         }
 
         function closeModal() {
@@ -757,21 +989,18 @@
             modal.classList.remove('active');
         }
 
-        // Close modal when clicking on the background (not on the image)
         document.getElementById('imageModal').addEventListener('click', function(e) {
             if (e.target === this || e.target.classList.contains('modal-content')) {
                 closeModal();
             }
         });
 
-        // Close modal with Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeModal();
             }
         });
 
-        // Add click event to all screenshot images
         document.addEventListener('DOMContentLoaded', function() {
             const screenshotImages = document.querySelectorAll('.screenshot-img img');
             screenshotImages.forEach(img => {
@@ -781,7 +1010,6 @@
             });
         });
 
-        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -792,7 +1020,6 @@
             });
         });
 
-        // Scroll animations
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'

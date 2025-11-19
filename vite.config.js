@@ -13,7 +13,9 @@ export default defineConfig({
                 'resources/css/reservations.css',
                 'resources/css/publier.css',
                 'resources/js/app.js',
-                'resources/js/panier.js'
+                'resources/js/panier.js',
+                'resources/js/rechercher.js',
+                'resources/js/reservations.js'
             ],
             refresh: true,
         }),

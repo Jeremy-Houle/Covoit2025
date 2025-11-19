@@ -228,21 +228,64 @@
 
 
 @media (max-width: 1024px) {
-    .reservation-details {
-        flex-direction: column;
-        gap: var(--spacing-md);
-    }
-
     .reservations-container {
-        padding: var(--spacing-2xl) var(--spacing-lg);
+        padding: var(--spacing-2xl) var(--spacing-md);
+    }
+    
+    .reservation-details {
+        gap: var(--spacing-xl);
+    }
+    
+    .route-points {
+        gap: var(--spacing-2xl);
+    }
+    
+    .route-arrow img {
+        width: 150px;
     }
 }
 
 @media (max-width: 768px) {
-    .btn-update, .btn-cancel, .empty-reservations .btn {
-        width: 100%;
+    .reservations-container {
+        padding: var(--spacing-xl) var(--spacing-md);
     }
-
+    
+    .reservations-header {
+        padding: var(--spacing-xl);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .reservations-title {
+        font-size: var(--font-size-2xl);
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+    
+    .reservations-subtitle {
+        font-size: var(--font-size-sm);
+    }
+    
+    .reservation-card {
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .reservation-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .conducteur-info {
+        font-size: var(--font-size-sm);
+        gap: var(--spacing-xs);
+    }
+    
+    .reservation-status {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
     .route-points {
         flex-direction: column;
         gap: var(--spacing-md);
@@ -250,7 +293,242 @@
 
     .route-arrow img {
         transform: rotate(90deg);
+        width: 60px;
+    }
+    
+    .depart-icon, 
+    .destination-icon {
+        font-size: 1.5rem;
+    }
+    
+    .point-label {
+        font-size: var(--font-size-sm);
+    }
+    
+    .reservation-details {
+        gap: var(--spacing-md);
+    }
+    
+    .detail-item {
+        font-size: 0.8rem;
+    }
+    
+    .reservation-actions {
+        gap: var(--spacing-sm);
+    }
+
+    .btn-update, 
+    .btn-cancel, 
+    .empty-reservations .btn {
+        width: 100%;
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+    
+    .empty-reservations {
+        margin-top: var(--spacing-2xl);
+    }
+    
+    .empty-reservations-icon {
+        font-size: 4rem;
+    }
+    
+    .empty-reservations h3 {
+        font-size: var(--font-size-xl);
+    }
+    
+    .empty-reservations p {
+        font-size: var(--font-size-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    .reservations-container {
+        padding: var(--spacing-lg) var(--spacing-sm);
+    }
+    
+    .reservations-header {
+        padding: var(--spacing-lg) var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .reservations-title {
+        font-size: var(--font-size-xl);
+        gap: var(--spacing-xs);
+    }
+    
+    .reservations-title i {
+        font-size: var(--font-size-xl);
+    }
+    
+    .reservations-subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .reservation-card {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .conducteur-info {
+        font-size: 0.8rem;
+        flex-wrap: wrap;
+    }
+    
+    .conducteur-info i {
+        font-size: var(--font-size-base);
+    }
+    
+    .badge-reservation {
+        font-size: 0.7rem;
+        padding: 4px var(--spacing-sm);
+    }
+    
+    .route-points {
+        gap: var(--spacing-sm);
+    }
+    
+    .route-arrow img {
         width: 50px;
+    }
+    
+    .depart-icon, 
+    .destination-icon {
+        font-size: 1.25rem;
+    }
+    
+    .point-label {
+        font-size: 0.8rem;
+    }
+    
+    .reservation-details {
+        gap: var(--spacing-sm);
+    }
+    
+    .detail-item {
+        font-size: 0.75rem;
+        gap: 4px;
+    }
+    
+    .detail-item i {
+        font-size: 0.7rem;
+    }
+    
+    .reservation-actions {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+    
+    .btn-update, 
+    .btn-cancel {
+        padding: var(--spacing-xs) var(--spacing-md);
+        font-size: 0.8rem;
+    }
+    
+    .empty-reservations {
+        margin-top: var(--spacing-xl);
+    }
+    
+    .empty-reservations-icon {
+        font-size: 3rem;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .empty-reservations h3 {
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .empty-reservations p {
+        font-size: 0.8rem;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .empty-reservations .btn {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .reservations-container {
+        padding: var(--spacing-md) var(--spacing-xs);
+    }
+    
+    .reservations-header {
+        padding: var(--spacing-md) var(--spacing-sm);
+    }
+    
+    .reservations-title {
+        font-size: var(--font-size-lg);
+    }
+    
+    .reservations-title i {
+        font-size: var(--font-size-lg);
+    }
+    
+    .reservations-subtitle {
+        font-size: 0.75rem;
+    }
+    
+    .reservation-card {
+        padding: var(--spacing-sm);
+    }
+    
+    .conducteur-info {
+        font-size: 0.75rem;
+    }
+    
+    .badge-reservation {
+        font-size: 0.65rem;
+    }
+    
+    .route-arrow img {
+        width: 40px;
+    }
+    
+    .depart-icon, 
+    .destination-icon {
+        font-size: 1rem;
+    }
+    
+    .point-label {
+        font-size: 0.75rem;
+    }
+    
+    .detail-item {
+        font-size: 0.7rem;
+    }
+    
+    .btn-update, 
+    .btn-cancel {
+        font-size: 0.75rem;
+        padding: 6px var(--spacing-sm);
+    }
+    
+    .empty-reservations h3 {
+        font-size: var(--font-size-base);
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .reservation-card {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .reservation-card:hover {
+        transform: none;
+    }
+    
+    .btn-update,
+    .btn-cancel,
+    .empty-reservations .btn {
+        min-height: 44px;
+    }
+    
+    .btn-favorite {
+        min-width: 40px;
+        min-height: 40px;
     }
 }
 

@@ -421,11 +421,19 @@
 @media (max-width: 1024px) {
     .main-content {
         grid-template-columns: 1fr;
-        gap: var(--spacing-2xl);
+        gap: var(--spacing-xl);
     }
     
     .summary-section {
         position: static;
+    }
+    
+    .panier-container {
+        padding: var(--spacing-2xl) var(--spacing-md);
+    }
+    
+    .route-arrow img {
+        width: 150px;
     }
 }
 
@@ -436,14 +444,106 @@
     
     .panier-header {
         padding: var(--spacing-xl);
+        margin-bottom: var(--spacing-xl);
     }
     
     .panier-title {
-        font-size: var(--font-size-3xl);
+        font-size: var(--font-size-2xl);
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+    
+    .panier-title i {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .panier-subtitle {
+        font-size: var(--font-size-base);
+    }
+    
+    .trajets-section h2 {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-lg);
     }
     
     .trajet-card {
-        padding: var(--spacing-xl);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .trajet-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
+        padding-bottom: var(--spacing-md);
+    }
+    
+    .conducteur-info {
+        gap: var(--spacing-sm);
+    }
+    
+    .conducteur-info i {
+        font-size: var(--font-size-xl);
+    }
+    
+    .conducteur-nom {
+        font-size: var(--font-size-base);
+    }
+    
+    .trajet-status {
+        width: 100%;
+    }
+    
+    .route-points {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .route-arrow img {
+        transform: rotate(90deg);
+        width: 60px;
+    }
+    
+    .depart-icon,
+    .destination-icon {
+        font-size: var(--font-size-lg);
+    }
+    
+    .point-label {
+        font-size: var(--font-size-base);
+    }
+    
+    .detail-row {
+        gap: var(--spacing-lg);
+    }
+    
+    .detail-item {
+        font-size: 0.8rem;
+    }
+    
+    .summary-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .summary-title {
+        font-size: var(--font-size-lg);
+    }
+    
+    .empty-cart {
+        padding: var(--spacing-2xl) var(--spacing-xl);
+    }
+    
+    .empty-cart-icon {
+        font-size: 3rem;
+    }
+    
+    .empty-cart h3 {
+        font-size: var(--font-size-xl);
+    }
+    
+    .empty-cart p {
+        font-size: var(--font-size-base);
     }
     
     .route-points {
@@ -603,17 +703,128 @@ body:not(.modal-open) .modal-backdrop {
         padding: var(--spacing-lg) var(--spacing-sm);
     }
     
-    .trajet-card {
-        padding: var(--spacing-lg);
+    .panier-header {
+        padding: var(--spacing-lg) var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
     }
     
     .panier-title {
-        font-size: var(--font-size-2xl);
+        font-size: var(--font-size-xl);
+        gap: var(--spacing-xs);
+    }
+    
+    .panier-title i {
+        font-size: var(--font-size-xl);
+    }
+    
+    .panier-subtitle {
+        font-size: var(--font-size-sm);
+    }
+    
+    .trajets-section h2 {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .trajet-card {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .trajet-header {
+        margin-bottom: var(--spacing-sm);
+        padding-bottom: var(--spacing-sm);
+    }
+    
+    .conducteur-info {
+        font-size: 0.8rem;
+        gap: var(--spacing-xs);
+    }
+    
+    .conducteur-info i {
+        font-size: var(--font-size-base);
+    }
+    
+    .conducteur-nom {
+        font-size: 0.8rem;
+    }
+    
+    .badge {
+        font-size: 0.7rem !important;
+        padding: 4px var(--spacing-sm) !important;
+    }
+    
+    .route-arrow img {
+        width: 45px;
+    }
+    
+    .depart-icon,
+    .destination-icon {
+        font-size: var(--font-size-base);
+    }
+    
+    .point-label {
+        font-size: 0.8rem;
+    }
+    
+    .detail-row {
+        gap: var(--spacing-md);
+    }
+    
+    .detail-item {
+        font-size: 0.75rem;
+    }
+    
+    .detail-item i {
+        font-size: 0.7rem;
+    }
+    
+    .trajet-pricing {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .price-item {
+        font-size: 0.8rem;
+    }
+    
+    .total-price {
+        font-size: var(--font-size-lg);
+    }
+    
+    .summary-card {
+        padding: var(--spacing-md);
+    }
+    
+    .summary-title {
+        font-size: var(--font-size-base);
+    }
+    
+    .empty-cart {
+        padding: var(--spacing-xl) var(--spacing-md);
+    }
+    
+    .empty-cart-icon {
+        font-size: 2.5rem;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .empty-cart h3 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .empty-cart p {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .empty-cart .btn {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        font-size: var(--font-size-sm);
     }
     
     .btn-pay {
         width: 100%;
-        padding: var(--spacing-lg);
+        padding: var(--spacing-md);
     }
     
     .modal-dialog {
@@ -1262,5 +1473,100 @@ body:not(.modal-open) .modal-backdrop {
         min-width: 45px;
         font-size: var(--font-size-xl);
         padding: var(--spacing-sm) var(--spacing-md);
+    }
+}
+
+@media (max-width: 360px) {
+    .panier-container {
+        padding: var(--spacing-md) var(--spacing-xs);
+    }
+    
+    .panier-header {
+        padding: var(--spacing-md) var(--spacing-sm);
+    }
+    
+    .panier-title {
+        font-size: var(--font-size-lg);
+    }
+    
+    .panier-title i {
+        font-size: var(--font-size-lg);
+    }
+    
+    .panier-subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .trajets-section h2 {
+        font-size: var(--font-size-sm);
+    }
+    
+    .trajet-card {
+        padding: var(--spacing-sm);
+    }
+    
+    .conducteur-info {
+        font-size: 0.75rem;
+    }
+    
+    .conducteur-nom {
+        font-size: 0.75rem;
+    }
+    
+    .badge {
+        font-size: 0.65rem !important;
+    }
+    
+    .route-arrow img {
+        width: 40px;
+    }
+    
+    .depart-icon,
+    .destination-icon {
+        font-size: 0.9rem;
+    }
+    
+    .point-label {
+        font-size: 0.75rem;
+    }
+    
+    .detail-item {
+        font-size: 0.7rem;
+    }
+    
+    .price-item,
+    .total-price {
+        font-size: 0.8rem;
+    }
+    
+    .summary-title {
+        font-size: var(--font-size-sm);
+    }
+    
+    .btn-pay {
+        font-size: 0.8rem;
+        padding: var(--spacing-sm);
+    }
+}
+
+/* Touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .trajet-card {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .trajet-card:hover {
+        transform: none;
+    }
+    
+    .btn-pay,
+    .btn-remove,
+    .empty-cart .btn {
+        min-height: 44px;
+    }
+    
+    .btn-places {
+        min-width: 40px;
+        min-height: 40px;
     }
 }

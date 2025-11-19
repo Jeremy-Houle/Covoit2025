@@ -29,7 +29,6 @@
         </div>
 
         <div class="faq-accordion">
-            <!-- Inscription & Connexion -->
             <div class="faq-item" data-category="inscription">
                 <div class="faq-question">
                     <h3>Comment créer un compte sur Covoit2025 ?</h3>
@@ -60,7 +59,6 @@
                 </div>
             </div>
 
-            <!-- Réservations -->
             <div class="faq-item" data-category="reservation">
                 <div class="faq-question">
                     <h3>Comment réserver un trajet ?</h3>
@@ -101,7 +99,6 @@
                 </div>
             </div>
 
-            <!-- Paiements -->
             <div class="faq-item" data-category="paiement">
                 <div class="faq-question">
                     <h3>Comment fonctionne le paiement ?</h3>
@@ -134,7 +131,6 @@
                 </div>
             </div>
 
-            <!-- Sécurité -->
             <div class="faq-item" data-category="securite">
                 <div class="faq-question">
                     <h3>Comment Covoit2025 garantit-il ma sécurité ?</h3>
@@ -165,7 +161,6 @@
                 </div>
             </div>
 
-            <!-- Trajets -->
             <div class="faq-item" data-category="trajet">
                 <div class="faq-question">
                     <h3>Comment publier un trajet en tant que conducteur ?</h3>
@@ -487,40 +482,317 @@
     box-shadow: var(--shadow-lg);
 }
 
+@media (max-width: 1024px) {
+    .faq-hero {
+        padding: calc(70px + var(--spacing-2xl)) 0 var(--spacing-2xl);
+    }
+    
+    .faq-content {
+        padding: var(--spacing-2xl) 0;
+    }
+    
+    .faq-categories {
+        gap: var(--spacing-sm);
+    }
+    
+    .faq-accordion {
+        margin-bottom: var(--spacing-2xl);
+    }
+}
+
 @media (max-width: 768px) {
+    .faq-hero {
+        padding: calc(70px + var(--spacing-xl)) 0 var(--spacing-xl);
+    }
+    
+    .faq-hero-content {
+        padding: 0 var(--spacing-md);
+    }
+    
     .faq-hero-title {
-        font-size: var(--font-size-4xl);
+        font-size: var(--font-size-3xl);
+        margin-bottom: var(--spacing-md);
     }
     
     .faq-hero-subtitle {
-        font-size: var(--font-size-lg);
+        font-size: var(--font-size-base);
+        line-height: 1.6;
+    }
+    
+    .faq-content {
+        padding: var(--spacing-xl) 0;
+    }
+    
+    .container {
+        padding: 0 var(--spacing-md);
+    }
+    
+    .faq-search {
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .search-box {
+        max-width: 100%;
+    }
+    
+    .search-box input {
+        padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) calc(var(--spacing-lg) * 2.5);
+        font-size: var(--font-size-sm);
+    }
+    
+    .search-box i {
+        left: var(--spacing-md);
+        font-size: var(--font-size-base);
+    }
+    
+    .faq-categories {
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .category-btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
+        flex: 1 1 auto;
+        min-width: calc(50% - var(--spacing-sm) / 2);
+    }
+    
+    .faq-accordion {
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .faq-item {
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .faq-question {
+        padding: var(--spacing-md);
+    }
+    
+    .faq-question h3 {
+        font-size: var(--font-size-base);
+        padding-right: var(--spacing-sm);
+    }
+    
+    .faq-question i {
+        font-size: 0.7rem;
+    }
+    
+    .faq-answer p {
+        padding: 0 var(--spacing-md) var(--spacing-md);
+        font-size: var(--font-size-sm);
+        line-height: 1.6;
+    }
+    
+    .faq-contact {
+        padding: var(--spacing-xl);
+    }
+    
+    .faq-contact-content h2 {
+        font-size: var(--font-size-2xl);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .faq-contact-content p {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .btn-contact {
+        padding: var(--spacing-sm) var(--spacing-xl);
+        font-size: var(--font-size-base);
+    }
+}
+
+@media (max-width: 480px) {
+    .faq-hero {
+        padding: calc(60px + var(--spacing-lg)) 0 var(--spacing-lg);
+    }
+    
+    .faq-hero-content {
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .faq-hero-title {
+        font-size: var(--font-size-2xl);
+        line-height: 1.3;
+    }
+    
+    .faq-hero-subtitle {
+        font-size: var(--font-size-sm);
+        line-height: 1.5;
+    }
+    
+    .faq-content {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .container {
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .faq-search {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .search-box input {
+        padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-xs) calc(var(--spacing-lg) * 2.2);
+        font-size: var(--font-size-sm);
+    }
+    
+    .search-box i {
+        left: var(--spacing-sm);
+        font-size: var(--font-size-sm);
     }
     
     .faq-categories {
         flex-direction: column;
+        gap: var(--spacing-xs);
+        margin-bottom: var(--spacing-lg);
     }
     
     .category-btn {
         width: 100%;
         text-align: center;
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
+        min-width: 100%;
+    }
+    
+    .faq-accordion {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .faq-item {
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .faq-question {
+        padding: var(--spacing-sm) var(--spacing-md);
     }
     
     .faq-question h3 {
-        font-size: var(--font-size-base);
+        font-size: var(--font-size-sm);
+        line-height: 1.4;
     }
     
-    .faq-contact-content h2 {
-        font-size: var(--font-size-2xl);
+    .faq-question i {
+        font-size: 0.65rem;
     }
-}
-
-@media (max-width: 480px) {
-    .faq-hero-title {
-        font-size: var(--font-size-3xl);
+    
+    .faq-answer p {
+        padding: 0 var(--spacing-md) var(--spacing-sm);
+        font-size: var(--font-size-sm);
+        line-height: 1.5;
+    }
+    
+    .faq-item.active .faq-answer {
+        max-height: 600px;
     }
     
     .faq-contact {
-        padding: var(--spacing-xl);
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+    
+    .faq-contact-content h2 {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .faq-contact-content p {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .btn-contact {
+        width: 100%;
+        max-width: 300px;
+        padding: var(--spacing-sm) var(--spacing-lg);
+        font-size: var(--font-size-sm);
+    }
+}
+
+@media (max-width: 360px) {
+    .faq-hero {
+        padding: calc(60px + var(--spacing-md)) 0 var(--spacing-md);
+    }
+    
+    .faq-hero-title {
+        font-size: var(--font-size-xl);
+    }
+    
+    .faq-hero-subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .container {
+        padding: 0 var(--spacing-xs);
+    }
+    
+    .search-box input {
+        padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-xs) calc(var(--spacing-lg) * 2);
+        font-size: 0.8rem;
+    }
+    
+    .search-box i {
+        left: var(--spacing-xs);
+        font-size: 0.8rem;
+    }
+    
+    .category-btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.8rem;
+    }
+    
+    .faq-question {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .faq-question h3 {
+        font-size: 0.8rem;
+    }
+    
+    .faq-answer p {
+        padding: 0 var(--spacing-sm) var(--spacing-xs);
+        font-size: 0.8rem;
+    }
+    
+    .faq-contact {
+        padding: var(--spacing-md) var(--spacing-sm);
+    }
+    
+    .faq-contact-content h2 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .faq-contact-content p {
+        font-size: 0.8rem;
+    }
+    
+    .btn-contact {
+        font-size: 0.8rem;
+        padding: var(--spacing-xs) var(--spacing-md);
+    }
+}
+
+/* Touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .faq-question {
+        min-height: 48px;
+        -webkit-tap-highlight-color: rgba(37, 99, 235, 0.1);
+    }
+    
+    .category-btn {
+        min-height: 44px;
+        -webkit-tap-highlight-color: rgba(37, 99, 235, 0.3);
+    }
+    
+    .btn-contact {
+        min-height: 48px;
+    }
+    
+    .search-box input {
+        min-height: 44px;
     }
 }
 </style>
@@ -529,7 +801,6 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Accordéon FAQ
     const faqItems = document.querySelectorAll('.faq-item');
     
     faqItems.forEach(item => {
@@ -537,29 +808,24 @@ document.addEventListener('DOMContentLoaded', function() {
         question.addEventListener('click', function() {
             const isActive = item.classList.contains('active');
             
-            // Fermer tous les autres items
             faqItems.forEach(otherItem => {
                 if (otherItem !== item) {
                     otherItem.classList.remove('active');
                 }
             });
             
-            // Toggle l'item actuel
             item.classList.toggle('active', !isActive);
         });
     });
 
-    // Filtrage par catégorie
     const categoryButtons = document.querySelectorAll('.category-btn');
     categoryButtons.forEach(btn => {
         btn.addEventListener('click', function() {
             const category = this.dataset.category;
             
-            // Mettre à jour les boutons actifs
             categoryButtons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
-            // Filtrer les items
             faqItems.forEach(item => {
                 if (category === 'all' || item.dataset.category === category) {
                     item.classList.remove('hidden');
@@ -570,7 +836,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Recherche
     const searchInput = document.getElementById('faqSearch');
     if (searchInput) {
         searchInput.addEventListener('input', function() {

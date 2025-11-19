@@ -482,18 +482,32 @@
     margin-top: var(--spacing-xs);
 }
 
+@media (max-width: 1200px) {
+    .actions-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 @media (max-width: 1024px) {
     .dashboard {
         grid-template-columns: 1fr;
-        gap: var(--spacing-2xl);
+        gap: var(--spacing-xl);
+    }
+    
+    .profil-container {
+        padding: var(--spacing-2xl) var(--spacing-md);
     }
     
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
     
     .stat-card.large {
         grid-column: span 1;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -503,28 +517,136 @@
     }
     
     .profil-header {
-        padding: var(--spacing-xl);
+        flex-direction: column;
+        text-align: center;
+        padding: var(--spacing-lg);
+        gap: var(--spacing-md);
+    }
+    
+    .profile-info {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+    
+    .profile-avatar img {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .profile-details {
+        align-items: center;
     }
     
     .profil-title {
-        font-size: var(--font-size-3xl);
+        font-size: var(--font-size-xl);
+    }
+    
+    .profil-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-edit-profil {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
     }
     
     .actions-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+    
+    .action-card {
+        padding: var(--spacing-md);
+        min-height: 90px;
+    }
+    
+    .action-icon {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .action-icon i {
+        font-size: var(--font-size-base);
+    }
+    
+    .action-content h3 {
+        font-size: var(--font-size-sm);
+    }
+    
+    .action-content p {
+        font-size: 0.7rem;
     }
     
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
     }
     
-    .profile {
-        flex-direction: column;
-        text-align: center;
+    .stat-card {
+        padding: var(--spacing-md);
     }
     
-    .profile-info {
-        align-items: center;
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .stat-icon i {
+        font-size: var(--font-size-sm);
+    }
+    
+    .stat-number {
+        font-size: var(--font-size-lg);
+    }
+    
+    .stat-number.large {
+        font-size: var(--font-size-xl);
+    }
+    
+    .quick-actions h2,
+    .stats-section h2,
+    .activity-section h2 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .bookings-section,
+    .messages-section {
+        padding: var(--spacing-md);
+    }
+    
+    .bookings-section h2,
+    .messages-section h2 {
+        font-size: var(--font-size-base);
+    }
+    
+    .activity-item {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .activity-content h4 {
+        font-size: 0.8rem;
+    }
+    
+    .activity-content p {
+        font-size: 0.7rem;
+    }
+    
+    .booking-location {
+        font-size: var(--font-size-sm);
+    }
+    
+    .booking-date {
+        font-size: 0.8rem;
+    }
+    
+    .message-content h4 {
+        font-size: var(--font-size-sm);
+    }
+    
+    .message-content p {
+        font-size: 0.8rem;
     }
 }
 
@@ -534,17 +656,26 @@
     }
     
     .profil-header {
-        padding: var(--spacing-lg);
+        padding: var(--spacing-md);
+        gap: var(--spacing-sm);
+    }
+    
+    .profile-avatar img {
+        width: 60px;
+        height: 60px;
+        border-width: 2px;
     }
     
     .profil-title {
-        font-size: var(--font-size-2xl);
+        font-size: var(--font-size-lg);
     }
     
-    .action-card,
-    .stat-card,
-    .activity-item {
-        padding: var(--spacing-md);
+    .profile-role {
+        font-size: 0.75rem;
+    }
+    
+    .profile-status {
+        font-size: 0.7rem;
     }
     
     .profil-actions {
@@ -555,5 +686,225 @@
     .btn-edit-profil {
         width: 100%;
         justify-content: center;
+        padding: var(--spacing-xs) var(--spacing-md);
+        font-size: 0.8rem;
+    }
+    
+    .quick-actions h2,
+    .stats-section h2,
+    .activity-section h2 {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .actions-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xs);
+    }
+    
+    .action-card {
+        padding: var(--spacing-sm) var(--spacing-md);
+        min-height: 70px;
+    }
+    
+    .action-icon {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .action-icon i {
+        font-size: var(--font-size-sm);
+    }
+    
+    .action-content h3 {
+        font-size: 0.8rem;
+    }
+    
+    .action-content p {
+        font-size: 0.65rem;
+    }
+    
+    .stat-card {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .stat-icon {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .stat-number {
+        font-size: var(--font-size-base);
+    }
+    
+    .stat-number.large {
+        font-size: var(--font-size-lg);
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+    
+    .activity-item {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .activity-content h4 {
+        font-size: 0.75rem;
+    }
+    
+    .activity-content p {
+        font-size: 0.65rem;
+    }
+    
+    .activity-time span {
+        font-size: 0.65rem;
+    }
+    
+    .bookings-section,
+    .messages-section {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .bookings-section h2,
+    .messages-section h2 {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .booking-item {
+        padding: var(--spacing-sm) 0;
+    }
+    
+    .booking-location {
+        font-size: 0.8rem;
+    }
+    
+    .booking-date {
+        font-size: 0.7rem;
+    }
+    
+    .booking-price {
+        font-size: var(--font-size-base);
+    }
+    
+    .guest-count {
+        font-size: 0.75rem;
+    }
+    
+    .guest-avatars img {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .message-avatar img {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .message-content h4 {
+        font-size: 0.8rem;
+    }
+    
+    .message-content p {
+        font-size: 0.75rem;
+    }
+    
+    .message-time span {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .profil-container {
+        padding: var(--spacing-md) var(--spacing-xs);
+    }
+    
+    .profil-header {
+        padding: var(--spacing-sm);
+    }
+    
+    .profile-avatar img {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .profil-title {
+        font-size: var(--font-size-base);
+    }
+    
+    .profile-role {
+        font-size: 0.7rem;
+        padding: 2px var(--spacing-xs);
+    }
+    
+    .btn-edit-profil {
+        font-size: 0.75rem;
+        padding: 6px var(--spacing-sm);
+    }
+    
+    .quick-actions h2,
+    .stats-section h2,
+    .activity-section h2 {
+        font-size: var(--font-size-sm);
+    }
+    
+    .action-card {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        min-height: 60px;
+        gap: var(--spacing-xs);
+    }
+    
+    .action-icon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .action-icon i {
+        font-size: 0.8rem;
+    }
+    
+    .action-content h3 {
+        font-size: 0.75rem;
+    }
+    
+    .action-content p {
+        font-size: 0.6rem;
+    }
+    
+    .stat-card {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .stat-number {
+        font-size: var(--font-size-sm);
+    }
+    
+    .stat-number.large {
+        font-size: var(--font-size-base);
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
+    }
+    
+    .bookings-section h2,
+    .messages-section h2 {
+        font-size: 0.8rem;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .action-card {
+        min-height: 60px;
+        -webkit-tap-highlight-color: rgba(37, 99, 235, 0.1);
+    }
+    
+    .btn-edit-profil {
+        min-height: 44px;
+    }
+    
+    .stat-card {
+        -webkit-tap-highlight-color: transparent;
     }
 }

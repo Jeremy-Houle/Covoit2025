@@ -175,7 +175,6 @@
   position: relative;
 }
 
-/* Checkmark visible */
 .checkbox-content::before {
   content: '✓';
   position: absolute;
@@ -250,7 +249,7 @@
 }
 .mes-favoris .actions {
     display: flex;
-    gap: 10px; /* Espacement entre les boutons */
+    gap: 10px; 
     align-items: center;
 }
 
@@ -263,7 +262,7 @@
 }
 
 .mes-favoris .btn i {
-    margin-right: 5px; /* Espacement entre l'icône et le texte */
+    margin-right: 5px; 
 }
 
 
@@ -287,48 +286,229 @@
 @media (max-width: 1024px) {
   .publier-layout {
     grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
+    gap: var(--spacing-lg);
   }
   
   .map-container-publier {
     height: 400px;
+    position: relative;
+    top: 0;
+  }
+  
+  .publier-page {
+    padding-bottom: var(--spacing-2xl);
   }
 }
 
 @media (max-width: 768px) {
+  .publier-page {
+    padding-bottom: var(--spacing-xl);
+  }
+  
   .form-section {
     padding: var(--spacing-lg);
   }
   
   .form-row {
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .form-group label {
+    font-size: var(--font-size-sm);
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
   }
   
   .preferences-grid {
     grid-template-columns: 1fr;
+    gap: var(--spacing-xs);
   }
   
   .map-container-publier {
     height: 300px;
   }
   
+  .map-info {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+  
+  .map-info i {
+    font-size: var(--font-size-lg);
+  }
+  
   .btn-submit {
-    padding: var(--spacing-md) var(--spacing-xl);
+    padding: var(--spacing-md);
+    font-size: var(--font-size-base);
+  }
+  
+  .form-group-title {
+    font-size: var(--font-size-base);
+    margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .form-group-title i {
     font-size: var(--font-size-base);
   }
 }
 
 @media (max-width: 480px) {
-  .form-group-title {
-    font-size: var(--font-size-lg);
+  .publier-page {
+    padding-bottom: var(--spacing-lg);
   }
   
-  .checkbox-content {
+  .form-section {
     padding: var(--spacing-md);
   }
   
+  .modern-form {
+    gap: var(--spacing-md);
+  }
+  
+  .form-group-title {
+    font-size: var(--font-size-sm);
+    gap: var(--spacing-xs);
+    padding-bottom: 4px;
+    margin-top: var(--spacing-xs);
+  }
+  
+  .form-group-title i {
+    font-size: var(--font-size-sm);
+  }
+  
+  .form-group {
+    gap: 4px;
+  }
+  
+  .form-group label {
+    font-size: 0.8rem;
+  }
+  
+  .form-group label i {
+    font-size: var(--font-size-sm);
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+  
+  .checkbox-content {
+    padding: var(--spacing-sm);
+  }
+  
   .checkbox-content i {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
+  }
+  
+  .checkbox-content span {
+    font-size: 0.75rem;
+  }
+  
+  .checkbox-content::before {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+  }
+  
+  .map-container-publier {
+    height: 250px;
+  }
+  
+  .map-info {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.8rem;
+    gap: var(--spacing-sm);
+  }
+  
+  .map-info i {
+    font-size: var(--font-size-base);
+  }
+  
+  .btn-submit {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-md);
+  }
+  
+  .btn-submit i {
+    font-size: var(--font-size-base);
+  }
+}
+
+@media (max-width: 360px) {
+  .form-section {
+    padding: var(--spacing-sm);
+  }
+  
+  .form-group-title {
+    font-size: 0.8rem;
+  }
+  
+  .form-group label {
+    font-size: 0.75rem;
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 6px var(--spacing-xs);
+    font-size: 0.8rem;
+  }
+  
+  .checkbox-content {
+    padding: var(--spacing-xs);
+  }
+  
+  .checkbox-content i {
+    font-size: var(--font-size-base);
+  }
+  
+  .checkbox-content span {
+    font-size: 0.7rem;
+  }
+  
+  .map-container-publier {
+    height: 220px;
+  }
+  
+  .map-info {
+    font-size: 0.75rem;
+  }
+  
+  .btn-submit {
+    font-size: 0.8rem;
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .form-group input,
+  .form-group select {
+    min-height: 44px;
+  }
+  
+  .checkbox-card {
+    min-height: 44px;
+  }
+  
+  .checkbox-content {
+    min-height: 60px;
+    -webkit-tap-highlight-color: rgba(37, 99, 235, 0.1);
+  }
+  
+  .btn-submit {
+    min-height: 48px;
+  }
+  
+  .trash-button {
+    min-width: 44px;
+    min-height: 44px;
   }
 }

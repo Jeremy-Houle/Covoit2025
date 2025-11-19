@@ -270,33 +270,314 @@
     margin-left: var(--spacing-xs);
 }
 
-@media (max-width: 968px) {
+@media (max-width: 1024px) {
+    .contact-page {
+        padding: calc(70px + var(--spacing-lg)) var(--spacing-md) var(--spacing-xl);
+    }
+    
     .contact-content {
-        grid-template-columns: 1fr;
+        gap: var(--spacing-xl);
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-page {
+        padding: calc(70px + var(--spacing-md)) var(--spacing-sm) var(--spacing-xl);
+    }
+    
+    .contact-header {
+        margin-bottom: var(--spacing-xl);
     }
     
     .contact-header h1 {
         font-size: var(--font-size-2xl);
     }
     
-    .map-container {
-        height: 300px;
+    .contact-header p {
+        font-size: var(--font-size-base);
+        padding: 0 var(--spacing-sm);
     }
-}
-
-@media (max-width: 480px) {
-    .contact-page {
-        padding: calc(70px + var(--spacing-md)) var(--spacing-sm) var(--spacing-lg);
+    
+    .contact-content {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
     }
     
     .contact-info-card,
     .contact-form-card,
     .map-card {
-        padding: var(--spacing-lg);
+        padding: var(--spacing-xl);
+    }
+    
+    .info-title,
+    .form-title,
+    .map-title {
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .info-item {
+        padding: var(--spacing-sm) var(--spacing-md);
+        gap: var(--spacing-sm);
+    }
+    
+    .info-icon {
+        width: 35px;
+        height: 35px;
+        font-size: var(--font-size-base);
+    }
+    
+    .info-details h3 {
+        font-size: 0.7rem;
+    }
+    
+    .info-details p {
+        font-size: var(--font-size-sm);
+    }
+    
+    .form-input,
+    .form-textarea {
+        padding: var(--spacing-sm);
+        font-size: var(--font-size-sm);
+    }
+    
+    .submit-btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+    
+    .map-container {
+        height: 300px;
+    }
+    
+    .hours-section {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .hours-section h4 {
+        font-size: var(--font-size-sm);
+    }
+    
+    .hours-section p {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-page {
+        padding: calc(60px + var(--spacing-sm)) var(--spacing-xs) var(--spacing-lg);
+    }
+    
+    .contact-header {
+        margin-bottom: var(--spacing-lg);
     }
     
     .contact-header h1 {
         font-size: var(--font-size-xl);
+        padding: 0 var(--spacing-xs);
+    }
+    
+    .contact-header p {
+        font-size: var(--font-size-sm);
+        padding: 0 var(--spacing-xs);
+        line-height: 1.5;
+    }
+    
+    .contact-content {
+        gap: var(--spacing-md);
+    }
+    
+    .contact-info-card,
+    .contact-form-card,
+    .map-card {
+        padding: var(--spacing-md);
+    }
+    
+    .info-title,
+    .form-title,
+    .map-title {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--spacing-sm);
+        gap: var(--spacing-xs);
+    }
+    
+    .info-title i,
+    .form-title i,
+    .map-title i {
+        font-size: var(--font-size-sm);
+    }
+    
+    .info-item {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        gap: var(--spacing-xs);
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .info-icon {
+        width: 32px;
+        height: 32px;
+        font-size: var(--font-size-sm);
+    }
+    
+    .info-details h3 {
+        font-size: 0.65rem;
+        margin-bottom: 2px;
+    }
+    
+    .info-details p {
+        font-size: var(--font-size-sm);
+        line-height: 1.4;
+    }
+    
+    .form-group {
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .form-label {
+        font-size: var(--font-size-sm);
+        margin-bottom: 4px;
+    }
+    
+    .form-input,
+    .form-textarea {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-sm);
+    }
+    
+    .form-textarea {
+        min-height: 100px;
+    }
+    
+    .submit-btn {
+        padding: var(--spacing-sm);
+        font-size: var(--font-size-sm);
+        gap: var(--spacing-xs);
+    }
+    
+    .map-container {
+        height: 250px;
+    }
+    
+    .hours-section {
+        margin-top: var(--spacing-sm);
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .hours-section h4 {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--spacing-xs);
+        flex-wrap: wrap;
+    }
+    
+    .hours-section p {
+        font-size: 0.75rem;
+    }
+    
+    .open-badge {
+        font-size: 0.65rem;
+        padding: 2px var(--spacing-xs);
+    }
+}
+
+@media (max-width: 360px) {
+    .contact-page {
+        padding: calc(60px + var(--spacing-xs)) var(--spacing-xs) var(--spacing-md);
+    }
+    
+    .contact-header h1 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .contact-header p {
+        font-size: 0.8rem;
+    }
+    
+    .contact-info-card,
+    .contact-form-card,
+    .map-card {
+        padding: var(--spacing-sm);
+    }
+    
+    .info-title,
+    .form-title,
+    .map-title {
+        font-size: var(--font-size-sm);
+    }
+    
+    .info-item {
+        padding: var(--spacing-xs);
+    }
+    
+    .info-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+    
+    .info-details h3 {
+        font-size: 0.6rem;
+    }
+    
+    .info-details p {
+        font-size: 0.8rem;
+    }
+    
+    .form-label {
+        font-size: 0.8rem;
+    }
+    
+    .form-input,
+    .form-textarea {
+        padding: var(--spacing-xs);
+        font-size: 0.8rem;
+    }
+    
+    .submit-btn {
+        font-size: 0.8rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .map-container {
+        height: 220px;
+    }
+    
+    .hours-section h4 {
+        font-size: 0.8rem;
+    }
+    
+    .hours-section p {
+        font-size: 0.7rem;
+    }
+    
+    .open-badge {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+    }
+}
+
+/* Touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .info-item {
+        -webkit-tap-highlight-color: rgba(37, 99, 235, 0.05);
+    }
+    
+    .info-item:hover {
+        transform: none;
+    }
+    
+    .form-input,
+    .form-textarea {
+        min-height: 44px;
+    }
+    
+    .submit-btn {
+        min-height: 48px;
+    }
+    
+    .info-details a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
     }
 }
 </style>

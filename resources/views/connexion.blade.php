@@ -256,7 +256,12 @@
 
 @media (max-width: 768px) {
     .auth-page {
-        padding: calc(70px + var(--spacing-xs)) var(--spacing-sm) var(--spacing-xs);
+        padding: calc(70px + var(--spacing-sm)) var(--spacing-sm) var(--spacing-sm);
+    }
+    
+    .auth-container {
+        max-width: 100%;
+        padding: 0 var(--spacing-sm);
     }
     
     .auth-card {
@@ -266,15 +271,208 @@
     .auth-header h1 {
         font-size: var(--font-size-xl);
     }
+    
+    .auth-header h1::before {
+        font-size: var(--font-size-lg);
+    }
+    
+    .auth-header p {
+        font-size: 0.8rem;
+    }
+    
+    .form-input {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-sm);
+    }
+    
+    .auth-button {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
 }
 
 @media (max-width: 480px) {
+    .auth-page {
+        padding: calc(60px + var(--spacing-xs)) var(--spacing-xs) var(--spacing-xs);
+    }
+    
+    .auth-container {
+        padding: 0 var(--spacing-xs);
+    }
+    
     .auth-card {
         padding: var(--spacing-md);
     }
     
+    .auth-header {
+        margin-bottom: var(--spacing-md);
+    }
+    
     .auth-header h1 {
         font-size: var(--font-size-lg);
+        gap: 6px;
+    }
+    
+    .auth-header h1::before {
+        font-size: var(--font-size-base);
+    }
+    
+    .auth-header p {
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
+    
+    .form-group {
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .form-label {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+    }
+    
+    .form-input {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-sm);
+    }
+    
+    .checkbox-group {
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .checkbox-label {
+        font-size: 0.7rem;
+    }
+    
+    .auth-button {
+        padding: var(--spacing-sm);
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .auth-form {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .divider {
+        margin: var(--spacing-sm) 0;
+    }
+    
+    .divider span {
+        font-size: 0.7rem;
+    }
+    
+    .social-buttons {
+        gap: var(--spacing-xs);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .social-button {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.7rem;
+    }
+    
+    .social-icon {
+        font-size: var(--font-size-xs);
+    }
+    
+    .auth-footer p {
+        font-size: 0.7rem;
+        margin: 6px 0;
+    }
+    
+    .forgot-password {
+        font-size: 0.7rem !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .auth-page {
+        padding: calc(60px + 4px) 4px 4px;
+    }
+    
+    .auth-container {
+        padding: 0 4px;
+    }
+    
+    .auth-card {
+        padding: var(--spacing-sm);
+    }
+    
+    .auth-header h1 {
+        font-size: var(--font-size-base);
+        gap: 4px;
+    }
+    
+    .auth-header h1::before {
+        font-size: var(--font-size-sm);
+    }
+    
+    .auth-header p {
+        font-size: 0.7rem;
+    }
+    
+    .form-label {
+        font-size: 0.65rem;
+    }
+    
+    .form-input {
+        padding: 6px var(--spacing-xs);
+        font-size: 0.8rem;
+    }
+    
+    .checkbox-label {
+        font-size: 0.65rem;
+    }
+    
+    .auth-button {
+        font-size: 0.8rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .social-button {
+        font-size: 0.65rem;
+        padding: 6px var(--spacing-xs);
+    }
+    
+    .auth-footer p,
+    .forgot-password {
+        font-size: 0.65rem !important;
+    }
+}
+
+/* Touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .form-input {
+        min-height: 44px;
+    }
+    
+    .checkbox-group {
+        min-height: 44px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        min-width: 20px;
+        min-height: 20px;
+    }
+    
+    .auth-button {
+        min-height: 48px;
+    }
+    
+    .social-button {
+        min-height: 44px;
+    }
+    
+    .auth-footer a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        padding: var(--spacing-xs) 0;
     }
 }
 </style>

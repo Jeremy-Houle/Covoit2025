@@ -16,6 +16,26 @@
     align-items: center;
 }
 
+@media (hover: none) and (pointer: coarse) {
+    .btn-voir-details,
+    .btn-voir-plus,
+    .cta-button {
+        min-height: 48px;
+        -webkit-tap-highlight-color: rgba(37, 99, 235, 0.3);
+    }
+    
+    .value-card,
+    .step-card,
+    .benefit-card,
+    .trajet-card {
+        -webkit-tap-highlight-color: rgba(37, 99, 235, 0.1);
+    }
+    
+    .nav-link {
+        min-height: 44px;
+    }
+}
+
 .hero-video {
     position: absolute;
     top: 0;
@@ -119,7 +139,6 @@
     font-size: var(--font-size-base);
 }
 
-/* Section Trajets Populaires */
 .trajets-populaires-section {
     padding: var(--spacing-3xl) 0;
     background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
@@ -160,12 +179,18 @@
 
 .trajets-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
+}
+
+@media (max-width: 320px) {
+    .trajets-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .trajet-card {
@@ -362,10 +387,37 @@
     box-shadow: var(--shadow-xl);
 }
 
+@media (max-width: 1200px) {
+    .values-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xl);
+    }
+    
+    .steps-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xl);
+    }
+}
+
 @media (max-width: 1024px) {
     .trajets-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-md);
+    }
+    
+    .benefits-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xl);
+    }
+    
+    .hero-section {
+        padding: calc(70px + var(--spacing-2xl)) 0 var(--spacing-2xl);
+    }
+    
+    .value-card,
+    .step-card,
+    .benefit-card {
+        padding: var(--spacing-xl);
     }
 }
 
@@ -385,6 +437,67 @@
     
     .trajet-card {
         padding: var(--spacing-md);
+    }
+    
+    .hero-title {
+        font-size: var(--font-size-3xl);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .hero-subtitle {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .hero-section {
+        padding: calc(70px + var(--spacing-xl)) 0 var(--spacing-xl);
+        min-height: 70vh;
+    }
+    
+    .value-icon,
+    .step-icon {
+        width: 70px;
+        height: 70px;
+        font-size: var(--font-size-2xl);
+    }
+    
+    .benefit-icon {
+        width: 70px;
+        height: 70px;
+        font-size: var(--font-size-2xl);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .benefit-card {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+    
+    .value-title,
+    .step-title {
+        font-size: var(--font-size-xl);
+    }
+    
+    .benefit-content h3 {
+        font-size: var(--font-size-xl);
+    }
+    
+    .cta-title {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .cta-subtitle {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .values-section,
+    .how-it-works-section,
+    .why-choose-section,
+    .trajets-populaires-section,
+    .cta-section {
+        padding: var(--spacing-xl) 0;
     }
 }
 
@@ -623,7 +736,22 @@
 
 @media (max-width: 480px) {
     .hero-title {
-        font-size: var(--font-size-3xl);
+        font-size: var(--font-size-2xl);
+        line-height: 1.3;
+    }
+    
+    .hero-subtitle {
+        font-size: var(--font-size-sm);
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .hero-section {
+        min-height: 60vh;
+        padding: calc(60px + var(--spacing-lg)) 0 var(--spacing-lg);
+    }
+    
+    .hero-content {
+        padding: 0 var(--spacing-md);
     }
     
     .value-card,
@@ -632,9 +760,155 @@
         padding: var(--spacing-lg);
     }
     
+    .value-icon,
+    .step-icon {
+        width: 60px;
+        height: 60px;
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .benefit-icon {
+        width: 60px;
+        height: 60px;
+        font-size: var(--font-size-xl);
+    }
+    
+    .value-title,
+    .step-title {
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .benefit-content h3 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .value-description,
+    .step-description,
+    .benefit-content p {
+        font-size: var(--font-size-sm);
+    }
+    
+    .section-title {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .section-subtitle {
+        font-size: var(--font-size-sm);
+        padding: 0 var(--spacing-sm);
+    }
+    
     .cta-button {
         width: 100%;
-        max-width: 300px;
+        max-width: 100%;
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: var(--font-size-base);
+    }
+    
+    .cta-title {
+        font-size: var(--font-size-xl);
+    }
+    
+    .cta-subtitle {
+        font-size: var(--font-size-sm);
+        padding: 0 var(--spacing-md);
+    }
+    
+    .trajet-route {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .route-arrow {
+        transform: rotate(90deg);
+        margin: 0 auto;
+    }
+    
+    .route-point {
+        width: 100%;
+    }
+    
+    .trajet-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .btn-voir-details,
+    .btn-voir-plus {
+        width: 100%;
+        padding: var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+    
+    .values-section,
+    .how-it-works-section,
+    .why-choose-section,
+    .trajets-populaires-section,
+    .cta-section {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .values-grid,
+    .steps-grid,
+    .benefits-grid {
+        gap: var(--spacing-lg);
+    }
+    
+    .step-number {
+        width: 35px;
+        height: 35px;
+        font-size: var(--font-size-base);
+    }
+    
+    .container {
+        padding: 0 var(--spacing-md);
+    }
+}
+
+@media (max-width: 360px) {
+    .hero-title {
+        font-size: var(--font-size-xl);
+    }
+    
+    .hero-subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .section-title {
+        font-size: var(--font-size-lg);
+    }
+    
+    .value-icon,
+    .step-icon,
+    .benefit-icon {
+        width: 50px;
+        height: 50px;
+        font-size: var(--font-size-lg);
+    }
+    
+    .value-title,
+    .step-title,
+    .benefit-content h3 {
+        font-size: var(--font-size-base);
+    }
+    
+    .cta-title {
+        font-size: var(--font-size-lg);
+    }
+    
+    .step-number {
+        width: 30px;
+        height: 30px;
+        font-size: var(--font-size-sm);
+        top: -12px;
+    }
+    
+    .trajet-card {
+        padding: var(--spacing-sm);
     }
 }
 </style>

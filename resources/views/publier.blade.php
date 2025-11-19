@@ -5,7 +5,6 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/publier.css') }}?v={{ time() }}">
     <style>
-        /* Style pour le tableau de mes trajets */
         .mes-trajets {
             margin-top: 20px;
             max-height: 500px;
@@ -33,13 +32,41 @@
             color: #333;
             margin-bottom: 15px;
         }
+        
+        .mes-favoris {
+            margin-top: 40px;
+        }
+        
+        .mes-favoris h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .publier-main {
+            width: 100%;
+        }
+        
+        .empty-message {
+            margin-top: 30px;
+            color: #555;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .inline-form {
+            display: inline;
+        }
 
-        /* ---- MODAL ---- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -58,6 +85,7 @@
         .modal-content h3 {
             margin-bottom: 10px;
             color: #333;
+            font-size: var(--font-size-lg);
         }
         .modal-content p {
             color: #555;
@@ -67,14 +95,16 @@
         .modal-buttons {
             display: flex;
             justify-content: space-around;
+            gap: var(--spacing-md);
         }
         .btn-cancel, .btn-confirm {
-            padding: 8px 16px;
+            padding: 10px 20px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             transition: 0.2s ease;
+            flex: 1;
         }
         .btn-cancel {
             background: #e0e0e0;
@@ -94,12 +124,265 @@
             from {opacity: 0; transform: translateY(-10px);}
             to {opacity: 1; transform: translateY(0);}
         }
+        
+        .notification-consent {
+            margin-top: var(--spacing-md);
+        }
+        
+        .consent-checkbox {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--light-blue);
+            border-radius: var(--border-radius-lg);
+            border: 2px solid var(--primary-blue);
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+        
+        .consent-checkbox:hover {
+            background: rgba(37, 99, 235, 0.15);
+        }
+        
+        .consent-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary-blue);
+            flex-shrink: 0;
+        }
+        
+        .consent-content {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: flex-start;
+            flex: 1;
+        }
+        
+        .consent-content i {
+            color: var(--primary-blue);
+            font-size: var(--font-size-lg);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .consent-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .consent-text strong {
+            color: var(--gray-800);
+            font-size: var(--font-size-sm);
+        }
+        
+        .consent-text small {
+            color: var(--gray-600);
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .publier-container {
+            padding-top: 100px;
+        }
+        
+        @media (max-width: 768px) {
+            .publier-container {
+                padding-top: 80px;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .mes-trajets table,
+            .mes-favoris table {
+                font-size: var(--font-size-sm);
+            }
+            
+            .mes-trajets th,
+            .mes-favoris th {
+                padding: var(--spacing-xs) var(--spacing-sm);
+                font-size: 0.8rem;
+            }
+            
+            .mes-trajets td,
+            .mes-favoris td {
+                padding: var(--spacing-xs) var(--spacing-sm);
+                font-size: 0.75rem;
+            }
+            
+            .mes-trajets h2,
+            .mes-favoris h2 {
+                font-size: var(--font-size-lg);
+            }
+            
+            .trash-button {
+                font-size: 1rem;
+                padding: var(--spacing-xs);
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: var(--spacing-lg);
+            }
+            
+            .modal-content h3 {
+                font-size: var(--font-size-base);
+            }
+            
+            .modal-content p {
+                font-size: var(--font-size-sm);
+            }
+            
+            .consent-checkbox {
+                padding: var(--spacing-sm);
+                gap: var(--spacing-sm);
+            }
+            
+            .consent-content i {
+                font-size: var(--font-size-base);
+            }
+            
+            .consent-text strong {
+                font-size: 0.8rem;
+            }
+            
+            .consent-text small {
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .publier-container {
+                padding-top: 70px;
+            }
+            
+            .mes-trajets,
+            .mes-favoris {
+                margin-top: var(--spacing-md);
+            }
+            
+            .mes-trajets h2,
+            .mes-favoris h2 {
+                font-size: var(--font-size-base);
+                margin-bottom: var(--spacing-sm);
+            }
+            
+            .mes-trajets table,
+            .mes-favoris table {
+                font-size: 0.75rem;
+            }
+            
+            .mes-trajets th,
+            .mes-favoris th {
+                padding: 6px 8px;
+                font-size: 0.7rem;
+            }
+            
+            .mes-trajets td,
+            .mes-favoris td {
+                padding: 6px 8px;
+                font-size: 0.7rem;
+            }
+            
+            .trash-button {
+                font-size: 0.9rem;
+            }
+            
+            .btn {
+                font-size: 0.7rem !important;
+                padding: 4px 8px !important;
+            }
+            
+            .modal-content {
+                padding: var(--spacing-md);
+            }
+            
+            .modal-content h3 {
+                font-size: var(--font-size-sm);
+                margin-bottom: var(--spacing-xs);
+            }
+            
+            .modal-content p {
+                font-size: 0.8rem;
+                margin-bottom: var(--spacing-md);
+            }
+            
+            .modal-buttons {
+                gap: var(--spacing-sm);
+            }
+            
+            .btn-cancel, .btn-confirm {
+                padding: var(--spacing-xs) var(--spacing-md);
+                font-size: 0.8rem;
+            }
+            
+            .consent-checkbox {
+                padding: var(--spacing-xs) var(--spacing-sm);
+            }
+            
+            .consent-checkbox input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .consent-content i {
+                font-size: var(--font-size-sm);
+            }
+            
+            .consent-text strong {
+                font-size: 0.75rem;
+            }
+            
+            .consent-text small {
+                font-size: 0.65rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .publier-container {
+                padding-top: 65px;
+            }
+            
+            .mes-trajets h2,
+            .mes-favoris h2 {
+                font-size: var(--font-size-sm);
+            }
+            
+            .mes-trajets th,
+            .mes-favoris th,
+            .mes-trajets td,
+            .mes-favoris td {
+                padding: 4px 6px;
+                font-size: 0.65rem;
+            }
+            
+            .modal-content {
+                padding: var(--spacing-sm);
+            }
+            
+            .modal-content h3 {
+                font-size: 0.8rem;
+            }
+            
+            .modal-content p {
+                font-size: 0.75rem;
+            }
+            
+            .btn-cancel, .btn-confirm {
+                padding: 6px var(--spacing-sm);
+                font-size: 0.75rem;
+            }
+        }
     </style>
 @endpush
 
 @section('content')
 <div class="publier-page">
-    <div class="container" style="padding-top: 100px;">
+    <div class="container publier-container">
         <div class="page-header">
             <h1 class="page-title">
                 <i class="fa fa-plus-circle"></i> Publier un trajet
@@ -121,10 +404,10 @@
         @endif
        
 
-        <div class="publier-layout" style="display: flex; gap: 30px;">
-            <div style="flex: 1;">
+        <div class="publier-layout">
+            <div class="publier-main">
                 <div class="map-section">
-                    <div class="map-container-publier" style="height: 400px;">
+                    <div class="map-container-publier">
                         <div id="map"></div>
                     </div>
                     <div class="map-info">
@@ -135,7 +418,7 @@
 
                 <div class="mes-trajets">
                     @if($mesTrajets->isEmpty()) 
-                        <p style="margin-top: 30px; color: #555;">Vous n'avez aucun trajet publié.</p>
+                        <p class="empty-message">Vous n'avez aucun trajet publié.</p>
                     @else
                         <h2>Mes trajets publiés</h2>
                         <div class="table-responsive">
@@ -186,9 +469,9 @@
                     @endif
                 </div>
 
-                <div class="mes-favoris" style="margin-top: 40px;">
+                <div class="mes-favoris">
                     @if($mesFavoris->isEmpty())
-                        <p style="color: #555;">Vous n'avez aucun trajet dans vos sauvegardés.</p>
+                        <p class="empty-message">Vous n'avez aucun trajet dans vos sauvegardés.</p>
                     @else
                         <h2>Mes trajets sauvegardés</h2>
                         <div class="table-responsive">
@@ -210,8 +493,7 @@
                                             <td>{{ $favori->PlacesDisponibles }}</td>
                                             <td>{{ $favori->Prix }} $</td>
                                             <td>
-                                                <div style="display: flex; gap: 10px; align-items: center;">
-                                                    <!-- Bouton Réajouter -->
+                                                <div class="action-buttons">
                                                     <button title="Réajouter ce trajet"
                                                         class="btn btn-sm btn-success btn-reajouter" 
                                                         data-depart="{{ $favori->Depart }}" 
@@ -221,8 +503,7 @@
                                                         <i class="fas fa-redo"></i> Réajouter
                                                     </button>
 
-                                                    <!-- Bouton Enlever -->
-                                                    <form action="{{ route('favoris.delete', $favori->IdFavori) }}" method="POST" style="display:inline;">
+                                                    <form action="{{ route('favoris.delete', $favori->IdFavori) }}" method="POST" class="inline-form">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
@@ -240,7 +521,7 @@
                 </div>
             </div>
 
-            <div class="form-section" style="flex: 1;">
+            <div class="form-section">
                 <form action="{{ route('trajets.store') }}" method="POST" id="trajetForm" class="modern-form">
                     @csrf
                     <input type="hidden" name="IdConducteur" value="{{ session('utilisateur_id') }}">

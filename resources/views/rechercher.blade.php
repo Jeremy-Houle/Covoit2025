@@ -2,6 +2,130 @@
 
 @section('title', 'Rechercher - Covoit2025')
 
+@push('styles')
+<style>
+    .rechercher-page {
+        margin-bottom: 60px;
+    }
+    
+    .rechercher-container {
+        padding-top: 100px;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: var(--spacing-2xl);
+    }
+    
+    .page-title {
+        display: block;
+    }
+    
+    @media (max-width: 768px) {
+        .rechercher-page {
+            margin-bottom: 40px;
+        }
+        
+        .rechercher-container {
+            padding-top: 80px;
+        }
+        
+        .trajet .d-flex {
+            flex-direction: column !important;
+            gap: var(--spacing-sm) !important;
+            align-items: flex-start !important;
+        }
+        
+        .trajet .d-flex > div:last-child {
+            width: 100%;
+            justify-content: flex-start !important;
+        }
+        
+        .reserve-controls {
+            flex-direction: row !important;
+            width: 100% !important;
+            gap: var(--spacing-xs) !important;
+        }
+        
+        .reserve-controls select {
+            flex: 0 0 auto !important;
+        }
+        
+        .reserve-controls button {
+            flex: 1 !important;
+            white-space: nowrap !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .rechercher-page {
+            margin-bottom: 30px;
+        }
+        
+        .rechercher-container {
+            padding-top: 70px;
+        }
+        
+        .trajet .btn-favorite,
+        .trajet .btn-details {
+            min-height: 36px !important;
+            min-width: 36px !important;
+        }
+        
+        .trajet .reserve-controls select {
+            width: 60px !important;
+            max-width: 60px !important;
+        }
+        
+        .trajet .rating {
+            flex-wrap: wrap;
+            gap: 4px !important;
+        }
+        
+        .trajet .detail-item {
+            padding: 4px var(--spacing-xs) !important;
+            font-size: 0.8rem !important;
+        }
+        
+        .trajet .detail-item i {
+            font-size: 0.75rem !important;
+        }
+        
+        .trajet .prix {
+            font-size: var(--font-size-xl) !important;
+        }
+        
+        .commentsWrapper {
+            margin-top: var(--spacing-sm);
+        }
+        
+        .comments {
+            font-size: var(--font-size-lg) !important;
+            padding: var(--spacing-xs) !important;
+            cursor: pointer;
+        }
+    }
+    
+    @media (max-width: 360px) {
+        .rechercher-container {
+            padding-top: 65px;
+        }
+        
+        .trajet .btn-reserve,
+        .trajet .btn-voir-details {
+            font-size: 0.7rem !important;
+            padding: 6px 8px !important;
+        }
+        
+        .trajet .places-select {
+            width: 50px !important;
+            max-width: 50px !important;
+            font-size: 0.75rem !important;
+        }
+    }
+</style>
+@endpush
+
 @push('scripts')
     @vite(['resources/js/rechercher.js'])
     <script>
@@ -11,10 +135,10 @@
 @endpush
 
 @section('content')
-    <div class="rechercher-page" style="margin-bottom: 60px;">
-        <div class="container" style="padding-top: 100px;">
-            <div class="page-header" style="text-align: center;">
-                <h1 class="page-title" style="display: block;">
+    <div class="rechercher-page">
+        <div class="container rechercher-container">
+            <div class="page-header">
+                <h1 class="page-title">
                     <i class="fa fa-search"></i> Rechercher des trajets
                 </h1>
                 <p class="page-subtitle">Trouvez le trajet idéal en quelques clics</p>
