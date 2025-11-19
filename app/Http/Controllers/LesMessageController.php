@@ -76,7 +76,7 @@ class LesMessageController extends Controller
             return redirect('/connexion');
         }
 
-        $messages = DB::table('LesMessages as m')
+        $messages = DB::table('lesmessages as m')
             ->select('m.*')
             ->where('m.IdExpediteur', $userId)
             ->orWhere('m.IdDestinataire', $userId)
