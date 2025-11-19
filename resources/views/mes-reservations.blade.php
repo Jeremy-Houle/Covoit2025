@@ -11,7 +11,7 @@
     <script>
         window.csrfToken = '{{ csrf_token() }}';
     </script>
-    @vite(['resources/js/reservations.js'])
+    @vite(['resources/js/reservations.js', 'resources/js/animations/reservations-animations.js'])
 @endpush
 
 @section('content')

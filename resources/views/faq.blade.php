@@ -2,6 +2,10 @@
 
 @section('title', 'FAQ - Covoit2025')
 
+@push('scripts')
+    @vite(['resources/js/animations/faq-animations.js'])
+@endpush
+
 @section('content')
 <section class="faq-hero">
     <div class="faq-hero-content">

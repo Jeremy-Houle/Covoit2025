@@ -2,6 +2,10 @@
 
 @section('title', 'Connexion - Covoit2025')
 
+@push('scripts')
+    @vite(['resources/js/animations/connexion-animations.js'])
+@endpush
+
 @push('styles')
 <style>
 

@@ -6,11 +6,44 @@
     <title>Covoit2025 - Présentation du Projet</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    @vite(['resources/js/presentation.js'])
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar {
+            width: 16px !important;
+            height: 16px !important;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%) !important;
+            border-radius: 8px !important;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%) !important;
+            border-radius: 8px !important;
+            border: 3px solid #f8fafc !important;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%) !important;
+            border-color: #ffffff !important;
+        }
+
+        ::-webkit-scrollbar-thumb:active {
+            background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%) !important;
+        }
+
+        html,
+        body,
+        * {
+            scrollbar-width: auto !important;
+            scrollbar-color: #2563eb #f8fafc !important;
         }
 
         body {
@@ -39,7 +72,6 @@
             }
         }
 
-        /* Hero Section */
         .hero {
             min-height: 100vh;
             display: flex;
@@ -981,7 +1013,7 @@
             const modalImg = document.getElementById('modalImage');
             modal.classList.add('active');
             modalImg.src = imageSrc;
-            modal.scrollTop = 0; 
+            modal.scrollTop = 0;
         }
 
         function closeModal() {
@@ -1010,36 +1042,6 @@
             });
         });
 
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.feature-card, .screenshot-card, .team-member').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.6s ease';
-            observer.observe(el);
-        });
     </script>
 </body>
 </html>

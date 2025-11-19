@@ -11,7 +11,7 @@
 @endpush
 
 @push('scripts')
-@vite(['resources/js/panier.js'])
+@vite(['resources/js/panier.js', 'resources/js/animations/panier-animations.js'])
 <script>
     window.csrfToken = '{{ csrf_token() }}';
     console.log('CSRF Token:', window.csrfToken);
@@ -372,7 +372,6 @@ function confirmerSuppression() {
     paiementInput.value = currentDeleteData.paiementId;
     form.appendChild(paiementInput);
     
-    // Fermer le modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
     if (modal) {
         modal.hide();
@@ -595,7 +594,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="confirmation-content">
                         <h6 class="confirmation-title">Supprimer ce trajet du panier ?</h6>
-                        <!-- <p class="confirmation-text" id="deleteTrajetInfo"> -->
                         </p>
                     </div>
                 </div>

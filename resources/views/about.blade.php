@@ -2,6 +2,10 @@
 
 @section('title', 'À propos')
 
+@push('scripts')
+    @vite(['resources/js/animations/about-animations.js'])
+@endpush
+
 @section('content')
 <section class="about-hero">
     <div class="about-hero-content">
@@ -488,7 +492,6 @@
     }
 }
 
-/* Touch optimizations */
 @media (hover: none) and (pointer: coarse) {
     .team-member {
         -webkit-tap-highlight-color: rgba(37, 99, 235, 0.1);

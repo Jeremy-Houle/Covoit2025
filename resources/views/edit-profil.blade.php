@@ -2,6 +2,10 @@
 
 @section('title', 'Modifier mon profil')
 
+@push('scripts')
+    @vite(['resources/js/animations/edit-profil-animations.js'])
+@endpush
+
 @push('styles')
 <style>
 

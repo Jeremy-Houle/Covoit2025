@@ -2,6 +2,10 @@
 
 @section('title', 'Profil ' . $user->Prenom . ' ' . $user->Nom)
 
+@push('scripts')
+    @vite(['resources/js/animations/profil-animations.js'])
+@endpush
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/profil.css') }}?v={{ time() }}">
 @endpush

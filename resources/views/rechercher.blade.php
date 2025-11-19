@@ -127,7 +127,7 @@
 @endpush
 
 @push('scripts')
-    @vite(['resources/js/rechercher.js'])
+    @vite(['resources/js/rechercher.js', 'resources/js/animations/rechercher-animations.js'])
     <script>
         window.csrfToken = '{{ csrf_token() }}';
         window.userRole = {!! json_encode(session('utilisateur_role', '')) !!};

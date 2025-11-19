@@ -2,6 +2,10 @@
 
 @section('title', 'Messages - Covoit2025')
 
+@push('scripts')
+    @vite(['resources/js/animations/messages-animations.js'])
+@endpush
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/messages.css') }}?v={{ time() }}">
 @endpush

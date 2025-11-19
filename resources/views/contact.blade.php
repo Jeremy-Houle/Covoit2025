@@ -2,6 +2,10 @@
 
 @section('title', 'Contact - Covoit2025')
 
+@push('scripts')
+    @vite(['resources/js/animations/contact-animations.js'])
+@endpush
+
 @push('styles')
 <style>
 .contact-page {

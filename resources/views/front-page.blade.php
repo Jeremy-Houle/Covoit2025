@@ -2,6 +2,10 @@
 
 @section('title', 'Accueil - Covoit2025')
 
+@push('scripts')
+    @vite(['resources/js/accueil.js'])
+@endpush
+
 @push('styles')
 <style>
 
