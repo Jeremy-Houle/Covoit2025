@@ -296,7 +296,7 @@ class CartController extends Controller
         if (strtolower($role) === 'conducteur') {
             $transactions = DB::table('historiquetransactions')
                 ->where('IdConducteur', $userId)
-                ->join('Utilisateurs', 'HistoriqueTransactions.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
+                ->join('utilisateurs', 'historiquetransactions.IdUtilisateur', '=', 'utilisateurs.IdUtilisateur')
                 ->select(
                     'HistoriqueTransactions.*',
                     'Utilisateurs.Nom as NomPassager',

@@ -112,7 +112,7 @@ public function update(Request $request)
                 ->map(function ($resa) {
                     $passagers = DB::table('reservations')
                         ->where('IdTrajet', $resa->IdTrajet)
-                        ->join('Utilisateurs', 'reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
+                        ->join('utilisateurs', 'reservations.IdPassager', '=', 'utilisateurs.IdUtilisateur')
                         ->select('Utilisateurs.Prenom', 'Utilisateurs.Nom')
                         ->get();
                     $resa->passagers = $passagers;
@@ -128,7 +128,7 @@ public function update(Request $request)
                 ->map(function ($trajet) {
                     $reservations = DB::table('reservations')
                         ->where('IdTrajet', $trajet->IdTrajet)
-                        ->join('Utilisateurs', 'reservations.IdPassager', '=', 'Utilisateurs.IdUtilisateur')
+                        ->join('utilisateurs', 'reservations.IdPassager', '=', 'utilisateurs.IdUtilisateur')
                         ->select('reservations.PlacesReservees', 'Utilisateurs.Prenom', 'Utilisateurs.Nom')
                         ->get();
                     $trajet->PlacesReservees = $reservations->sum('PlacesReservees');
@@ -136,7 +136,7 @@ public function update(Request $request)
 
                     $trajet->commentaires = DB::table('commentaires')
                         ->where('IdTrajet', $trajet->IdTrajet)
-                        ->join('Utilisateurs', 'Commentaires.IdUtilisateur', '=', 'Utilisateurs.IdUtilisateur')
+                        ->join('utilisateurs', 'commentaires.IdUtilisateur', '=', 'utilisateurs.IdUtilisateur')
                         ->select('Commentaires.Commentaire', 'Utilisateurs.Prenom', 'Utilisateurs.Nom')
                         ->get();
 
@@ -145,7 +145,7 @@ public function update(Request $request)
         }
 
         $messagesRecents = DB::table('lesmessages as m')
-            ->join('Utilisateurs as u', 'm.IdExpediteur', '=', 'u.IdUtilisateur')
+            ->join('utilisateurs as u', 'm.IdExpediteur', '=', 'u.IdUtilisateur')
             ->where('m.IdDestinataire', $userId)
             ->orderBy('m.DateEnvoi', 'desc')
             ->limit(5)

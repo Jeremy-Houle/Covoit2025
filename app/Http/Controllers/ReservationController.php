@@ -50,7 +50,7 @@ class ReservationController extends Controller
         } else {
             $reservations = DB::table('reservations as r')
                 ->join('trajets as t', 'r.IdTrajet', '=', 't.IdTrajet')
-                ->join('Utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
+                ->join('utilisateurs as u', 't.IdConducteur', '=', 'u.IdUtilisateur')
                 ->where('r.IdPassager', $utilisateurId)
                 ->select(
                     'r.IdReservation',
