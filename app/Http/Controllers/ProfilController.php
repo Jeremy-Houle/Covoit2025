@@ -75,10 +75,10 @@ public function update(Request $request)
         try {
             $emailTo = isset($changedFields['Courriel']) ? $oldUser->Courriel : $updatedUser->Courriel;
             
-            Mail::to($emailTo)->send(new InfoCompteModifieMail($updatedUser, $changedFields));
+            Mail::to($emailTo)->queue(new InfoCompteModifieMail($updatedUser, $changedFields));
             
             if (isset($changedFields['Courriel'])) {
-                Mail::to($updatedUser->Courriel)->send(new InfoCompteModifieMail($updatedUser, $changedFields));
+                Mail::to($updatedUser->Courriel)->queue(new InfoCompteModifieMail($updatedUser, $changedFields));
             }
         } catch (\Exception $e) {
             \Log::error('Erreur lors de l\'envoi de l\'email de modification: ' . $e->getMessage());

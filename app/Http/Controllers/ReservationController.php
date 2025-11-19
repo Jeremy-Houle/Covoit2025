@@ -123,7 +123,7 @@ class ReservationController extends Controller
                 $passager = DB::table('utilisateurs')->where('IdUtilisateur', $userId)->first();
                 if ($passager) {
                     $updatedReservation = DB::table('reservations')->where('IdReservation', $id)->first();
-                    Mail::to($passager->Courriel)->send(
+                    Mail::to($passager->Courriel)->queue(
                         new TrajetConfirmeMail($trajet, $passager, $updatedReservation, 'modified')
                     );
                 }
@@ -155,7 +155,7 @@ class ReservationController extends Controller
 
         try {
             if ($passager && $trajet) {
-                Mail::to($passager->Courriel)->send(
+                Mail::to($passager->Courriel)->queue(
                     new ReservationAnnuleeParPassagerMail($trajet, $passager, $reservation)
                 );
             }

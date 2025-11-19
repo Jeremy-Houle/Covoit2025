@@ -378,7 +378,7 @@ class TrajetController extends Controller
                             'PlacesReservees' => $places
                         ];
 
-                        Mail::to($passager->Courriel)->send(
+                        Mail::to($passager->Courriel)->queue(
                             new TrajetConfirmeMail($trajetInfo, $passager, $reservation, 'confirmed')
                         );
                     }
@@ -436,7 +436,7 @@ class TrajetController extends Controller
 
         foreach ($reservations as $resa) {
             try {
-                Mail::to($resa->Courriel)->send(
+                Mail::to($resa->Courriel)->queue(
                     new TrajetAnnuleMail($trajetUpdated, $resa, $conducteur, 'modified')
                 );
             } catch (\Exception $e) {

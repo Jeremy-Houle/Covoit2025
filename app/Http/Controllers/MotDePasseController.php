@@ -41,7 +41,7 @@ class MotDePasseController extends Controller
         ]);
 
         try {
-            Mail::to($request->email)->send(new ReinitialiserMotDePasseMail($token, $request->email));
+            Mail::to($request->email)->queue(new ReinitialiserMotDePasseMail($token, $request->email));
             return back()->with('success', 'Un email de réinitialisation a été envoyé à votre adresse.');
         } catch (\Exception $e) {
             \Log::error('Erreur lors de l\'envoi de l\'email de réinitialisation: ' . $e->getMessage());
