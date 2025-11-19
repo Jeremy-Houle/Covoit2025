@@ -33,7 +33,7 @@ public function update(Request $request)
     $request->validate([
         'Prenom' => 'required|string|max:50',
         'Nom' => 'required|string|max:50',
-        'Courriel' => 'required|email|unique:Utilisateurs,Courriel,' . $userId . ',IdUtilisateur',
+        'Courriel' => 'required|email|unique:utilisateurs,Courriel,' . $userId . ',IdUtilisateur',
         'MotDePasse' => 'nullable|min:6|confirmed',
         'Role' => 'required|in:Passager,Conducteur',
     ]);
