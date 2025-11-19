@@ -88,7 +88,8 @@ class AuthController extends Controller
                 ->first();
 
             try {
-                Mail::to($courriel)->send(new BienvenueMail($nouvelUtilisateur));
+                // Envoyer l'email en queue (asynchrone) pour ne pas bloquer l'utilisateur
+                Mail::to($courriel)->queue(new BienvenueMail($nouvelUtilisateur));
             } catch (\Exception $e) {
                 \Log::error('Erreur lors de l\'envoi de l\'email de bienvenue: ' . $e->getMessage());
             }
